@@ -12,5 +12,8 @@ namespace JESUIS.Editor.Settings
 
         public static readonly Color TAB_BAR_COLOR = new Color(0.23529411764705882f, 0.23529411764705882f, 0.23529411764705882f);
         public static readonly Color TAB_BAR_TRIM_COLOR = new Color(0.13725490196078433f, 0.13725490196078433f, 0.13725490196078433f);
+
+        public static readonly Color TAB_DROPDOWN_COLOR = new Color(0.23529411764705882f, 0.23529411764705882f, 0.23529411764705882f);
+        public static readonly Color TAB_DROPDOWN_HOVER_COLOR = new Color(0.27450980392156865f, 0.27450980392156865f, 0.27450980392156865f);
     }
 }
