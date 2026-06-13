@@ -1,6 +1,6 @@
 using UnityEngine.UIElements;
 
-namespace JESUIS.Editor.Elements.Common.Layout.TabBarElements
+namespace JESUIS.Editor.Elements.Common.Layout.TabBarWidgets
 {
     public class TabElement : VisualElement
     {

@@ -1,4 +1,4 @@
-using JESUIS.Editor.Elements.Common.Layout.TabBarElements;
+using JESUIS.Editor.Elements.Common.Layout.TabBarWidgets;
 using UnityEngine.UIElements;
 
 namespace JESUIS.Editor.Elements.Common.Layout
