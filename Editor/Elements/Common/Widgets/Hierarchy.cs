@@ -13,21 +13,19 @@ namespace JESUIS.Editor.Elements.Common.Widgets
     {
         public const string HierarchyAssetPath = "Assets/JESUIS/Editor/Resources/Icons/Hierarchy/";
 
-        Func<HierarchyItem, IEnumerable<NamedAction>> onRightClick;
-
         public HierarchyItem RootItem { get; private set; }
+        public HierarchyItem SelectedItem { get; private set; }
 
-        public Hierarchy(object rootObject, Func<HierarchyItem, IEnumerable<NamedAction>> onRightClick)
+
+        public Hierarchy(object rootObject, Func<HierarchyItem, IEnumerable<NamedAction>> onRightClick, Action<HierarchyItem> onElementClick)
         {
-            this.onRightClick = onRightClick;
-
             style.left = 0;
             style.top = 0;
             style.width = Length.Percent(100);
             style.height = Length.Percent(100);
             style.backgroundColor = Colors.PANEL_COLOR;
 
-            RootItem = new HierarchyItem(rootObject, onRightClick, AssetDatabase.LoadAssetAtPath<Texture2D>(Path.Combine(HierarchyAssetPath + "Root.png")), true);
+            RootItem = new HierarchyItem(rootObject, onRightClick, onElementClick, AssetDatabase.LoadAssetAtPath<Texture2D>(Path.Combine(HierarchyAssetPath + "Root.png")), true);
             RootItem.SetHierarchyOwner(this);
             
             RebuildListVisuals();
@@ -46,6 +44,20 @@ namespace JESUIS.Editor.Elements.Common.Widgets
                 index++;
             }
         }
+
+        public void SetSelectedItem(HierarchyItem hierarchyItem)
+        {
+            if (SelectedItem != null)
+            {
+                SelectedItem.SetSelectedState(false);
+            }
+
+            SelectedItem = hierarchyItem;
+            if (SelectedItem != null)
+            {
+                SelectedItem.SetSelectedState(true);
+            }
+        }
     };
 
     public class HierarchyItem : VisualElement
@@ -61,6 +73,7 @@ namespace JESUIS.Editor.Elements.Common.Widgets
 
         Widgets.Hierarchy ownerHierarchy;
         Func<HierarchyItem, IEnumerable<NamedAction>> onRightClick;
+        Action<HierarchyItem> onClick;
 
         public HierarchyItem Parent { get; private set; }
         public List<HierarchyItem> ChildItems { get; private set; }
@@ -71,17 +84,20 @@ namespace JESUIS.Editor.Elements.Common.Widgets
         CollapseIcon collapseIcon;
 
         int depth;
+        bool isSelected = false;
 
         public object TargetObject { get; private set; }
 
-        public HierarchyItem(object targetObject, Func<HierarchyItem, IEnumerable<NamedAction>> onRightClick, bool isRoot = false) : this(targetObject, onRightClick, null, isRoot)
+        public HierarchyItem(object targetObject, Func<HierarchyItem, IEnumerable<NamedAction>> onRightClick, Action<HierarchyItem> onClick, bool isRoot = false) 
+            : this(targetObject, onRightClick, onClick, null, isRoot)
         {
         }
 
-        public HierarchyItem(object targetObject, Func<HierarchyItem, IEnumerable<NamedAction>> onRightClick, Texture iconTexture, bool isRoot = false)
+        public HierarchyItem(object targetObject, Func<HierarchyItem, IEnumerable<NamedAction>> onRightClick, Action<HierarchyItem> onClick, Texture iconTexture, bool isRoot = false)
         {
             this.isRoot = isRoot;
             this.onRightClick = onRightClick;
+            this.onClick = onClick;
             this.Parent = null;
 
             ChildItems = new List<HierarchyItem>();
@@ -159,6 +175,19 @@ namespace JESUIS.Editor.Elements.Common.Widgets
             }
         }
 
+        public void SetSelectedState(bool isSelected)
+        {
+            this.isSelected = isSelected;
+            if (isSelected)
+            {
+                SetHoveredStyle();
+            }
+            else
+            {
+                SetDefaultStyle();
+            }
+        }
+
         void AddCollapseIcon()
         {
             collapseIcon = new CollapseIcon(OnCollapseChanged);
@@ -216,20 +245,44 @@ namespace JESUIS.Editor.Elements.Common.Widgets
         {
             if (isRoot)
             {
-                style.backgroundColor = Colors.HIERARCHY_ROOT_ITEM_UNHIGHLIGHTED;
+                if (isSelected)
+                    style.backgroundColor = Colors.HIERARCHY_ROOT_ITEM_SELECTED;
+                else
+                    style.backgroundColor = Colors.HIERARCHY_ROOT_ITEM_UNHIGHLIGHTED;
+
                 style.borderBottomColor = Colors.HIERARCHY_ROOT_ITEM_TRIM;
                 style.borderBottomWidth = 1;
             }
             else
-                style.backgroundColor = Colors.HIERARCHY_ITEM_UNHIGHLIGHTED;
+            {
+                if (isSelected)
+                    style.backgroundColor = Colors.HIERARCHY_ITEM_SELECTED;
+                else
+                    style.backgroundColor = Colors.HIERARCHY_ITEM_UNHIGHLIGHTED;
+            }
+        }
+
+        void SetHoveredStyle()
+        {
+            if (isRoot)
+            {
+                if (isSelected)
+                    style.backgroundColor = Colors.HIERARCHY_ROOT_ITEM_SELECTED;
+                else
+                    style.backgroundColor = Colors.HIERARCHY_ROOT_ITEM_HIGHLIGHTED;
+            }
+            else
+            {
+                if (isSelected)
+                    style.backgroundColor = Colors.HIERARCHY_ITEM_SELECTED;
+                else
+                    style.backgroundColor = Colors.HIERARCHY_ITEM_HIGHLIGHTED;
+            }
         }
 
         void OnMouseEnter(PointerEnterEvent pointerEnterEvent)
         {
-            if (isRoot)
-                style.backgroundColor = Colors.HIERARCHY_ROOT_ITEM_HIGHLIGHTED;
-            else
-                style.backgroundColor = Colors.HIERARCHY_ITEM_HIGHLIGHTED;
+            SetHoveredStyle();
         }
 
         void OnMouseLeave(PointerLeaveEvent pointerLeaveEvent)
@@ -246,6 +299,12 @@ namespace JESUIS.Editor.Elements.Common.Widgets
                     ContextMenuBuilder.BuildMenu(onRightClick(this));
                 }
                 pointerDownEvent.StopImmediatePropagation();
+            }
+            else if (pointerDownEvent.button == 0)
+            {
+                onClick?.Invoke(this);
+                pointerDownEvent.StopImmediatePropagation();
+                ownerHierarchy.SetSelectedItem(this);
             }
         }
 

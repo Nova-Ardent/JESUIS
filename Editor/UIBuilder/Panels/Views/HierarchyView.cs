@@ -1,24 +1,27 @@
 using JESUIS.Editor.Elements.Common.Widgets;
 using JESUIS.Editor.Helpers;
+using JESUIS.Editor.Helpers.Utils;
 using JESUIS.Shared.ScreenData.ScreenDataTypes;
 using System.Collections.Generic;
-using UnityEngine.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
     public class HierarchyView : EditorViews
     {
         Shared.ScreenData.Screen screen;
+        ReactiveProperty<BaseElement> reactiveSelectedElement;
 
         public override Views Type { get => Views.Hierarchy; }
 
         Elements.Common.Widgets.Hierarchy editorHierarchy;
 
-        public HierarchyView(Shared.ScreenData.Screen screen)
+        public HierarchyView(Shared.ScreenData.Screen screen, ReactiveProperty<BaseElement> reactiveSelectedElement)
         {
             this.screen = screen;
-            editorHierarchy = new Elements.Common.Widgets.Hierarchy(screen.GetRootElement(), GetActions);
+            this.reactiveSelectedElement = reactiveSelectedElement;
+            editorHierarchy = new Elements.Common.Widgets.Hierarchy(screen.GetRootElement(), GetActions, OnElementClicked);
 
             style.left = 0;
             style.top = 0;
@@ -26,6 +29,14 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             style.height = Length.Percent(100);
 
             Add(editorHierarchy);
+        }
+
+        void OnElementClicked(HierarchyItem item)
+        {
+            if (item.TargetObject is BaseElement baseElement)
+            {
+                reactiveSelectedElement.Value = baseElement;
+            }
         }
 
         IEnumerable<NamedAction> GetActions(HierarchyItem item)
@@ -49,7 +60,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             if (item.TargetObject is BaseElement baseElement)
             {
                 baseElement.AddChild(newEmpty);
-                item.AddChild(new HierarchyItem(newEmpty, GetActions));
+                item.AddChild(new HierarchyItem(newEmpty, GetActions, OnElementClicked));
                 editorHierarchy.RebuildListVisuals();
             }
             else
