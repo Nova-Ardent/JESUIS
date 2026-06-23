@@ -52,6 +52,11 @@ namespace JESUIS.Editor.Elements.Common.Layout.TabBarWidgets
             RegisterCallback<MouseDownEvent>(OnMouseDown);
         }
 
+        public void SetOption(int index)
+        {
+            OnChange(index);
+        }
+
         void InitDropDownIcon()
         {
             dropDownIcon = new Image();
@@ -96,6 +101,11 @@ namespace JESUIS.Editor.Elements.Common.Layout.TabBarWidgets
 
         public void OnChange(int optionSelected)
         {
+            if (optionSelected < 0 || optionSelected >= options.Count)
+            {
+                return;
+            }
+
             if (staticName != null)
             {
                 return;
