@@ -12,13 +12,16 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         Action<EditorViews.Views> onViewChanged;
 
         public EditorViews NoneView { get => new EditorViews(); }
+        
         public HierarchyView CurrentHierarchyView { get; private set; }
+        public InspectorView CurrentInspectorView { get; private set; }
 
         public ViewManager(EditorState editorState)
         {
             this.editorState = editorState;
 
             CurrentHierarchyView = new HierarchyView(editorState);
+            CurrentInspectorView = new InspectorView(editorState);
         }
 
         public EditorViews GetView(EditorViews.Views view, bool triggerOnChange = true)
@@ -28,6 +31,9 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case EditorViews.Views.Hierarchy:
                     onViewChanged?.Invoke(view);
                     return CurrentHierarchyView;
+                case EditorViews.Views.Inspector:
+                    onViewChanged?.Invoke(view);
+                    return CurrentInspectorView;
                 default:
                     return NoneView;
             }

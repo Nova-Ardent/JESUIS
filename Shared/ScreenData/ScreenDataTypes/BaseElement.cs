@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace JESUIS.Shared.ScreenData.ScreenDataTypes
 {
     [System.Serializable]
     public class BaseElement
     {
-        protected string Name;
+        [SerializeField] protected string Name;
 
         List<BaseElement> children = new List<BaseElement>();
 
