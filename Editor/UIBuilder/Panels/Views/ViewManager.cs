@@ -1,4 +1,5 @@
 using JESUIS.Editor.Helpers.Utils;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.ScreenDataTypes;
 using System;
 
@@ -6,20 +7,18 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
     public class ViewManager
     {
-        Shared.ScreenData.Screen screenData;
-
-        ReactiveProperty<BaseElement> selectedElement = new ReactiveProperty<BaseElement>(null);
+        EditorState editorState;
 
         Action<EditorViews.Views> onViewChanged;
 
         public EditorViews NoneView { get => new EditorViews(); }
         public HierarchyView CurrentHierarchyView { get; private set; }
 
-        public ViewManager(Shared.ScreenData.Screen screenData)
+        public ViewManager(EditorState editorState)
         {
-            this.screenData = screenData;
+            this.editorState = editorState;
 
-            CurrentHierarchyView = new HierarchyView(screenData, selectedElement);
+            CurrentHierarchyView = new HierarchyView(editorState);
         }
 
         public EditorViews GetView(EditorViews.Views view, bool triggerOnChange = true)

@@ -1,6 +1,7 @@
 using JESUIS.Editor.Elements.Common.Layout;
 using JESUIS.Editor.Elements.Common.Window;
 using JESUIS.Editor.Helpers;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels;
 using JESUIS.Editor.UIBuilder.Panels.Views;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace JESUIS.Editor.UIBuilder
 {
     public class MainWindow : BaseWindow<MainWindow>
     {
-        Shared.ScreenData.Screen screenData;
+        EditorState editorState = new EditorState();
 
         ViewManager viewManager;
         SplittablePanel mainPanel;
@@ -23,8 +24,8 @@ namespace JESUIS.Editor.UIBuilder
 
         protected override void CreateGUI()
         {
-            screenData = new Shared.ScreenData.Screen();
-            viewManager = new ViewManager(screenData);
+            editorState.CurrentScreen = new Shared.ScreenData.Screen();
+            viewManager = new ViewManager(editorState);
 
             mainPanel = new SplittablePanel();
             mainPanel.SetToInitialState(new UIEditorPanel(viewManager));

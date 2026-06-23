@@ -1,6 +1,7 @@
 using JESUIS.Editor.Elements.Common.Widgets;
 using JESUIS.Editor.Helpers;
 using JESUIS.Editor.Helpers.Utils;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.ScreenDataTypes;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,18 +11,16 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
     public class HierarchyView : EditorViews
     {
-        Shared.ScreenData.Screen screen;
-        ReactiveProperty<BaseElement> reactiveSelectedElement;
+        EditorState editorState;
 
         public override Views Type { get => Views.Hierarchy; }
 
         Elements.Common.Widgets.Hierarchy editorHierarchy;
 
-        public HierarchyView(Shared.ScreenData.Screen screen, ReactiveProperty<BaseElement> reactiveSelectedElement)
+        public HierarchyView(EditorState editorState)
         {
-            this.screen = screen;
-            this.reactiveSelectedElement = reactiveSelectedElement;
-            editorHierarchy = new Elements.Common.Widgets.Hierarchy(screen.GetRootElement(), GetActions, OnElementClicked);
+            this.editorState = editorState;
+            editorHierarchy = new Elements.Common.Widgets.Hierarchy(editorState.CurrentScreen.GetRootElement(), GetActions, OnElementClicked);
 
             style.left = 0;
             style.top = 0;
@@ -35,7 +34,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         {
             if (item.TargetObject is BaseElement baseElement)
             {
-                reactiveSelectedElement.Value = baseElement;
+                editorState.SelectedElement.Value = baseElement;
             }
         }
 
