@@ -5,13 +5,14 @@ using JESUIS.Editor.UIBuilder.Panels;
 using JESUIS.Editor.UIBuilder.Panels.Views;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
-
 
 namespace JESUIS.Editor.UIBuilder
 {
     public class MainWindow : BaseWindow<MainWindow>
     {
+        Shared.ScreenData.Screen screenData;
+
+        ViewManager viewManager;
         SplittablePanel mainPanel;
 
         [MenuItem("JESUIS/UI Builder")]
@@ -22,8 +23,11 @@ namespace JESUIS.Editor.UIBuilder
 
         protected override void CreateGUI()
         {
+            screenData = new Shared.ScreenData.Screen();
+            viewManager = new ViewManager(screenData);
+
             mainPanel = new SplittablePanel();
-            mainPanel.SetToInitialState(new UIEditorPanel());
+            mainPanel.SetToInitialState(new UIEditorPanel(viewManager));
 
             rootVisualElement.Add(mainPanel);
             base.CreateGUI();
@@ -31,8 +35,8 @@ namespace JESUIS.Editor.UIBuilder
 
         protected override IEnumerable<NamedAction> GetContextMenuOptions()
         {
-            yield return new NamedAction("Split Vertically", () => mainPanel.SplitVertically(new UIEditorPanel()), true);
-            yield return new NamedAction("Split Horizontally", () => mainPanel.SplitHorizontally(new UIEditorPanel()), true);
+            yield return new NamedAction("Split Vertically", () => mainPanel.SplitVertically(new UIEditorPanel(viewManager)), true);
+            yield return new NamedAction("Split Horizontally", () => mainPanel.SplitHorizontally(new UIEditorPanel(viewManager)), true);
         }
     }
 }

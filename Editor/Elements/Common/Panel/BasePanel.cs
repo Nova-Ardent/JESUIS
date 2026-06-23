@@ -20,7 +20,7 @@ namespace JESUIS.Editor.Elements.Common.Panel
             style.height = height;
         }
 
-        public void Resize(float width, float height)
+        public virtual void Resize(float width, float height)
         {
             style.width = width;
             style.height = height;

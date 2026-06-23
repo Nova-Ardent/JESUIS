@@ -14,6 +14,11 @@ namespace JESUIS.Shared.ScreenData.ScreenDataTypes
             children.Add(child);
         }
 
+        public void RemoveChild(BaseElement child)
+        {
+            children.Remove(child);
+        }
+
         public override string ToString()
         {
             return Name;

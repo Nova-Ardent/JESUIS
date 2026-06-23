@@ -42,6 +42,17 @@ namespace JESUIS.Editor.Elements.Common.Widgets
             icon.style.rotate = new StyleRotate(new Rotate(IsCollapsed ? -90 : 0));
         }
 
+        public void SetState(bool collapsed)
+        {
+            IsCollapsed = collapsed;
+            UpdateIcon();
+        }
+
+        public bool GetState()
+        {
+            return IsCollapsed;
+        }
+
         public void Toggle()
         {
             IsCollapsed = !IsCollapsed;
