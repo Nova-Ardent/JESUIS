@@ -18,10 +18,13 @@ namespace JESUIS.Editor.Elements.Common.Input
         Label label;
         TextField inputField;
 
+        T defaultValue;
         public T CurrentValue { get; private set; }
+        
+        
         Action<T> onValueChanged;
 
-        public InputFieldElement(string labelText, T defaultValue)
+        public InputFieldElement(string labelText, T defaultValue = default(T))
         {
             style.width = Length.Percent(TOTAL_PERCENT_WIDTH);
             style.height = HEIGHT;
@@ -51,19 +54,14 @@ namespace JESUIS.Editor.Elements.Common.Input
             inputField.RegisterValueChangedCallback(OnValueChanged);
 
             Add(inputField);
-            ChangePlaceHolder(defaultValue);
 
             CurrentValue = defaultValue;
+            this.defaultValue = defaultValue;
         }
 
         public void ChangeLabel(string newLabel)
         {
             label.text = newLabel;
-        }
-
-        public void ChangePlaceHolder(T value)
-        {
-            inputField.textEdition.placeholder = value.ToString();
         }
 
         public void SetValue(T newValue)
@@ -93,6 +91,14 @@ namespace JESUIS.Editor.Elements.Common.Input
 
         void OnValueChanged(ChangeEvent<string> changeEvent)
         {
+            if (string.IsNullOrEmpty(changeEvent.newValue))
+            {
+                inputField.value = defaultValue.ToString();
+                CurrentValue = defaultValue;
+                onValueChanged?.Invoke(CurrentValue);
+                return;
+            }
+
             if (!IsValueValid(changeEvent.newValue))
             {
                 inputField.value = changeEvent.previousValue;
