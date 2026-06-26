@@ -220,10 +220,15 @@ namespace JESUIS.Editor.Elements.Common.Widgets
             }
         }
 
+        public void UpdateLabel()
+        {
+            label.text = TargetObject.ToString();
+        }
+
         void SetLabel(string text)
         {
             label = new Label(text);
-            label.text = text;
+            UpdateLabel();
             label.style.position = Position.Absolute;
             label.style.unityTextAlign = TextAnchor.MiddleLeft;
             label.style.height = HEIGHT;

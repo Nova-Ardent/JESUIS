@@ -97,6 +97,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             textField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
+                editorState.TriggerSelectedElementIsDirty(this);
             });
             return textField;
         }
@@ -108,6 +109,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             intField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
+                editorState.TriggerSelectedElementIsDirty(this);
             });
             return intField;
         }
@@ -119,6 +121,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             floatField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
+                editorState.TriggerSelectedElementIsDirty(this);
             });
             return floatField;
         }
@@ -130,6 +133,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             vectorField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
+                editorState.TriggerSelectedElementIsDirty(this);
             });
             return vectorField;
         }
@@ -141,6 +145,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             vectorField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
+                editorState.TriggerSelectedElementIsDirty(this);
             });
             return vectorField;
         }

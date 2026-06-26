@@ -12,6 +12,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
     public class HierarchyView : EditorViews
     {
         EditorState editorState;
+        HierarchyItem hierarchyItem;
 
         public override Views Type { get => Views.Hierarchy; }
 
@@ -21,6 +22,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         {
             this.editorState = editorState;
             editorHierarchy = new Elements.Common.Widgets.Hierarchy(editorState.CurrentScreen.GetRootElement(), GetActions, OnElementClicked);
+            editorState.ListenToSelectedElementIsDirty(OnSelectedElementIsDirty);
 
             style.left = 0;
             style.top = 0;
@@ -34,8 +36,17 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         {
             if (item.TargetObject is BaseElement baseElement)
             {
+                hierarchyItem = item;
                 editorState.SelectedElement.Value = baseElement;
             }
+        }
+
+        void OnSelectedElementIsDirty(EditorViews triggeringView)
+        {
+            if (triggeringView == this)
+                return;
+
+            hierarchyItem.UpdateLabel();
         }
 
         IEnumerable<NamedAction> GetActions(HierarchyItem item)
