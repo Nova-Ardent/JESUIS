@@ -110,12 +110,30 @@ namespace JESUIS.Editor.UIBuilder.Panels
             }
         }
 
+        private void CollapseWindow()
+        {
+            var splitPanel = this?.parent?.parent;
+            if (splitPanel is SplittablePanel splittablePanel && splittablePanel != null && splittablePanel.IsSplit)
+            {
+                if (this.parent is SplittablePanel parentPanel)
+                {
+                    splittablePanel.Collapse(parentPanel, true);
+                }
+            }
+        }
+
         protected override IEnumerable<NamedAction> GetContextMenuOptions()
         {
             if (this.parent is SplittablePanel panel)
             {
                 yield return new NamedAction("Split Vertically", SplitVertically, true);
                 yield return new NamedAction("Split Horizontally", SplitHorizontally, true);
+
+                var splitPanel = this?.parent?.parent;
+                if (splitPanel is SplittablePanel splittablePanel && splittablePanel != null && splittablePanel.IsSplit)
+                {
+                    yield return new NamedAction("Collapse", CollapseWindow, true);
+                }
             }
         }
     }

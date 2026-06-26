@@ -27,12 +27,16 @@ namespace JESUIS.Editor.Elements.Common.Layout
 
         public void SetToInitialState<T>(T element) where T : VisualElement, IResizable
         {
+            SetToInitialState((VisualElement)element);
+        }
+
+        void SetToInitialState(VisualElement element)
+        {
             if (elementOne != null)
             {
                 Remove(elementOne);
+                elementOne = null;
             }
-            elementOne = element;
-            Add(elementOne);
 
             if (elementTwo != null)
             {
@@ -46,8 +50,18 @@ namespace JESUIS.Editor.Elements.Common.Layout
                 panelBar = null;
             }
 
+            IsSplit = false;
+            isSplitVertically = false;
+            
+            elementOne = element;
+            elementOne.style.left = 0;
+            elementOne.style.top = 0;
+            
             IResizable resizable = elementOne as IResizable;
             resizable.Resize(_width, _height);
+
+            Add(elementOne);
+
         }
 
         public void SplitVertically<T>(T newElement) where T : VisualElement, IResizable
@@ -80,6 +94,62 @@ namespace JESUIS.Editor.Elements.Common.Layout
             SetStyleForHorizontalSplit();
         }
 
+        public void Collapse<T>(T elementToRmove, bool repairEmptyChains) where T : VisualElement, IResizable
+        {
+            if (elementToRmove == elementOne)
+            {
+                SetToInitialState(elementTwo);
+                if (repairEmptyChains)
+                    RepairEmptyChains();
+            }
+            else if (elementToRmove == elementTwo)
+            {
+                SetToInitialState(elementOne);
+                if (repairEmptyChains)
+                    RepairEmptyChains();
+            }
+            else
+            {
+                UnityEngine.Debug.LogError("Element to remove is not part of this SplittablePanel.");
+            }
+        }
+
+        // if you're parenting every child with a splittable panel, before adding them, it can create double-chains
+        // that need to be repaired.
+        // or else it'll create useless empty splittable panels like so:
+        // root
+        //  | split
+        //      | split <-- the problem
+        //          | editor
+        //  | split
+        //      | editor
+        void RepairEmptyChains()
+        {
+            if (parent is SplittablePanel parentSplit)
+            {
+                if (parentSplit.elementOne == this)
+                {
+                    parentSplit.Remove(parentSplit.elementOne);
+                    parentSplit.elementOne = elementOne;
+                    parentSplit.Add(elementOne);
+
+                    parentSplit.panelBar.BringToFront();
+
+                    parentSplit.Resize(parentSplit._width, parentSplit._height);
+                }
+                else if (parentSplit.elementTwo == this)
+                {
+                    parentSplit.Remove(parentSplit.elementTwo);
+                    parentSplit.elementTwo = elementOne;
+                    parentSplit.Add(elementOne);
+
+                    parentSplit.panelBar.BringToFront();
+
+                    parentSplit.Resize(parentSplit._width, parentSplit._height);
+                }
+            }
+        }
+
         public void Resize(float width, float height)
         {
             _width = width;
@@ -93,11 +163,6 @@ namespace JESUIS.Editor.Elements.Common.Layout
                 if (elementOne is IResizable resizableOne)
                 {
                     resizableOne.Resize(width, height);
-                }
-
-                if (elementTwo is IResizable resizableTwo)
-                {
-                    resizableTwo.Resize(width, height);
                 }
             }
             else
