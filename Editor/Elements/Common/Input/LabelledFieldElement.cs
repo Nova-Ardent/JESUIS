@@ -10,12 +10,15 @@ namespace JESUIS.Editor.Elements.Common.Input
         public const int DEFAULT_INPUT_FIELD_PERCENT_WIDTH = 60;
         public const int DEFAULT_LABEL_PADDING_LEFT = 25;
 
+        public const int SUB_ELEMENT_TOTAL_PERCENT_WIDTH = 100;
+        public const int SUB_ELEMENT_LABEL_WIDTH = 15;
+
         public const int HEIGHT = 20;
 
         Label label;
         protected VisualElement FieldContainer {  get; private set; }
 
-        public LabelledFieldElement(string labelText)
+        public LabelledFieldElement(string labelText, bool isSubElement = false)
         {
             style.width = Length.Percent(DEFAULT_TOTAL_PERCENT_WIDTH);
             style.height = HEIGHT;
@@ -25,19 +28,39 @@ namespace JESUIS.Editor.Elements.Common.Input
             label.style.left = 0;
             label.style.top = 0;
 
-            label.style.width = Length.Percent(DEFAULT_LABEL_PERCENT_WIDTH);
             label.style.height = HEIGHT;
             label.style.unityTextAlign = TextAnchor.MiddleLeft;
-            label.style.paddingLeft = DEFAULT_LABEL_PADDING_LEFT;
+            if (isSubElement)
+            {
+                label.style.width = SUB_ELEMENT_LABEL_WIDTH;
+            }
+            else
+            {
+                label.style.width = Length.Percent(DEFAULT_LABEL_PERCENT_WIDTH);
+                label.style.paddingLeft = DEFAULT_LABEL_PADDING_LEFT;
+            }
+
             Add(label);
 
             FieldContainer = new VisualElement();
             FieldContainer.style.position = Position.Absolute;
-            FieldContainer.style.left = Length.Percent(DEFAULT_LABEL_PERCENT_WIDTH);
-            FieldContainer.style.top = 0;
 
-            FieldContainer.style.width = Length.Percent(DEFAULT_INPUT_FIELD_PERCENT_WIDTH);
-            FieldContainer.style.height = HEIGHT;
+            if (isSubElement)
+            {
+                FieldContainer.style.left = 0;
+                FieldContainer.style.top = 0;
+                FieldContainer.style.paddingLeft = SUB_ELEMENT_LABEL_WIDTH;
+                FieldContainer.style.width = Length.Percent(100);
+                FieldContainer.style.height = HEIGHT;
+            }
+            else
+            {
+                FieldContainer.style.left = Length.Percent(DEFAULT_LABEL_PERCENT_WIDTH);
+                FieldContainer.style.top = 0;
+
+                FieldContainer.style.width = Length.Percent(DEFAULT_INPUT_FIELD_PERCENT_WIDTH);
+                FieldContainer.style.height = HEIGHT;
+            }
             Add(FieldContainer);
         }
 

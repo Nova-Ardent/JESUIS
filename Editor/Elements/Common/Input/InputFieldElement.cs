@@ -13,7 +13,7 @@ namespace JESUIS.Editor.Elements.Common.Input
         
         Action<T> onValueChanged;
 
-        public InputFieldElement(string labelText, T defaultValue = default(T)) : base(labelText)
+        public InputFieldElement(string labelText, T defaultValue = default(T), bool isSubElement = false) : base(labelText, isSubElement)
         {
             inputField = new TextField();
             
@@ -29,6 +29,12 @@ namespace JESUIS.Editor.Elements.Common.Input
 
             CurrentValue = defaultValue;
             this.defaultValue = defaultValue;
+        }
+
+        public void SetValueWithoutNotify(T newValue)
+        {
+            inputField.value = defaultValue.ToString();
+            CurrentValue = defaultValue;
         }
 
         public void SetValue(T newValue)
