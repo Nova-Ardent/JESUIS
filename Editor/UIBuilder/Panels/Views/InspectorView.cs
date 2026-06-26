@@ -6,6 +6,8 @@ using System.Reflection;
 using System;
 using UnityEngine.UIElements;
 using UnityEngine;
+using System.Linq;
+
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
@@ -35,7 +37,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
 
             float CurrentPosition = 0;
-            foreach (var field in GetAllFields(baseElement.GetType()))
+            foreach (var field in GetAllFields(baseElement.GetType()).DistinctBy(x => x.Name))
             {
                 VisualElement visualElement = GetInspectorElement(field, baseElement);
                 if (visualElement == null)
@@ -46,7 +48,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 visualElement.style.top = CurrentPosition;
                 Add(visualElement);
 
-                CurrentPosition = visualElement.style.height.value.value;
+                CurrentPosition += visualElement.style.height.value.value;
             }
         }
 
@@ -57,6 +59,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type == typeof(string): return RegisterStringInputField(fieldInfo, target);
                 case var type when type == typeof(int): return RegisterIntInputField(fieldInfo, target);
                 case var type when type == typeof(float): return RegisterFloatInputField(fieldInfo, target);
+                case var type when type == typeof(Vector2): return Vector2fFieldElement(fieldInfo, target);
+                case var type when type == typeof(Vector2Int): return Vector2iFieldElement(fieldInfo, target);
                 default:
                     Debug.LogWarning($"Could not create inspector element for field type {fieldInfo.FieldType}");
                     return null;
@@ -65,19 +69,24 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         IEnumerable<FieldInfo> GetAllFields(Type type)
         {
-            foreach (var fieldInfo in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            while (type != null)
             {
-                if (fieldInfo.IsPublic)
+                foreach (var fieldInfo in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
                 {
-                    yield return fieldInfo;
-                    continue;
+                    if (fieldInfo.IsPublic)
+                    {
+                        yield return fieldInfo;
+                        continue;
+                    }
+
+                    if (fieldInfo.IsDefined(typeof(SerializeField), true))
+                    {
+                        yield return fieldInfo;
+                        continue;
+                    }
                 }
 
-                if (fieldInfo.IsDefined(typeof(SerializeField), true))
-                {
-                    yield return fieldInfo;
-                    continue;
-                }
+                type = type.BaseType;
             }
         }
 
@@ -112,6 +121,28 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 info.SetValue(target, newText);
             });
             return floatField;
+        }
+
+        VisualElement Vector2fFieldElement(FieldInfo info, object target)
+        {
+            Vector2fFieldElement vectorField = new Vector2fFieldElement(info.Name);
+            vectorField.SetValueWithoutNotify((Vector2)info.GetValue(target));
+            vectorField.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+            });
+            return vectorField;
+        }
+
+        VisualElement Vector2iFieldElement(FieldInfo info, object target)
+        {
+            Vector2iFieldElement vectorField = new Vector2iFieldElement(info.Name);
+            vectorField.SetValueWithoutNotify((Vector2Int)info.GetValue(target));
+            vectorField.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+            });
+            return vectorField;
         }
     }
 }

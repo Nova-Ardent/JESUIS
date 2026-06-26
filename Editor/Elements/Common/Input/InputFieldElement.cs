@@ -33,8 +33,8 @@ namespace JESUIS.Editor.Elements.Common.Input
 
         public void SetValueWithoutNotify(T newValue)
         {
-            inputField.value = defaultValue.ToString();
-            CurrentValue = defaultValue;
+            inputField.value = newValue.ToString();
+            CurrentValue = newValue;
         }
 
         public void SetValue(T newValue)
@@ -81,5 +81,57 @@ namespace JESUIS.Editor.Elements.Common.Input
             CurrentValue = Convert(changeEvent.newValue);
             onValueChanged?.Invoke(CurrentValue);
         }
+    }
+
+    public abstract class InputFieldElement<I, J> : LabelledFieldElement
+    {
+        protected InputFieldElement<I> input1;
+        protected InputFieldElement<J> input2;
+
+        public InputFieldElement(string labelText, string subLabel1, string subLabel2) : this(labelText, subLabel1, default(I), subLabel2, default(J))
+        {
+        }
+
+        public InputFieldElement(string labelText, string subLabel1, I default1, string subLabel2, J default2) : base(labelText)
+        {
+            input1 = CreateInputOne(subLabel1, default1);
+            input1.style.position = Position.Absolute;
+            input1.style.width = Length.Percent(50);
+            input1.style.height = Length.Percent(100);
+            input1.style.left = 0;
+            input1.style.top = 0;
+            input1.RegisterOnValueChanged(OnValueOneChanged);
+            FieldContainer.Add(input1);
+
+            input2 = CreateInputTwo(subLabel2, default2);
+            input2.style.position = Position.Absolute;
+            input2.style.width = Length.Percent(50);
+            input2.style.height = Length.Percent(100);
+            input2.style.left = Length.Percent(50);
+            input2.style.top = 0;
+            input2.RegisterOnValueChanged(OnValueTwoChanged);
+            FieldContainer.Add(input2);
+        }
+
+        public void SetValuesWithoutNotify(I value1, J value2)
+        {
+            input1.SetValueWithoutNotify(value1);
+            input2.SetValueWithoutNotify(value2);
+        }
+
+        void OnValueOneChanged(I newValue)
+        {
+            OnChange(newValue, input2.CurrentValue);
+        }
+
+        void OnValueTwoChanged(J newValue)
+        {
+            OnChange(input1.CurrentValue, newValue);
+        }
+
+        protected abstract void OnChange(I i, J j);
+
+        protected abstract InputFieldElement<I> CreateInputOne(string subLabel, I defaultValue);
+        protected abstract InputFieldElement<J> CreateInputTwo(string subLabel, J defaultValue);
     }
 }
