@@ -11,6 +11,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             None,
             Hierarchy,
             Inspector,
+            Renderer,
         }
     }
 }
