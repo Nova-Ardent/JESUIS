@@ -13,7 +13,9 @@ namespace JESUIS.Editor.UIBuilder
     {
         EditorState editorState = new EditorState();
 
+        UIEditorLayoutManager uIEditorLayoutManager;
         ViewManager viewManager;
+
         SplittablePanel mainPanel;
 
         [MenuItem("JESUIS/UI Builder")]
@@ -25,19 +27,36 @@ namespace JESUIS.Editor.UIBuilder
         protected override void CreateGUI()
         {
             editorState.CurrentScreen = new Shared.ScreenData.Screen();
-            viewManager = new ViewManager(editorState);
 
+            uIEditorLayoutManager = new UIEditorLayoutManager();
+            viewManager = new ViewManager(editorState);
             mainPanel = new SplittablePanel();
-            mainPanel.SetToInitialState(new UIEditorPanel(viewManager));
+            uIEditorLayoutManager.SetRootElement(mainPanel);
+
+            if (!uIEditorLayoutManager.HasSavedLayout())
+            {
+                mainPanel.SetToInitialState(new UIEditorPanel(viewManager, uIEditorLayoutManager));
+            }
+            else
+            {
+                uIEditorLayoutManager.SetRootElement(mainPanel);
+                uIEditorLayoutManager.LoadLayout(viewManager);
+            }
 
             rootVisualElement.Add(mainPanel);
-            base.CreateGUI();
+            mainPanel.Resize(position.width, position.height);
+            base.CreateGUI(); 
+        }
+
+        private void OnInspectorUpdate()
+        {
+            uIEditorLayoutManager.SaveLayout();
         }
 
         protected override IEnumerable<NamedAction> GetContextMenuOptions()
         {
-            yield return new NamedAction("Split Vertically", () => mainPanel.SplitVertically(new UIEditorPanel(viewManager)), true);
-            yield return new NamedAction("Split Horizontally", () => mainPanel.SplitHorizontally(new UIEditorPanel(viewManager)), true);
+            yield return new NamedAction("Split Vertically", () => mainPanel.SplitVertically(new UIEditorPanel(viewManager, uIEditorLayoutManager)), true);
+            yield return new NamedAction("Split Horizontally", () => mainPanel.SplitHorizontally(new UIEditorPanel(viewManager, uIEditorLayoutManager)), true);
         }
     }
 }

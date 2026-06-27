@@ -13,11 +13,11 @@ namespace JESUIS.Editor.Elements.Common.Layout
         float _width = 0;
         float _height = 0;
 
-        public bool IsSplit { get; private set; } = false;
-        bool isSplitVertically = false;
+        public bool IsSplit { get ; private set; } = false;
+        public bool IsSplitVertically { get; private set; } = false;
 
-        VisualElement elementOne = null;
-        VisualElement elementTwo = null;
+        public VisualElement elementOne { get; private set; }
+        public VisualElement elementTwo { get; private set; }
 
         DragBar panelBar = null;
 
@@ -51,7 +51,7 @@ namespace JESUIS.Editor.Elements.Common.Layout
             }
 
             IsSplit = false;
-            isSplitVertically = false;
+            IsSplitVertically = false;
             
             elementOne = element;
             elementOne.style.left = 0;
@@ -75,7 +75,7 @@ namespace JESUIS.Editor.Elements.Common.Layout
             panelBar.RegisterCallbacks(SetStyleForVerticalSplit);
 
             IsSplit = true;
-            isSplitVertically = true;
+            IsSplitVertically = true;
             SetStyleForVerticalSplit();
         }
 
@@ -90,7 +90,7 @@ namespace JESUIS.Editor.Elements.Common.Layout
             panelBar.RegisterCallbacks(SetStyleForHorizontalSplit);
 
             IsSplit = true;
-            isSplitVertically = false;
+            IsSplitVertically = false;
             SetStyleForHorizontalSplit();
         }
 
@@ -133,7 +133,7 @@ namespace JESUIS.Editor.Elements.Common.Layout
                     parentSplit.elementOne = elementOne;
                     parentSplit.Add(elementOne);
 
-                    parentSplit.panelBar.BringToFront();
+                    parentSplit?.panelBar?.BringToFront();
 
                     parentSplit.Resize(parentSplit._width, parentSplit._height);
                 }
@@ -143,7 +143,7 @@ namespace JESUIS.Editor.Elements.Common.Layout
                     parentSplit.elementTwo = elementOne;
                     parentSplit.Add(elementOne);
 
-                    parentSplit.panelBar.BringToFront();
+                    parentSplit?.panelBar?.BringToFront();
 
                     parentSplit.Resize(parentSplit._width, parentSplit._height);
                 }
@@ -169,7 +169,7 @@ namespace JESUIS.Editor.Elements.Common.Layout
             {
                 panelBar.Resize(_width, _height);
 
-                if (isSplitVertically)
+                if (IsSplitVertically)
                 {
                     panelBar.SetBounds(-_width / 2 + MIN_MAX_DRAGBAR_PADDING, _width / 2 - MIN_MAX_DRAGBAR_PADDING);
                     SetStyleForVerticalSplit();

@@ -12,14 +12,18 @@ namespace JESUIS.Editor.UIBuilder.Panels
 {
     public class UIEditorPanel : BasePanel
     {
+        UIEditorLayoutManager layoutManager;
         ViewManager viewManager;
 
         TabBar tabBar;
+        DropDown dropDown;
+
         VisualElement content;
         EditorViews currentView;
         
-        public UIEditorPanel(ViewManager viewManager) : this(viewManager, 0, 0)
+        public UIEditorPanel(ViewManager viewManager, UIEditorLayoutManager layoutManager) : this(viewManager, 0, 0)
         {
+            this.layoutManager = layoutManager;
         }
 
         public UIEditorPanel(ViewManager viewManager, float width, float height) : base(width, height)
@@ -46,6 +50,26 @@ namespace JESUIS.Editor.UIBuilder.Panels
             base.Resize(width, height);
             content.style.width = width;
             content.style.height = height - TabBar.COMMON_TAB_BAR_HEIGHT;
+
+            layoutManager.QueueEditorPreferenceUpdate();
+        }
+
+        public EditorViews.Views GetView()
+        {
+            return currentView.Type;
+        }
+
+        public void SetView(EditorViews.Views view)
+        {
+            currentView = viewManager.GetView(view);
+            content.Clear();
+
+            if (currentView.Type != EditorViews.Views.None)
+            {
+                content.Add(currentView);
+            }
+
+            dropDown.SetOption((int)view);
         }
 
         void SetViewOptions()
@@ -65,12 +89,14 @@ namespace JESUIS.Editor.UIBuilder.Panels
                         {
                             content.Add(currentView);
                         }
+
+                        layoutManager.QueueEditorPreferenceUpdate();
                     }
                     , true);
                 return action;
             }).ToList();
 
-            DropDown dropDown = new DropDown(150, namedActions);
+            dropDown = new DropDown(150, namedActions);
             tabBar.Add(dropDown);
 
             viewManager.RegisterOnViewChanged(view =>
@@ -91,8 +117,10 @@ namespace JESUIS.Editor.UIBuilder.Panels
                 parentPanel.SetToInitialState(topSplit);
                 parentPanel.SplitVertically(bottomSplit);
 
-                bottomSplit.SetToInitialState(new UIEditorPanel(viewManager));
+                bottomSplit.SetToInitialState(new UIEditorPanel(viewManager, layoutManager));
                 topSplit.SetToInitialState(this);
+
+                layoutManager.QueueEditorPreferenceUpdate();
             }
         }
 
@@ -105,8 +133,10 @@ namespace JESUIS.Editor.UIBuilder.Panels
                 parentPanel.SetToInitialState(leftSplit);
                 parentPanel.SplitHorizontally(rightSplit);
 
-                leftSplit.SetToInitialState(new UIEditorPanel(viewManager));
+                leftSplit.SetToInitialState(new UIEditorPanel(viewManager, layoutManager));
                 rightSplit.SetToInitialState(this);
+
+                layoutManager.QueueEditorPreferenceUpdate();
             }
         }
 
@@ -118,6 +148,8 @@ namespace JESUIS.Editor.UIBuilder.Panels
                 if (this.parent is SplittablePanel parentPanel)
                 {
                     splittablePanel.Collapse(parentPanel, true);
+
+                    layoutManager.QueueEditorPreferenceUpdate();
                 }
             }
         }
