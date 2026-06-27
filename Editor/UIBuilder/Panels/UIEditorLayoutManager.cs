@@ -12,6 +12,7 @@ namespace JESUIS.Editor.UIBuilder.Panels
         {
             [SerializeField] public bool IsSplit = false;
             [SerializeField] public bool IsSplitVertically = false;
+            [SerializeField] public float SplitPosition = 0;
             [SerializeReference] public object ElementOne = null;
             [SerializeReference] public object ElementTwo = null;
         }
@@ -58,6 +59,10 @@ namespace JESUIS.Editor.UIBuilder.Panels
         {
             splittablePanelState.IsSplit = splittablePanel.IsSplit;
             splittablePanelState.IsSplitVertically = splittablePanel.IsSplitVertically;
+            if (splittablePanel.IsSplit)
+            {
+                splittablePanelState.SplitPosition = splittablePanel.GetDragBarPosition();
+            }
 
             if (splittablePanel.elementOne is SplittablePanel splitOne)
             {
@@ -105,11 +110,21 @@ namespace JESUIS.Editor.UIBuilder.Panels
 
             SplittablePanelState state = JsonUtility.FromJson<SplittablePanelState>(json);
 
-            if (!RegenerateSplittablePanelFromState(state, rootElement, viewManager))
+            try
             {
+                if (!RegenerateSplittablePanelFromState(state, rootElement, viewManager))
+                {
+                    EditorPrefs.DeleteKey("JESUIS_UIEditorLayout");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"Failed to load UI Editor Preferences: {e.Message}");
                 EditorPrefs.DeleteKey("JESUIS_UIEditorLayout");
+                return false;
             }
 
+            Debug.Log("Loaded UI Editor layout from preferences");
             return true;
         }
 
@@ -140,7 +155,7 @@ namespace JESUIS.Editor.UIBuilder.Panels
                     UIEditorPanel newPanel = new UIEditorPanel(viewManager, this); 
                     newPanel.SetView(uiState2.CurrentView);
 
-                    if (state.IsSplitVertically)
+                    if (state.IsSplitVertically) 
                     {
                         panel.SplitVertically(newPanel);
                     }
@@ -166,9 +181,10 @@ namespace JESUIS.Editor.UIBuilder.Panels
                 else
                 {
                     Debug.LogError("Failed to loaded UI Editor Preferences: Invalid state");
-                    return false;
+                    return false; 
                 }
 
+                panel.SetDragBarPosition(state.SplitPosition); 
             }
             return true;
         }

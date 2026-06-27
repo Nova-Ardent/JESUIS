@@ -259,5 +259,15 @@ namespace JESUIS.Editor.Elements.Common.Layout
             elementTwo.style.left = padding;
             elementTwo.style.top = _height / 2 + DragBar.DRAG_BAR_TOTAL_SIZE / 2 + panelBar.GetDragPosition();
         }
+
+        public float GetDragBarPosition()
+        {
+            return panelBar.GetDragPosition();
+        }
+
+        public void SetDragBarPosition(float position)
+        {
+            panelBar.SetDragPosition(position);
+        }
     }
 }

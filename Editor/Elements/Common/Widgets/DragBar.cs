@@ -78,6 +78,11 @@ namespace JESUIS.Editor.Elements.Common.Widgets
             return barDraggedDistance;
         }
 
+        public void SetDragPosition(float position)
+        {
+            barDraggedDistance = position;
+        }
+
         public void SetBounds(float min, float max)
         {
             this.min = min;
