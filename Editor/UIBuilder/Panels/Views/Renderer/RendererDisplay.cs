@@ -40,7 +40,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
             }
 
             parent.RegisterCallback<GeometryChangedEvent>(OnParentGeometryChanged);
-            dragHelper.SetTarget(2, parent);
+            dragHelper.SetTarget(2, parent, true);
 
             UpdateTransform();
         }
