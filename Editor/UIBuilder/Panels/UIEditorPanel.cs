@@ -40,6 +40,7 @@ namespace JESUIS.Editor.UIBuilder.Panels
             content.style.position = Position.Absolute;
             content.style.left = 0;
             content.style.top = TabBar.COMMON_TAB_BAR_HEIGHT;
+            content.style.overflow = Overflow.Hidden;
             Add(content);
 
             SetViewOptions();
