@@ -26,5 +26,8 @@ namespace JESUIS.Editor.Settings
         public static readonly Color HIERARCHY_ROOT_ITEM_TRIM = new Color(0.25098039215686274f, 0.25098039215686274f, 0.25098039215686274f);
 
         public static readonly Color RENDERER_BACKGROUND_COLOR = new Color(0.1607843137254902f, 0.1607843137254902f, 0.1607843137254902f);
+
+        public static readonly Color RENDERER_CHECKERBACKGROUND_LIGHT_COLOR = new Color(1, 1, 1);
+        public static readonly Color RENDERER_CHECKERBACKGROUND_DARK_COLOR = new Color(0.8980393f, 0.8980393f, 0.8980393f);
     }
 }

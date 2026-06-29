@@ -58,6 +58,11 @@ namespace JESUIS.Editor.Elements.Common.VisualElements
             vertices[3].tint = Color.white;
         } 
 
+        public Material GetMaterial()
+        {
+            return material;
+        }
+
         public void SetSize(int width, int height)
         {
             if (renderTexture != null)
@@ -82,16 +87,16 @@ namespace JESUIS.Editor.Elements.Common.VisualElements
             UpdateTexture();
         }
 
+        public void UpdateTexture()
+        {
+            Graphics.Blit(Texture2D.whiteTexture, renderTexture, material);
+        }
+
         ~MaterialRTTVisualElement()
         {
             renderTexture?.Release();
             UnityEngine.Object.DestroyImmediate(renderTexture);
             UnityEngine.Object.DestroyImmediate(material);
-        }
-
-        public void UpdateTexture()
-        {
-            Graphics.Blit(Texture2D.whiteTexture, renderTexture, material);
         }
 
         void OnGenerateVisualContent(MeshGenerationContext ctx)

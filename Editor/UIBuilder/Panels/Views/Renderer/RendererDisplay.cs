@@ -1,23 +1,37 @@
+using JESUIS.Editor.Elements.Common.VisualElements;
 using JESUIS.Editor.Helpers.Motions;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using JESUIS.Editor.Settings;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
 {
-    public class RendererDisplay : VisualElement
+    public class RendererDisplay : MaterialRTTVisualElement
     {
+        static readonly string BackgroundShaderPath = "Assets/JESUIS/Editor/Resources/Shaders/UIEditor/Renderer/Background.shader";
+
         bool isAttached = false;
         DragHelper dragHelper = new DragHelper();
 
-        public RendererDisplay()
+        public RendererDisplay() : base(AssetDatabase.LoadAssetAtPath<Shader>(BackgroundShaderPath))
         {
             style.position = Position.Absolute;
-            style.width = 100;
-            style.height = 100;
-            style.backgroundColor = Color.white;
+            SetSize(100, 100);
 
             RegisterCallback<AttachToPanelEvent>(OnAttach);
             dragHelper.RegisterOnPositionChanged(x => UpdateTransform());
+
+            SetBackgroundColors();
+        }
+
+        void SetBackgroundColors()
+        {
+            Material material = GetMaterial();
+            material.SetColor("_Color1", Colors.RENDERER_CHECKERBACKGROUND_LIGHT_COLOR);
+            material.SetColor("_Color2", Colors.RENDERER_CHECKERBACKGROUND_DARK_COLOR);
+            material.SetFloat("_Divisions", 100 / 10);
+            UpdateTexture();
         }
 
         public void UpdateTransform()
