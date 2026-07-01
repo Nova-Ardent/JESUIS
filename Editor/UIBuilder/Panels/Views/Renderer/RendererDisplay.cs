@@ -1,9 +1,9 @@
 using JESUIS.Editor.Elements.Common.VisualElements;
 using JESUIS.Editor.Helpers.Motions;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
 using JESUIS.Editor.Settings;
+using UnityEditor;
+using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
 {
@@ -11,16 +11,27 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
     {
         static readonly string BackgroundShaderPath = "Assets/JESUIS/Editor/Resources/Shaders/UIEditor/Renderer/Background.shader";
 
+        const float MIN_ZOOM = 0.05f;
+        const float MAX_ZOOM = 10f;
+        const float ZOOM_SPEED = 0.1f;
+
         bool isAttached = false;
         DragHelper dragHelper = new DragHelper();
+        ZoomHelper zoomHelper = new ZoomHelper();
+
+        float currentWidth = 100;
+        float currentHeight = 100;
 
         public RendererDisplay() : base(AssetDatabase.LoadAssetAtPath<Shader>(BackgroundShaderPath))
         {
             style.position = Position.Absolute;
             SetSize(100, 100);
+            currentWidth = 100;
+            currentHeight = 100;
 
             RegisterCallback<AttachToPanelEvent>(OnAttach);
             dragHelper.RegisterOnPositionChanged(x => UpdateTransform());
+            zoomHelper.RegisterOnChange(OnZoomChanged);
 
             SetBackgroundColors();
         }
@@ -41,6 +52,27 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
             this.style.top = centerOffset.y + dragHelper.Offset.y;
         }
 
+        public void OnZoomChanged(float newZoom, float previousZoom, Vector2 targetMousePosition)
+        {
+            style.scale = new Vector2(newZoom, newZoom);
+
+            Vector2 relativeMousePosition = this.WorldToLocal(targetMousePosition);
+            Vector2 prevSize = new Vector2(currentWidth, currentHeight) * previousZoom;
+            Vector2 mousePosition = new Vector2(relativeMousePosition.x / currentWidth - 0.5f, relativeMousePosition.y / currentHeight - 0.5f);
+
+            Vector2 newSize = new Vector2(currentWidth, currentHeight) * newZoom;
+
+            style.scale = new Vector2(newZoom, newZoom);
+
+            Vector2 centerOffset = GetCenterOffset();
+            dragHelper.SetOffset
+                ( new Vector2
+                    ( style.left.value.value + (prevSize.x - newSize.x) * mousePosition.x - centerOffset.x
+                    , style.top.value.value + (prevSize.y - newSize.y) * mousePosition.y - centerOffset.y
+                    )
+                );
+        }
+
         void OnParentGeometryChanged(GeometryChangedEvent evt)
         {
             UpdateTransform();
@@ -55,6 +87,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
 
             parent.RegisterCallback<GeometryChangedEvent>(OnParentGeometryChanged);
             dragHelper.SetTarget(2, parent, true);
+            zoomHelper.SetTarget(parent, MIN_ZOOM, MAX_ZOOM, ZOOM_SPEED, ZoomHelper.ZoomMethod.Multiplicative);
 
             UpdateTransform();
         }

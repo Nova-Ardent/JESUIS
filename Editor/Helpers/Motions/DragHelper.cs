@@ -24,6 +24,12 @@ namespace JESUIS.Editor.Helpers.Motions
             SetTarget(mouseIndex, target, false);
         }
 
+        public void SetOffset(Vector2 newOffset)
+        {
+            Offset = newOffset;
+            onPositionChanged?.Invoke(Offset);
+        }
+
         public void SetTarget(int mouseIndex, VisualElement target, bool includeMouseWheelAction, float mouseWheelScrollDistance = SCROLL_DISTANCE_DEFAULT)
         {
             this.mouseIndex = mouseIndex;
@@ -41,6 +47,11 @@ namespace JESUIS.Editor.Helpers.Motions
 
         public void OnMouseWheel(WheelEvent wheelEvent)
         {
+            if (wheelEvent.ctrlKey)
+            {
+                return;
+            }
+
             UpdateOffset(new Vector2(-wheelEvent.delta.x, wheelEvent.delta.y) * SCROLL_DISTANCE_DEFAULT);
         }
 
