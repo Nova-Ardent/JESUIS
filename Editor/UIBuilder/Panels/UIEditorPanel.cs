@@ -98,7 +98,7 @@ namespace JESUIS.Editor.UIBuilder.Panels
             }).ToList();
 
             dropDown = new DropDown(150, namedActions);
-            tabBar.Add(dropDown);
+            tabBar.AddOption(dropDown);
 
             viewManager.RegisterOnViewChanged(view =>
             {
