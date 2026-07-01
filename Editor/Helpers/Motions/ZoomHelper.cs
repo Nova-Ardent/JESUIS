@@ -65,7 +65,6 @@ namespace JESUIS.Editor.Helpers.Motions
                 }
                 else if (wheelEvent.delta.y > 0)
                 {
-
                     currentZoom = Mathf.Max(currentZoom - zoomSpeed, minZoom);
                 }
             }
