@@ -60,9 +60,8 @@ namespace JESUIS.Editor.Helpers.Motions
             if (downEvent.button == mouseIndex)
             {
                 isMouseDown = true;
+                UpdateOffset(downEvent.mouseDelta);
             }
-
-            UpdateOffset(downEvent.mouseDelta);
         }
 
         public void OnMouseUpEvent(MouseUpEvent upEvent)
