@@ -2,7 +2,7 @@ using JESUIS.Editor.Elements.Common.Widgets;
 using JESUIS.Editor.Helpers;
 using JESUIS.Editor.Helpers.Utils;
 using JESUIS.Editor.UIBuilder.Data;
-using JESUIS.Shared.ScreenData.ScreenDataTypes;
+using JESUIS.Shared.ScreenData.Data;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;

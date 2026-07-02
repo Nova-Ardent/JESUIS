@@ -1,6 +1,6 @@
 using JESUIS.Editor.Elements.Common.Input;
 using JESUIS.Editor.UIBuilder.Data;
-using JESUIS.Shared.ScreenData.ScreenDataTypes;
+using JESUIS.Shared.ScreenData.Data;
 using System.Collections.Generic;
 using System.Reflection;
 using System;

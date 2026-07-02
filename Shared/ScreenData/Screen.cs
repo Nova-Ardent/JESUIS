@@ -1,4 +1,4 @@
-using JESUIS.Shared.ScreenData.ScreenDataTypes;
+using JESUIS.Shared.ScreenData.Data;
 using UnityEngine;
 
 namespace JESUIS.Shared.ScreenData

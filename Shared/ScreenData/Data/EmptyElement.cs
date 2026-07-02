@@ -1,4 +1,4 @@
-namespace JESUIS.Shared.ScreenData.ScreenDataTypes
+namespace JESUIS.Shared.ScreenData.Data
 {
     [System.Serializable]
     public class EmptyElement : BaseElement
