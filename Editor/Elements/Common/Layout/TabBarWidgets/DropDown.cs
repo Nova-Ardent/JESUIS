@@ -52,9 +52,19 @@ namespace JESUIS.Editor.Elements.Common.Layout.TabBarWidgets
             RegisterCallback<MouseDownEvent>(OnMouseDown);
         }
 
-        public void SetOption(int index)
+        public void SetOption(int index, bool trigger = false)
         {
             OnChange(index);
+            if (!trigger)
+            {
+                return;
+            }
+
+            if (index < 0 || index >= options.Count)
+            {
+                return;
+            }
+            options[index].Action?.Invoke();
         }
 
         void InitDropDownIcon()
