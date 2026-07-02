@@ -4,7 +4,8 @@ Shader "Hidden/Background"
     {
         _Color1 ("Color 1", Color) = (1,1,1,1)
         _Color2 ("Color 2", Color) = (0,0,0,1)
-        _Divisions ("Divisions", Float) = 8
+        _DivisionsHorizontal ("DivisionsHorizontal", Float) = 8
+        _DivisionsVertical ("DivisionsVertical", Float) = 8
 
         _MainTex ("Texture", 2D) = "white" {}
     }
@@ -43,13 +44,14 @@ Shader "Hidden/Background"
 
             fixed4 _Color1;
             fixed4 _Color2;
-            float _Divisions;
+            float _DivisionsHorizontal;
+            float _DivisionsVertical;
 
             sampler2D _MainTex;
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float2 cell = floor(i.uv * _Divisions);
+                float2 cell = floor(float2(i.uv.x * _DivisionsHorizontal, i.uv.y * _DivisionsVertical));
                 float checker = fmod(cell.x + cell.y, 2.0);
                 return lerp(_Color1, _Color2, checker);
             }

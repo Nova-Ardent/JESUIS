@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine.UIElements;
+using JESUIS.Editor.Elements.Common.Layout.TabBarWidgets;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
@@ -12,6 +14,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             Hierarchy,
             Inspector,
             Renderer,
+        }
+
+        public virtual IEnumerable<TabElement> GetActiveTabOptions()
+        {
+            yield break;
         }
     }
 }

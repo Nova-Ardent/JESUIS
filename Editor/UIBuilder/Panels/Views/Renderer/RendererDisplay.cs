@@ -4,6 +4,7 @@ using JESUIS.Editor.Settings;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
 {
@@ -14,10 +15,14 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
         const float MIN_ZOOM = 0.05f;
         const float MAX_ZOOM = 10f;
         const float ZOOM_SPEED = 0.1f;
+        const float ASPECT_RATIO_INIT_PADDING = 150;
 
-        bool isAttached = false;
+        bool isAttached = false; 
+        bool isGeometryReady = false;
         DragHelper dragHelper = new DragHelper();
         ZoomHelper zoomHelper = new ZoomHelper();
+
+        Vector2Int? queuedAspectRatioChanged = null;
 
         float currentWidth = 100;
         float currentHeight = 100;
@@ -25,11 +30,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
         public RendererDisplay() : base(AssetDatabase.LoadAssetAtPath<Shader>(BackgroundShaderPath))
         {
             style.position = Position.Absolute;
-            SetSize(100, 100);
             currentWidth = 100;
             currentHeight = 100;
 
             RegisterCallback<AttachToPanelEvent>(OnAttach);
+            RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+
             dragHelper.RegisterOnPositionChanged(x => UpdateTransform());
             zoomHelper.RegisterOnChange(OnZoomChanged);
 
@@ -41,8 +47,35 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
             Material material = GetMaterial();
             material.SetColor("_Color1", Colors.RENDERER_CHECKERBACKGROUND_LIGHT_COLOR);
             material.SetColor("_Color2", Colors.RENDERER_CHECKERBACKGROUND_DARK_COLOR);
-            material.SetFloat("_Divisions", 100 / 10);
+            material.SetFloat("_DivisionsHorizontal", currentWidth / 10);
+            material.SetFloat("_DivisionsVertical", currentHeight / 10);
             UpdateTexture();
+        }
+
+        public void ChangeAspectRatio(int width, int height)
+        {
+            if (!isGeometryReady)
+            {
+                queuedAspectRatioChanged = new Vector2Int(width, height);
+                return;
+            }
+
+            currentWidth = width; 
+            currentHeight = height;
+
+            SetSize(width, height);
+
+            // adjust size to fit panel
+            float parentWidth = parent.resolvedStyle.width - ASPECT_RATIO_INIT_PADDING; 
+            float parentHeight = parent.resolvedStyle.height - ASPECT_RATIO_INIT_PADDING;
+            
+            float xScale = (parentWidth / width); 
+            float yScale = (parentHeight / height);
+
+            float zoom = Mathf.Min(xScale, yScale);
+            zoomHelper.UpdateZoom(zoom, new Vector2(parent.style.width.value.value / 2, parent.style.height.value.value / 2));
+            dragHelper.SetOffset(Vector2.zero);
+            SetBackgroundColors();
         }
 
         public void UpdateTransform()
@@ -76,7 +109,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
         void OnParentGeometryChanged(GeometryChangedEvent evt)
         {
             UpdateTransform();
-        }
+        } 
 
         void OnAttach(AttachToPanelEvent evt)
         {
@@ -84,12 +117,29 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
             {
                 return;
             }
+            isAttached = true;
 
             parent.RegisterCallback<GeometryChangedEvent>(OnParentGeometryChanged);
             dragHelper.SetTarget(2, parent, true);
             zoomHelper.SetTarget(parent, MIN_ZOOM, MAX_ZOOM, ZOOM_SPEED, ZoomHelper.ZoomMethod.Multiplicative);
+        }
 
-            UpdateTransform();
+        void OnGeometryChanged(GeometryChangedEvent evt)
+        {
+            if (isGeometryReady)
+            {
+                return;
+            }
+            isGeometryReady = true;
+
+            if (queuedAspectRatioChanged != null)
+            {
+                ChangeAspectRatio(queuedAspectRatioChanged.Value.x, queuedAspectRatioChanged.Value.y);
+            }
+            else
+            {
+                UpdateTransform();
+            }
         }
 
         Vector2 GetCenterOffset()

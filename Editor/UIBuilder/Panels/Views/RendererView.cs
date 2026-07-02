@@ -1,6 +1,8 @@
+using JESUIS.Editor.Elements.Common.Layout.TabBarWidgets;
 using JESUIS.Editor.Settings;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer;
+using System.Collections.Generic;
 using UnityEngine.UIElements;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
@@ -12,6 +14,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         public override Views Type => Views.Renderer;
 
         RendererDisplay rendererDisplay = new RendererDisplay();
+
+        AspectRatioDropDown aspectRatioDropDown;
 
         public RendererView(EditorState editorState)
         {
@@ -25,6 +29,19 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             style.backgroundColor = Colors.RENDERER_BACKGROUND_COLOR;
 
             Add(rendererDisplay);
+
+            aspectRatioDropDown = new AspectRatioDropDown(UpdateAspectRatio);
+            aspectRatioDropDown.SetOption(0, true);
+        }
+
+        void UpdateAspectRatio(int width, int height) 
+        {
+            rendererDisplay.ChangeAspectRatio(width, height);
+        }
+        
+        public override IEnumerable<TabElement> GetActiveTabOptions()
+        {
+            yield return aspectRatioDropDown;
         }
     }
 }

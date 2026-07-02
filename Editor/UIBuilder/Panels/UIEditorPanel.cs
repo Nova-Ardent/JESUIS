@@ -68,6 +68,7 @@ namespace JESUIS.Editor.UIBuilder.Panels
             if (currentView.Type != EditorViews.Views.None)
             {
                 content.Add(currentView);
+                tabBar.AddOptions(currentView.GetActiveTabOptions());
             }
 
             dropDown.SetOption((int)view);
@@ -83,12 +84,14 @@ namespace JESUIS.Editor.UIBuilder.Panels
                     ( view.ToString()
                     , () =>
                     {
+                        tabBar.RemoveOptions(currentView.GetActiveTabOptions());
                         currentView = viewManager.GetView(view);
                         content.Clear();
 
                         if (currentView.Type != EditorViews.Views.None)
                         {
                             content.Add(currentView);
+                            tabBar.AddOptions(currentView.GetActiveTabOptions());
                         }
 
                         layoutManager.QueueEditorPreferenceUpdate();

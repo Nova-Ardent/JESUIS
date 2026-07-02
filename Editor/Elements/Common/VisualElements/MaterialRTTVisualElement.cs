@@ -89,7 +89,11 @@ namespace JESUIS.Editor.Elements.Common.VisualElements
 
         public void UpdateTexture()
         {
-            Graphics.Blit(Texture2D.whiteTexture, renderTexture, material);
+            schedule.Execute(() =>
+            {
+                Graphics.Blit(Texture2D.whiteTexture, renderTexture, material);
+                MarkDirtyRepaint();
+            });
         }
 
         ~MaterialRTTVisualElement()

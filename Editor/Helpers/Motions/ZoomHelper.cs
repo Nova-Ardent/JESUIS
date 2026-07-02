@@ -27,6 +27,13 @@ namespace JESUIS.Editor.Helpers.Motions
 
         }
 
+        public void UpdateZoom(float newZoomValue, Vector2 from)
+        {
+            float wasZoom = currentZoom;
+            currentZoom = Mathf.Clamp(newZoomValue, minZoom, maxZoom);
+            onChange?.Invoke(currentZoom, wasZoom, from);
+        }
+
         public void RegisterOnChange(Action<float, float, Vector2> onChange)
         {
             if (this.onChange == null)
