@@ -1,7 +1,7 @@
 using System;
 using UnityEngine.UIElements;
 
-namespace JESUIS.Editor.Elements.Common.Input
+namespace JESUIS.Editor.Elements.Input
 {
     public class EnumFieldElement<T> : LabelledFieldElement where T : Enum
     {

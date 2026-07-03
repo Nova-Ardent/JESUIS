@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace JESUIS.Editor.Elements.Common.Layout.TabBarWidgets
+namespace JESUIS.Editor.Elements.Layout.TabBarWidgets
 {
     public class DropDown : TabElement
     {

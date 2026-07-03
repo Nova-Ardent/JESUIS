@@ -1,6 +1,6 @@
-using JESUIS.Editor.Elements.Common.Layout;
-using JESUIS.Editor.Elements.Common.Layout.TabBarWidgets;
-using JESUIS.Editor.Elements.Common.Panel;
+using JESUIS.Editor.Elements.Layout;
+using JESUIS.Editor.Elements.Layout.TabBarWidgets;
+using JESUIS.Editor.Elements.Panel;
 using JESUIS.Editor.Helpers;
 using JESUIS.Editor.UIBuilder.Panels.Views;
 using System.Collections.Generic;

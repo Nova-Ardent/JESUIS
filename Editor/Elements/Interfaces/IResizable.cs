@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace JESUIS.Editor.Elements.Common.Interfaces
+namespace JESUIS.Editor.Elements.Interfaces
 {
     public interface IResizable
     {

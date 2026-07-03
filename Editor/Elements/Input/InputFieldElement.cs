@@ -1,7 +1,7 @@
 using UnityEngine.UIElements;
 using System;
 
-namespace JESUIS.Editor.Elements.Common.Input
+namespace JESUIS.Editor.Elements.Input
 {
     public abstract class InputFieldElement<T> : LabelledFieldElement
     {

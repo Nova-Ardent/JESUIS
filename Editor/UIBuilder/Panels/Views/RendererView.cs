@@ -1,4 +1,4 @@
-using JESUIS.Editor.Elements.Common.Layout.TabBarWidgets;
+using JESUIS.Editor.Elements.Layout.TabBarWidgets;
 using JESUIS.Editor.Settings;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer;

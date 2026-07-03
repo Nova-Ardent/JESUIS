@@ -1,8 +1,8 @@
-using JESUIS.Editor.Elements.Common.Interfaces;
-using JESUIS.Editor.Elements.Common.Widgets;
+using JESUIS.Editor.Elements.Interfaces;
+using JESUIS.Editor.Elements.Widgets;
 using UnityEngine.UIElements;
 
-namespace JESUIS.Editor.Elements.Common.Layout
+namespace JESUIS.Editor.Elements.Layout
 {
     public class SplittablePanel : VisualElement
         , IResizable

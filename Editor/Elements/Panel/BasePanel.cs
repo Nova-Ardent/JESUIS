@@ -1,10 +1,10 @@
-using JESUIS.Editor.Elements.Common.Interfaces;
-using JESUIS.Editor.Elements.Common.Layout;
+using JESUIS.Editor.Elements.Interfaces;
+using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Helpers;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-namespace JESUIS.Editor.Elements.Common.Panel
+namespace JESUIS.Editor.Elements.Panel
 {
     public class BasePanel : VisualElement
         , IResizable

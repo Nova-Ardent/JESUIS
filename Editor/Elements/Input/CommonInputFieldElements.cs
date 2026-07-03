@@ -1,4 +1,4 @@
-namespace JESUIS.Editor.Elements.Common.Input
+namespace JESUIS.Editor.Elements.Input
 {
     public class TextInputFieldElement : InputFieldElement<string>
     {

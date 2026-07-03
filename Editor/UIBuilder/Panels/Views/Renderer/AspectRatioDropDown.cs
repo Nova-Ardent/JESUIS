@@ -1,4 +1,4 @@
-using JESUIS.Editor.Elements.Common.Layout.TabBarWidgets;
+using JESUIS.Editor.Elements.Layout.TabBarWidgets;
 using JESUIS.Editor.Helpers;
 using System;
 using System.Collections.Generic;

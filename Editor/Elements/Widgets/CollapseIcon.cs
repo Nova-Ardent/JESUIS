@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace JESUIS.Editor.Elements.Common.Widgets
+namespace JESUIS.Editor.Elements.Widgets
 {
     public class CollapseIcon : VisualElement
     {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine.UIElements;
-using JESUIS.Editor.Elements.Common.Layout.TabBarWidgets;
+using JESUIS.Editor.Elements.Layout.TabBarWidgets;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {

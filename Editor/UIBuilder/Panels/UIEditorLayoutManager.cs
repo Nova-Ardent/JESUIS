@@ -1,4 +1,4 @@
-using JESUIS.Editor.Elements.Common.Layout;
+using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.UIBuilder.Panels.Views;
 using UnityEditor;
 using UnityEngine;

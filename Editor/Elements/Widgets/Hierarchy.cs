@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 using System;
 using JESUIS.Editor.Helpers;
 
-namespace JESUIS.Editor.Elements.Common.Widgets
+namespace JESUIS.Editor.Elements.Widgets
 {
     public class Hierarchy : VisualElement
     {

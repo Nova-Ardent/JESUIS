@@ -1,11 +1,11 @@
-using JESUIS.Editor.Elements.Common.Interfaces;
+using JESUIS.Editor.Elements.Interfaces;
 using JESUIS.Editor.Settings;
 using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace JESUIS.Editor.Elements.Common.Widgets
+namespace JESUIS.Editor.Elements.Widgets
 {
     public class DragBar : VisualElement
         , IResizable

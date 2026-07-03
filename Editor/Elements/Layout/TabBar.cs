@@ -1,9 +1,9 @@
-using JESUIS.Editor.Elements.Common.Layout.TabBarWidgets;
+using JESUIS.Editor.Elements.Layout.TabBarWidgets;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace JESUIS.Editor.Elements.Common.Layout
+namespace JESUIS.Editor.Elements.Layout
 {
     public class TabBar : VisualElement
     {

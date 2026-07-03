@@ -1,4 +1,4 @@
-using JESUIS.Editor.Elements.Common.Input;
+using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.Data;
 using System.Collections.Generic;

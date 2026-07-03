@@ -1,4 +1,4 @@
-using JESUIS.Editor.Elements.Common.Widgets;
+using JESUIS.Editor.Elements.Widgets;
 using JESUIS.Editor.Helpers;
 using JESUIS.Editor.Helpers.Utils;
 using JESUIS.Editor.UIBuilder.Data;
@@ -16,12 +16,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         public override Views Type { get => Views.Hierarchy; }
 
-        Elements.Common.Widgets.Hierarchy editorHierarchy;
+        Elements.Widgets.Hierarchy editorHierarchy;
 
         public HierarchyView(EditorState editorState)
         {
             this.editorState = editorState;
-            editorHierarchy = new Elements.Common.Widgets.Hierarchy(editorState.CurrentScreen.GetRootElement(), GetActions, OnElementClicked);
+            editorHierarchy = new Elements.Widgets.Hierarchy(editorState.CurrentScreen.GetRootElement(), GetActions, OnElementClicked);
             editorState.ListenToSelectedElementIsDirty(OnSelectedElementIsDirty);
 
             style.left = 0;

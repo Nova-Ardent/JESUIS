@@ -1,12 +1,11 @@
-using JESUIS.Editor.Elements.Common.Interfaces;
-using JESUIS.Editor.Elements.Common.Panel;
+using JESUIS.Editor.Elements.Interfaces;
 using JESUIS.Editor.Helpers;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace JESUIS.Editor.Elements.Common.Window
+namespace JESUIS.Editor.Elements.Window
 {
     public class BaseWindow<T> : EditorWindow where T : EditorWindow
     {
