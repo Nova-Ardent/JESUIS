@@ -29,5 +29,8 @@ namespace JESUIS.Editor.Settings
 
         public static readonly Color RENDERER_CHECKERBACKGROUND_LIGHT_COLOR = new Color(1, 1, 1);
         public static readonly Color RENDERER_CHECKERBACKGROUND_DARK_COLOR = new Color(0.8980393f, 0.8980393f, 0.8980393f);
+
+        public static readonly Color HEADER_BACKING = new Color(0.24313725490196078f, 0.24313725490196078f, 0.24313725490196078f);
+        public static readonly Color HEADER_TRIM = new Color(0.0784313725490196f, 0.0784313725490196f, 0.0784313725490196f);
     }
 }
