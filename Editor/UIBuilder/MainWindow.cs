@@ -26,7 +26,7 @@ namespace JESUIS.Editor.UIBuilder
 
         protected override void CreateGUI()
         {
-            editorState.CurrentScreen = new Shared.ScreenData.Screen();
+            editorState.CurrentScreen = CreateInstance<Shared.ScreenData.Screen>();
 
             uIEditorLayoutManager = new UIEditorLayoutManager();
             viewManager = new ViewManager(editorState);

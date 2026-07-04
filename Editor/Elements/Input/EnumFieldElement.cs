@@ -22,6 +22,11 @@ namespace JESUIS.Editor.Elements.Input
             FieldContainer.Add(enumField);
         }
 
+        public void SetValueWithoutNotify(T value)
+        {
+            enumField.SetValueWithoutNotify(value);
+        }
+
         public void RegisterOnValueChanged(Action<T> onChange)
         {
             if (onValueChanged == null)

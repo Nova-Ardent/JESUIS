@@ -19,7 +19,11 @@ namespace JESUIS.Editor.Elements.Layout
             style.width = Length.Percent(100);
 
             style.borderTopWidth = 1;
-            style.borderTopColor = Colors.TAB_BAR_TRIM_COLOR;
+            style.borderTopColor = Colors.HEADER_TRIM_TOP;
+
+            style.borderBottomWidth = 1;
+            style.borderBottomColor = Colors.HEADER_TRIM_BOTTOM;
+
             style.backgroundColor = Colors.HEADER_BACKING;
 
             mainLabel = new Label(mainText);

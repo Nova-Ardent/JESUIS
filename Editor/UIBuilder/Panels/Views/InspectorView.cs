@@ -1,18 +1,21 @@
+using JESUIS.Editor.Elements.CompoundInputs;
 using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.Data;
-using System.Collections.Generic;
-using System.Reflection;
 using System;
-using UnityEngine.UIElements;
-using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
     public class InspectorView : EditorViews
     {
+        const int ELEMENT_PADDING = 2;
+        
         EditorState editorState;
 
         public override Views Type => Views.Inspector;
@@ -36,7 +39,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
-            float CurrentPosition = 0;
+            float CurrentPosition = ELEMENT_PADDING;
             foreach (var field in GetAllFields(baseElement.GetType()).DistinctBy(x => x.Name))
             {
                 VisualElement visualElement = GetInspectorElement(field, baseElement);
@@ -48,7 +51,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 visualElement.style.top = CurrentPosition;
                 Add(visualElement);
 
-                CurrentPosition += visualElement.style.height.value.value;
+                CurrentPosition += visualElement.style.height.value.value + ELEMENT_PADDING;
             }
         }
 
@@ -56,11 +59,16 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         {
             switch (fieldInfo.FieldType)
             {
+                // Common Types
                 case var type when type == typeof(string): return RegisterStringInputField(fieldInfo, target);
                 case var type when type == typeof(int): return RegisterIntInputField(fieldInfo, target);
                 case var type when type == typeof(float): return RegisterFloatInputField(fieldInfo, target);
                 case var type when type == typeof(Vector2): return Vector2fFieldElement(fieldInfo, target);
                 case var type when type == typeof(Vector2Int): return Vector2iFieldElement(fieldInfo, target);
+
+                // Compound Types
+                case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target);
+
                 default:
                     Debug.LogWarning($"Could not create inspector element for field type {fieldInfo.FieldType}");
                     return null;
