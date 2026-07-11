@@ -1,0 +1,50 @@
+.header
+{
+	height: 20px;
+	width: 100%;
+
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+}
+
+.header-main-label
+{
+	position: absolute;
+	height: 100%;
+	width: 50%;
+	-unity-font-style: bold;
+	-unity-text-align: middle-left;
+}
+
+.header-main-label-with-icon
+{
+	padding-left: 30px;
+}
+
+.header-main-label-without-icon
+{
+	padding-left: 10px;
+} 
+
+.header-sub-label
+{
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	padding-right: 10px;
+	height: 100%;
+	width: 50%;
+
+	-unity-font-style: normal;
+	-unity-text-align: middle-right;
+}
+
+.header-image
+{
+	position: absolute;
+
+	left: 5px;
+	top: 1px;
+	width: 18px;
+	height: 18px;
+}

@@ -1,3 +1,4 @@
+using JESUIS.Shared.ScreenData.Types;
 using System.Collections.Generic;
 using UnityEngine;
 

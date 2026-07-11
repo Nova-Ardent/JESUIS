@@ -39,19 +39,15 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
-            float CurrentPosition = ELEMENT_PADDING;
             foreach (var field in GetAllFields(baseElement.GetType()).DistinctBy(x => x.Name))
             {
                 VisualElement visualElement = GetInspectorElement(field, baseElement);
                 if (visualElement == null)
                     continue;
 
-                visualElement.style.position = Position.Absolute;
-                visualElement.style.left = 0;
-                visualElement.style.top = CurrentPosition;
+                visualElement.style.marginTop = ELEMENT_PADDING / 2;
+                visualElement.style.marginBottom = ELEMENT_PADDING / 2;
                 Add(visualElement);
-
-                CurrentPosition += visualElement.style.height.value.value + ELEMENT_PADDING;
             }
         }
 

@@ -1,5 +1,6 @@
 using UnityEngine.UIElements;
 using System;
+using JESUIS.Editor.Utilities.StyleSheets;
 
 namespace JESUIS.Editor.Elements.Input
 {
@@ -16,12 +17,7 @@ namespace JESUIS.Editor.Elements.Input
         public InputFieldElement(string labelText, T defaultValue = default(T), bool isSubElement = false) : base(labelText, isSubElement)
         {
             inputField = new TextField();
-            
-            inputField.style.width = Length.Percent(100);
-            inputField.style.height = Length.Percent(100);
-            inputField.style.paddingTop = 0;
-            inputField.style.paddingBottom = 2;
-            inputField.style.paddingRight = 10;
+            inputField.AddStyle(InputFieldsUSS.StyleSheetInstance, "input-field");
             inputField.isDelayed = true;
             inputField.RegisterValueChangedCallback(OnValueChanged);
 

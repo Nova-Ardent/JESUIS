@@ -1,3 +1,8 @@
+using JESUIS.Editor.Utilities.StyleSheets;
+using JESUIS.Editor.Utilities.System.PathUtils;
+using System.IO;
+using System.Runtime.CompilerServices;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -5,61 +10,43 @@ namespace JESUIS.Editor.Elements.Input
 {
     public class LabelledFieldElement : VisualElement
     {
-        public const int DEFAULT_TOTAL_PERCENT_WIDTH = 100;
         public const int DEFAULT_LABEL_PERCENT_WIDTH = 40;
         public const int DEFAULT_INPUT_FIELD_PERCENT_WIDTH = 60;
         public const int DEFAULT_LABEL_PADDING_LEFT = 25;
 
-        public const int SUB_ELEMENT_TOTAL_PERCENT_WIDTH = 100;
         public const int SUB_ELEMENT_LABEL_WIDTH = 15;
-
-        public const int HEIGHT = 20;
 
         Label label;
         protected VisualElement FieldContainer {  get; private set; }
 
         public LabelledFieldElement(string labelText, bool isSubElement = false)
-        {
-            style.width = Length.Percent(DEFAULT_TOTAL_PERCENT_WIDTH);
-            style.height = HEIGHT;
+        {;
+            this.AddStyle(InputFieldsUSS.StyleSheetInstance, "labelled-field-element");
 
             label = new Label(labelText);
-            label.style.position = Position.Absolute;
-            label.style.left = 0;
-            label.style.top = 0;
+            label.AddStyle(InputFieldsUSS.StyleSheetInstance, "labelled-field-label-common");
 
-            label.style.height = HEIGHT;
-            label.style.unityTextAlign = TextAnchor.MiddleLeft;
             if (isSubElement)
             {
-                label.style.width = SUB_ELEMENT_LABEL_WIDTH;
+                label.AddToClassList("labelled-field-label-sub");
             }
             else
             {
-                label.style.width = Length.Percent(DEFAULT_LABEL_PERCENT_WIDTH);
-                label.style.paddingLeft = DEFAULT_LABEL_PADDING_LEFT;
+                label.AddToClassList("labelled-field-label-main");
             }
 
             Add(label);
 
             FieldContainer = new VisualElement();
-            FieldContainer.style.position = Position.Absolute;
+            FieldContainer.AddStyle(InputFieldsUSS.StyleSheetInstance, "field-container-common");
 
             if (isSubElement)
             {
-                FieldContainer.style.left = 0;
-                FieldContainer.style.top = 0;
-                FieldContainer.style.paddingLeft = SUB_ELEMENT_LABEL_WIDTH;
-                FieldContainer.style.width = Length.Percent(100);
-                FieldContainer.style.height = HEIGHT;
+                FieldContainer.AddToClassList("field-container-sub");
             }
             else
             {
-                FieldContainer.style.left = Length.Percent(DEFAULT_LABEL_PERCENT_WIDTH);
-                FieldContainer.style.top = 0;
-
-                FieldContainer.style.width = Length.Percent(DEFAULT_INPUT_FIELD_PERCENT_WIDTH);
-                FieldContainer.style.height = HEIGHT;
+                FieldContainer.AddToClassList("field-container-main");
             }
             Add(FieldContainer);
         }

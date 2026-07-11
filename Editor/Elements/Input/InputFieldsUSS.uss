@@ -1,0 +1,58 @@
+.labelled-field-element
+{
+    width: 100%;
+    height: 20px;
+}
+
+.labelled-field-label-common
+{
+    position: absolute;
+
+    left: 0px;
+    top: 0px;
+    height: 20px;
+
+    -unity-text-align: middle-left;
+}
+
+.labelled-field-label-main
+{
+    width: 40%;
+    padding-left: 25px;
+}
+
+.labelled-field-label-sub
+{
+    width: 15px;
+}
+
+.input-field {
+    width: 100%;
+    height: 100%;
+
+    padding-top: 0px;
+    padding-bottom: 2px;
+    padding-right: 10px;
+}
+
+.field-container-common
+{
+    position: absolute;
+}
+
+.field-container-main
+{
+    left: 40%;
+    top: 0px;
+    width: 60%;
+    height: 20px;
+}
+
+.field-container-sub
+{
+    left: 0px;
+    top: 0px;
+    padding-left: 15px;
+    width: 100%;
+    height: 20px;
+}

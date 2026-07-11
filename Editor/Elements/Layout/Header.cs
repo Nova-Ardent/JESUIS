@@ -1,5 +1,5 @@
-﻿using Codice.Client.BaseCommands;
-using JESUIS.Editor.Settings;
+﻿using JESUIS.Editor.Settings;
+using JESUIS.Editor.Utilities.StyleSheets;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -7,63 +7,41 @@ namespace JESUIS.Editor.Elements.Layout
 {
     public class Header : VisualElement
     {
-        public const int HEADER_HEIGHT = 20;
-
-        Label mainLabel;// = new Label();
-        Label subLabel;// = new Label();
-        Image image;// = new Image();
+        Label mainLabel;
+        Label subLabel;
+        Image image;
 
         public Header(string mainText, string subText, Texture icon = null)
         {
-            style.height = HEADER_HEIGHT;
-            style.width = Length.Percent(100);
+            this.AddStyle(LayoutUSS.StyleSheetInstance, "header");
 
-            style.borderTopWidth = 1;
             style.borderTopColor = Colors.HEADER_TRIM_TOP;
-
-            style.borderBottomWidth = 1;
             style.borderBottomColor = Colors.HEADER_TRIM_BOTTOM;
-
             style.backgroundColor = Colors.HEADER_BACKING;
 
             mainLabel = new Label(mainText);
-            mainLabel.style.position = Position.Absolute;
-            mainLabel.style.left = 0;
+            mainLabel.AddStyle(LayoutUSS.StyleSheetInstance, "header-main-label");
+
             if (icon == null)
             {
-                mainLabel.style.paddingLeft = 10;
+                mainLabel.AddToClassList("header-main-label-without-icon");
             }
             else
             {
-                mainLabel.style.paddingLeft = 30;
+                mainLabel.AddToClassList("header-main-label-with-icon");
             }
-            mainLabel.style.top = 0;
-            mainLabel.style.height = Length.Percent(100);
-            mainLabel.style.width = Length.Percent(50);
-            mainLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            mainLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
             Add(mainLabel);
 
             subLabel = new Label(subText);
-            subLabel.style.position = Position.Absolute;
-            subLabel.style.right = 0;
-            subLabel.style.paddingRight = 10;
-            subLabel.style.top = 0;
-            subLabel.style.height = Length.Percent(100);
-            subLabel.style.width = Length.Percent(50);
-            subLabel.style.unityFontStyleAndWeight = FontStyle.Normal;
-            subLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+            subLabel.AddStyle(LayoutUSS.StyleSheetInstance, "header-sub-label");
             Add(subLabel);
 
             if (icon != null)
             {
                 image = new Image();
-                image.style.position = Position.Absolute;
-                image.style.left = 5;
-                image.style.top = 1;
-                image.style.width = 18;
-                image.style.height = 18;
+                image.AddStyle(LayoutUSS.StyleSheetInstance, "header-image");
                 image.image = icon;
+
                 Add(image);
             }
         }
