@@ -61,6 +61,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type == typeof(float): return RegisterFloatInputField(fieldInfo, target);
                 case var type when type == typeof(Vector2): return Vector2fFieldElement(fieldInfo, target);
                 case var type when type == typeof(Vector2Int): return Vector2iFieldElement(fieldInfo, target);
+                case var type when type.IsEnum: return EnumFieldElement(fieldInfo, target);
 
                 // Compound Types
                 case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target);
@@ -152,6 +153,18 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 editorState.TriggerSelectedElementIsDirty(this);
             });
             return vectorField;
+        }
+
+        VisualElement EnumFieldElement(FieldInfo info, object target)
+        {
+            EnumFieldElement enumField = new EnumFieldElement(info.Name, (Enum)info.GetValue(target));
+            enumField.SetValueWithoutNotify((Enum)info.GetValue(target));
+            enumField.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+                editorState.TriggerSelectedElementIsDirty(this);
+            });
+            return enumField;
         }
     }
 }

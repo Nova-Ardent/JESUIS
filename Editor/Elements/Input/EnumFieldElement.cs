@@ -3,6 +3,13 @@ using UnityEngine.UIElements;
 
 namespace JESUIS.Editor.Elements.Input
 {
+    public class EnumFieldElement : EnumFieldElement<Enum>
+    {
+        public EnumFieldElement(string labelText, Enum defaultValue) : base(labelText, defaultValue)
+        {
+        }
+    }
+
     public class EnumFieldElement<T> : LabelledFieldElement where T : Enum
     {
         EnumField enumField;
