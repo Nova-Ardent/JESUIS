@@ -26,6 +26,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
             style.borderBottomColor = Colors.RENDERER_BOX_SELECTOR_COLOR;
             style.borderLeftColor = Colors.RENDERER_BOX_SELECTOR_COLOR;
             style.borderRightColor = Colors.RENDERER_BOX_SELECTOR_COLOR;
+
+            schedule.Execute(()=>
+            {
+                if (target != null && GetActive())
+                    WrapToTarget();
+            }).Every(0);
         }
 
         public void WrapToTarget()
