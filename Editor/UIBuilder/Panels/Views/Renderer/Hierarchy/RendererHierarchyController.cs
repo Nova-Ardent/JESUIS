@@ -6,18 +6,21 @@ using UnityEngine.UIElements;
 using UnityEngine;
 using System;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder;
+using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 {
     public class RendererHierarchyController : BaseRendererElement
     {
+        BoxSelector boxSelector;
         EditorState editorState;
         RendererElementLoader elementLoader = RendererElementLoader.Instance;
 
         Dictionary<BaseElement, VisualElement> elementToRendererElementMap = new Dictionary<BaseElement, VisualElement>();
 
-        public RendererHierarchyController(EditorState editorState)
+        public RendererHierarchyController(EditorState editorState, BoxSelector boxSelector)
         {
+            this.boxSelector = boxSelector;
             this.editorState = editorState;
             this.editorState.ListenToElementIsDirty(OnElementIsDirty);
             
@@ -28,6 +31,21 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             style.right = 0;
 
             elementToRendererElementMap.Add(editorState.CurrentScreen.GetRootElement(), this);
+            editorState.SelectedElement.ListenTo(OnSelectedElementChanged);
+        }
+
+        public void OnSelectedElementChanged(BaseElement selectedElement)
+        {
+            if (selectedElement == null || selectedElement is RootElement)
+            {
+                boxSelector.SetActive(false);
+            }
+            else
+            {
+                boxSelector.SetActive(true);
+                boxSelector.SetTarget(elementToRendererElementMap[selectedElement]);
+                boxSelector.BringToFront();
+            }
         }
 
         public void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
@@ -57,6 +75,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
                     if (targetElement is IRendererElement rendererElement)
                     {
                         rendererElement.OnValuesChanged();
+                        boxSelector.WrapToTarget();
                     }
                 }
             }

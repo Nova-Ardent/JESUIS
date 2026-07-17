@@ -30,6 +30,8 @@ namespace JESUIS.Editor.Settings
         public static readonly Color RENDERER_CHECKERBACKGROUND_LIGHT_COLOR = new Color(1, 1, 1);
         public static readonly Color RENDERER_CHECKERBACKGROUND_DARK_COLOR = new Color(0.8980393f, 0.8980393f, 0.8980393f);
 
+        public static readonly Color RENDERER_BOX_SELECTOR_COLOR = new Color(0.1568627450980392f, 0.5019607843137255f, 0.9019607843137255f);
+
         public static readonly Color HEADER_BACKING = new Color(0.24313725490196078f, 0.24313725490196078f, 0.24313725490196078f);
         public static readonly Color HEADER_TRIM_TOP = new Color(0.0784313725490196f, 0.0784313725490196f, 0.0784313725490196f);
         public static readonly Color HEADER_TRIM_BOTTOM = new Color(0.18823529411764706f, 0.18823529411764706f, 0.18823529411764706f);
@@ -40,5 +42,6 @@ namespace JESUIS.Editor.Settings
         public static readonly Color ALIGNMENT_SELECTOR_PIN_UNSELECTED = new Color(0.5f, 0.5f, 0.5f);
         public static readonly Color ALIGNMENT_SELECTOR_PIN_SELECTED = new Color(1f, 1f, 1f);
         public static readonly Color ALIGNMENT_SELECTOR_PIN_HOVER = new Color(.75f, .75f, .75f);
+
     }
 }

@@ -3,6 +3,7 @@ using JESUIS.Editor.Helpers.Motions;
 using JESUIS.Editor.Settings;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy;
+using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -32,10 +33,10 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
         float currentWidth = 100;
         float currentHeight = 100;
 
-        public RendererDisplay(EditorState editorState) : base(AssetDatabase.LoadAssetAtPath<Shader>(BackgroundShaderPath))
+        public RendererDisplay(EditorState editorState, BoxSelector boxSelector) : base(AssetDatabase.LoadAssetAtPath<Shader>(BackgroundShaderPath))
         {
             this.editorState = editorState;
-            hierarchyController = new RendererHierarchyController(editorState);
+            hierarchyController = new RendererHierarchyController(editorState, boxSelector);
             Add(hierarchyController);
 
             style.position = Position.Absolute;
