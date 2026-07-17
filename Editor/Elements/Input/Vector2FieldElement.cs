@@ -8,7 +8,7 @@ namespace JESUIS.Editor.Elements.Input
         public Vector2 CurrentValue { get; private set; }
         Action<Vector2> onValueChanged;
 
-        public Vector2fFieldElement(string labelText) : base(labelText, "X", "Y")
+        public Vector2fFieldElement(string labelText, string XLabel = "X", string YLabel = "Y") : base(labelText, XLabel, YLabel)
         {
         }
 

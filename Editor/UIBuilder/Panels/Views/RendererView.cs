@@ -13,13 +13,14 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         public override Views Type => Views.Renderer;
 
-        RendererDisplay rendererDisplay = new RendererDisplay();
+        RendererDisplay rendererDisplay;
 
         AspectRatioDropDown aspectRatioDropDown;
 
         public RendererView(EditorState editorState)
         {
             this.editorState = editorState;
+            rendererDisplay = new RendererDisplay(editorState);
 
             style.left = 0;
             style.top = 0;

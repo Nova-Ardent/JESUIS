@@ -2,6 +2,7 @@ using JESUIS.Editor.Elements.Widgets;
 using JESUIS.Editor.Helpers;
 using JESUIS.Editor.Helpers.Utils;
 using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Shared.ScreenData.Data;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         {
             this.editorState = editorState;
             editorHierarchy = new Elements.Widgets.Hierarchy(editorState.CurrentScreen.GetRootElement(), GetActions, OnElementClicked);
-            editorState.ListenToSelectedElementIsDirty(OnSelectedElementIsDirty);
+            editorState.ListenToElementIsDirty(OnElementIsDirty);
 
             style.left = 0;
             style.top = 0;
@@ -41,12 +42,15 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
         }
 
-        void OnSelectedElementIsDirty(EditorViews triggeringView)
+        void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
         {
             if (triggeringView == this)
                 return;
 
-            hierarchyItem.UpdateLabel();
+            if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated)
+            {
+                hierarchyItem.UpdateLabel();
+            }
         }
 
         IEnumerable<NamedAction> GetActions(HierarchyItem item)
@@ -72,6 +76,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 baseElement.AddChild(newEmpty);
                 item.AddChild(new HierarchyItem(newEmpty, GetActions, OnElementClicked));
                 editorHierarchy.RebuildListVisuals();
+                editorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newEmpty));
             }
             else
             {

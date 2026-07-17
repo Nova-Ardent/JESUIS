@@ -40,9 +40,9 @@ namespace JESUIS.Editor.Elements.SpecialInputs
             alignmentTool.SetValueWithoutNotify(alignment);
         }
 
-        public void RegisterOnValidChanged(Action<Alignment> onChange)
+        public void RegisterOnValueChanged(Action<Alignment> onChange)
         {
-            alignmentTool.RegisterOnValidChanged(onChange);
+            alignmentTool.RegisterOnValueChanged(onChange);
         }
     }
 
@@ -130,7 +130,7 @@ namespace JESUIS.Editor.Elements.SpecialInputs
             ValueChanged(alignment, alignmentPins.Cast<AlignmentPin>().First(x => x.GetAlignment() == alignment), false);
         }
 
-        public void RegisterOnValidChanged(Action<Alignment> onChange)
+        public void RegisterOnValueChanged(Action<Alignment> onChange)
         {
             if (this.onChange == null)
             {

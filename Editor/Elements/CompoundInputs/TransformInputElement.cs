@@ -2,8 +2,12 @@ using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Elements.SpecialInputs;
 using JESUIS.Editor.Settings;
+using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.UIBuilder.Data.StateChanges;
+using JESUIS.Editor.UIBuilder.Panels.Views;
 using JESUIS.Editor.Utilities.StyleSheets;
 using JESUIS.Shared.ScreenData.Types;
+using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -18,6 +22,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
         public const int ALIGNMENT_PADDING = 20;
         public const string IconPath = "Assets/JESUIS/Editor/Resources/Icons/Inspector/Transform.png";
 
+        Vector2fFieldElement sizeField;
         Vector2fFieldElement positionField;
         Vector2fFieldElement scaleField;
         FloatInputFieldElement rotationField;
@@ -30,6 +35,8 @@ namespace JESUIS.Editor.Elements.CompoundInputs
 
         EnumFieldElement<Unit> horizontalPositionField;
         EnumFieldElement<Unit> horizontalSizeField;
+
+        Action onChange;
         
         public TransformInputElement(string name, Shared.ScreenData.Types.Transform target)
         {
@@ -40,21 +47,33 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             header.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-element-header");
             Add(header);
 
+            sizeField = new Vector2fFieldElement("Size", "W", "H");
+            sizeField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-size");
+            sizeField.SetValuesWithoutNotify(target.Size.x, target.Size.y);
+            sizeField.RegisterOnValueChanged((newValue) =>
+            {
+                target.Size = newValue;
+                onChange?.Invoke();
+            });
+            Add(sizeField);
+
             positionField = new Vector2fFieldElement("Position");
             positionField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-position");
             positionField.SetValuesWithoutNotify(target.Position.x, target.Position.y);
             positionField.RegisterOnValueChanged((newValue) =>
             {
                 target.Position = newValue;
+                onChange?.Invoke();
             });
             Add(positionField);
 
             scaleField = new Vector2fFieldElement("Scale");
             scaleField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-scale");
-            scaleField.SetValuesWithoutNotify(target.Size.x, target.Size.y);
+            scaleField.SetValuesWithoutNotify(target.Scale.x, target.Scale.y);
             scaleField.RegisterOnValueChanged((newValue) =>
             {
-                target.Size = newValue;
+                target.Scale = newValue;
+                onChange?.Invoke();
             });
             Add(scaleField);
 
@@ -64,27 +83,29 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             rotationField.RegisterOnValueChanged((newValue) =>
             {
                 target.Rotation = newValue;
+                onChange?.Invoke();
             });
             Add(rotationField);
 
             anchorField = new AlignmentSelector("Anchor");
             anchorField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-anchor");
             anchorField.SetValueWithoutNotify(target.Anchor);
-            anchorField.RegisterOnValidChanged((newValue) =>
+            anchorField.RegisterOnValueChanged((newValue) =>
             {
                 target.Anchor = newValue;
+                onChange?.Invoke();
             });
             Add(anchorField);
 
             pivotField = new AlignmentSelector("Pivot");
             pivotField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-pivot");
             pivotField.SetValueWithoutNotify(target.Pivot);
-            pivotField.RegisterOnValidChanged((newValue) =>
+            pivotField.RegisterOnValueChanged((newValue) =>
             {
                 target.Pivot = newValue;
+                onChange?.Invoke();
             });
             Add(pivotField);
-
 
             verticalPositionField = new EnumFieldElement<Unit>("Vert Pos", Unit.Pixels);
             verticalPositionField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-vertical-position");
@@ -92,6 +113,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             verticalPositionField.RegisterOnValueChanged((newValue) =>
             {
                 target.VerticalPosition = newValue;
+                onChange?.Invoke();
             });
             Add(verticalPositionField);
 
@@ -101,6 +123,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             verticalSizeField.RegisterOnValueChanged((newValue) =>
             {
                 target.VerticalSize = newValue;
+                onChange?.Invoke();
             });
             Add(verticalSizeField);
 
@@ -110,6 +133,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             horizontalPositionField.RegisterOnValueChanged((newValue) =>
             {
                 target.HorizontalPosition = newValue;
+                onChange?.Invoke();
             });
             Add(horizontalPositionField);
 
@@ -119,10 +143,23 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             horizontalSizeField.RegisterOnValueChanged((newValue) =>
             {
                 target.HorizontalSize = newValue;
+                onChange?.Invoke();
             });
             Add(horizontalSizeField);
 
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        }
+
+        public void RegisterOnValueChanged(Action onChange)
+        {
+            if (this.onChange == null)
+            {
+                this.onChange = onChange;
+            }
+            else
+            {
+                this.onChange += onChange;
+            }
         }
 
         void OnGeometryChanged(GeometryChangedEvent evt)
@@ -133,16 +170,21 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             horizontalSizeField.style.width = contentRect.width - horizontalSizeField.resolvedStyle.left;
         }
 
-        public static TransformInputElement RegisterField(FieldInfo info, object target)
+        public static TransformInputElement RegisterField(FieldInfo info, object target, EditorViews triggeringView, EditorState editorState)
         {
             Shared.ScreenData.Types.Transform transform = (Shared.ScreenData.Types.Transform)info.GetValue(target);
             if (transform == null)
             {
-                Debug.LogError("");
+                Debug.LogError("transform element is null.");
                 return null;
             }
 
-            return new TransformInputElement(info.Name, transform);
+            TransformInputElement inputElement = new TransformInputElement(info.Name, transform);
+            inputElement.RegisterOnValueChanged(() =>
+            {
+                editorState.TriggerElementIsDirty(triggeringView, new ValuesUpdated(editorState.SelectedElement));
+            });
+            return inputElement;
         }
     }
 }

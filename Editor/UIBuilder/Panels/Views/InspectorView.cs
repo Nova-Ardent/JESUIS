@@ -1,6 +1,7 @@
 using JESUIS.Editor.Elements.CompoundInputs;
 using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Shared.ScreenData.Data;
 using System;
 using System.Collections.Generic;
@@ -64,7 +65,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type.IsEnum: return EnumFieldElement(fieldInfo, target);
 
                 // Compound Types
-                case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target);
+                case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, editorState);
 
                 default:
                     Debug.LogWarning($"Could not create inspector element for field type {fieldInfo.FieldType}");
@@ -102,7 +103,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             textField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
-                editorState.TriggerSelectedElementIsDirty(this);
+                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
             return textField;
         }
@@ -114,7 +115,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             intField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
-                editorState.TriggerSelectedElementIsDirty(this);
+                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
             return intField;
         }
@@ -126,7 +127,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             floatField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
-                editorState.TriggerSelectedElementIsDirty(this);
+                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
             return floatField;
         }
@@ -138,7 +139,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             vectorField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
-                editorState.TriggerSelectedElementIsDirty(this);
+                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
             return vectorField;
         }
@@ -150,7 +151,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             vectorField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
-                editorState.TriggerSelectedElementIsDirty(this);
+                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
             return vectorField;
         }
@@ -162,7 +163,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             enumField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
-                editorState.TriggerSelectedElementIsDirty(this);
+                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
             return enumField;
         }

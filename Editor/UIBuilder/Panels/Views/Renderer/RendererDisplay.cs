@@ -1,16 +1,21 @@
 using JESUIS.Editor.Elements.Common.VisualElements;
 using JESUIS.Editor.Helpers.Motions;
 using JESUIS.Editor.Settings;
-using UnityEditor;
-using UnityEngine.UIElements;
-using UnityEngine;
+using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
 {
     public class RendererDisplay : MaterialRTTVisualElement
     {
         static readonly string BackgroundShaderPath = "Assets/JESUIS/Editor/Resources/Shaders/UIEditor/Renderer/Background.shader";
+
+        EditorState editorState;
+        RendererHierarchyController hierarchyController;
 
         const float MIN_ZOOM = 0.05f;
         const float MAX_ZOOM = 10f;
@@ -27,8 +32,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
         float currentWidth = 100;
         float currentHeight = 100;
 
-        public RendererDisplay() : base(AssetDatabase.LoadAssetAtPath<Shader>(BackgroundShaderPath))
+        public RendererDisplay(EditorState editorState) : base(AssetDatabase.LoadAssetAtPath<Shader>(BackgroundShaderPath))
         {
+            this.editorState = editorState;
+            hierarchyController = new RendererHierarchyController(editorState);
+            Add(hierarchyController);
+
             style.position = Position.Absolute;
             currentWidth = 100;
             currentHeight = 100;

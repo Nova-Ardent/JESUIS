@@ -1,6 +1,6 @@
 .transform-element
 {
-	height: 178px;
+	height: 200px;
 	width: 100%;
 	border-bottom-width: 1px;
 }
@@ -11,65 +11,72 @@
 	position: absolute;
 }
 
-.transform-position
+.transform-size
 {
 	position: absolute;
 	top: 22px;
 	left: 0px;
 }
 
-.transform-scale
+.transform-position
 {
 	position: absolute;
 	top: 44px;
 	left: 0px;
 }
 
-.transform-rotation
+.transform-scale
 {
 	position: absolute;
 	top: 66px;
 	left: 0px;
 }
 
+.transform-rotation
+{
+	position: absolute;
+	top: 88px;
+	left: 0px;
+}
+
 .transform-anchor
 {
 	position: absolute;
-	top: 92px;
+	top: 114px;
 	left: 20px;
 }
 
 .transform-pivot
 {
 	position: absolute;
-	top: 92px;
+	top: 114px;
 	left: 85px;
 }
 
 .transform-vertical-position
 {
 	position: absolute;
-	top: 88px;
+	top: 110px;
 	left: 130px;
 }
 
 .transform-vertical-size
 {
 	position: absolute;
-	top: 110px;
+	top: 132px;
 	left: 130px;
 }
 
 .transform-horizontal-position
 {
 	position: absolute;
-	top: 132px;
+	top: 154px;
 	left: 130px;
 }
 
 .transform-horizontal-size
 {
 	position: absolute;
-	top: 154px;
+	top: 176px;
 	left: 130px;
 }

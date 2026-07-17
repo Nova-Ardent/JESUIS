@@ -7,8 +7,8 @@ namespace JESUIS.Shared.ScreenData.Data
     [System.Serializable]
     public class BaseElement
     {
-        [SerializeField] protected string Name = "";
-        [SerializeField] protected Types.Transform Transform = new Types.Transform();
+        [SerializeField] public string Name = "";
+        [SerializeField] public Types.Transform Transform = new Types.Transform();
 
         [SerializeReference] List<BaseElement> children = new List<BaseElement>(); 
 
