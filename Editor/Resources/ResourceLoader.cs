@@ -22,6 +22,17 @@ namespace JESUIS.Editor.Resources
         string basePath;
 
         public IconResources Icons;
+        public ShaderResources Shaders;
+
+        public class ShaderResources
+        {
+            public Resource<Shader> Background;
+
+            public ShaderResources(string path)
+            {
+                Background = new Resource<Shader>(path, "UIEditor/Renderer/Background.shader");  
+            }
+        }
 
         public class IconResources
         {
@@ -64,6 +75,7 @@ namespace JESUIS.Editor.Resources
             basePath = Path.GetRelativePath(dataDir, callerDir);
 
             Icons = new IconResources(Path.Combine(basePath, "Icons"));
+            Shaders = new ShaderResources(Path.Combine(basePath, "Shaders"));
         }
     }
 }

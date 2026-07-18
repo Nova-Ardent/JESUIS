@@ -4,17 +4,14 @@ using JESUIS.Editor.Settings;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using JESUIS.Editor.Resources;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
 {
     public class RendererDisplay : MaterialRTTVisualElement
     {
-        static readonly string BackgroundShaderPath = "Assets/JESUIS/Editor/Resources/Shaders/UIEditor/Renderer/Background.shader";
-
         EditorState editorState;
         RendererHierarchyController hierarchyController;
 
@@ -33,7 +30,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
         float currentWidth = 100;
         float currentHeight = 100;
 
-        public RendererDisplay(EditorState editorState, BoxSelector boxSelector) : base(AssetDatabase.LoadAssetAtPath<Shader>(BackgroundShaderPath))
+        public RendererDisplay(EditorState editorState, BoxSelector boxSelector) : base(ResourceLoader.Instance.Shaders.Background.Value)
         {
             this.editorState = editorState;
             hierarchyController = new RendererHierarchyController(editorState, boxSelector);
