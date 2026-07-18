@@ -9,9 +9,9 @@ using JESUIS.Editor.Utilities.StyleSheets;
 using JESUIS.Shared.ScreenData.Types;
 using System;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using JESUIS.Editor.Resources;
 
 namespace JESUIS.Editor.Elements.CompoundInputs
 {
@@ -20,7 +20,6 @@ namespace JESUIS.Editor.Elements.CompoundInputs
         public const int BOTTOM_PADDING = 6;
         public const int ELEMENT_PADDING = 2;
         public const int ALIGNMENT_PADDING = 20;
-        public const string IconPath = "Assets/JESUIS/Editor/Resources/Icons/Inspector/Transform.png";
 
         Vector2fFieldElement sizeField;
         Vector2fFieldElement positionField;
@@ -43,7 +42,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             this.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-element");
             style.borderBottomColor = Colors.TRANSFORM_INPUT_BORDER_TRIM;
 
-            Header header = new Header("Transform", name, AssetDatabase.LoadAssetAtPath<Texture2D>(IconPath));
+            Header header = new Header("Transform", name, ResourceLoader.Instance.Icons.Inspector.Transform.Value);
             header.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-element-header");
             Add(header);
 

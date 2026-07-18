@@ -6,13 +6,12 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System;
 using JESUIS.Editor.Helpers;
+using JESUIS.Editor.Resources;
 
 namespace JESUIS.Editor.Elements.Widgets
 {
     public class Hierarchy : VisualElement
     {
-        public const string HierarchyAssetPath = "Assets/JESUIS/Editor/Resources/Icons/Hierarchy/";
-
         public HierarchyItem RootItem { get; private set; }
         public HierarchyItem SelectedItem { get; private set; }
 
@@ -25,7 +24,7 @@ namespace JESUIS.Editor.Elements.Widgets
             style.height = Length.Percent(100);
             style.backgroundColor = Colors.PANEL_COLOR;
 
-            RootItem = new HierarchyItem(rootObject, onRightClick, onElementClick, AssetDatabase.LoadAssetAtPath<Texture2D>(Path.Combine(HierarchyAssetPath + "Root.png")), true);
+            RootItem = new HierarchyItem(rootObject, onRightClick, onElementClick, ResourceLoader.Instance.Icons.Hierarchy.Root.Value, true);
             RootItem.SetHierarchyOwner(this);
             
             RebuildListVisuals();
