@@ -163,7 +163,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
             if (target is IRendererElement rendererElement)
             {
                 Vector2 positionDelta = Vector2.zero;
-                
+                Vector2 sizeDelta = Vector2.zero;
+
                 Shared.ScreenData.Types.Transform transform = rendererElement.GetTransform();
                 switch (horizontalPoint)
                 {
@@ -173,11 +174,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
                         else
                             positionDelta = target.parent.GetRelativeDelta(target, new Vector2(localDelta.x, 0));
 
-                        transform.Size.x -= localDelta.x;
+                        sizeDelta -= new Vector2(localDelta.x, 0);
                         break;
                     case DragEdgeHorizontal.Middle: break;
                     case DragEdgeHorizontal.Right:
-                        transform.Size.x += localDelta.x;
+                        sizeDelta += new Vector2(localDelta.x, 0);
                         break;
                 }
 
@@ -187,16 +188,31 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
                         if (horizontalPoint != DragEdgeHorizontal.Left)
                             positionDelta = target.parent.GetRelativeDelta(target, new Vector2(0, localDelta.y));
 
-                        transform.Size.y -= localDelta.y;
+                        sizeDelta -= new Vector2(0, localDelta.y);
                         break;
                     case DragEdgeVertical.Middle: break;
                     case DragEdgeVertical.Bottom:
-                        transform.Size.y += localDelta.y;
+                        sizeDelta += new Vector2(0, localDelta.y);
                         break;
                 }
 
+
+                if (transform.HorizontalPosition == Shared.ScreenData.Types.Unit.Percentage)
+                    positionDelta.x = 100 * positionDelta.x / target.parent.contentRect.width;
+
+                if (transform.VerticalPosition == Shared.ScreenData.Types.Unit.Percentage)
+                    positionDelta.y = 100 * positionDelta.y / target.parent.contentRect.height;
+
+                if (transform.HorizontalSize == Shared.ScreenData.Types.Unit.Percentage)
+                    sizeDelta.x = 100 * sizeDelta.x / target.parent.contentRect.width;
+
+                if (transform.VerticalSize == Shared.ScreenData.Types.Unit.Percentage)
+                    sizeDelta.y = 100 * sizeDelta.y / target.parent.contentRect.height;
+
                 transform.Position.x += positionDelta.x;
                 transform.Position.y += positionDelta.y;
+                transform.Size.x += sizeDelta.x;
+                transform.Size.y += sizeDelta.y;
 
                 rendererElement.OnValuesChanged();
                 WrapToTarget();
