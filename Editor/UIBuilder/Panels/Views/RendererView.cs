@@ -14,7 +14,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         public override Views Type => Views.Renderer;
 
-        BoxSelector boxSelector = new BoxSelector();
+        BoxSelector boxSelector;
         RendererDisplay rendererDisplay;
 
         AspectRatioDropDown aspectRatioDropDown;
@@ -22,6 +22,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         public RendererView(EditorState editorState)
         {
             this.editorState = editorState;
+
+            boxSelector = new BoxSelector(this);
             rendererDisplay = new RendererDisplay(editorState, boxSelector);
 
             style.left = 0;

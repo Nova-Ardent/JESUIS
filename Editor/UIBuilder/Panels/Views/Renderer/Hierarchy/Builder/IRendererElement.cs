@@ -1,4 +1,3 @@
-using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
 using JESUIS.Shared.ScreenData.Data;
 using UnityEngine.UIElements;
 
@@ -6,6 +5,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder
 {
     public interface IRendererElement
     {
+        public Shared.ScreenData.Types.Transform GetTransform();
         public void OnValuesChanged();
         public void OnParentGeometryChanged(GeometryChangedEvent geometryChangedEvent);
     }
