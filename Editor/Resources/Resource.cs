@@ -5,15 +5,15 @@ namespace JESUIS.Editor.Resources
 {
     public class Resource<T> where T : UnityEngine.Object
     {
-        string path = "";
+        protected string path = "";
 
         public Resource(string path, string file)
         {
             this.path = Path.Combine(path, file);
         }
 
-        T value;
-        public T Value 
+        protected T value;
+        public virtual T Value 
         {
             get
             {

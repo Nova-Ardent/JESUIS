@@ -1,5 +1,6 @@
 using System.IO;
 using System.Runtime.CompilerServices;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine;
 
 namespace JESUIS.Editor.Resources
@@ -30,7 +31,7 @@ namespace JESUIS.Editor.Resources
 
             public ShaderResources(string path)
             {
-                Background = new Resource<Shader>(path, "UIEditor/Renderer/Background.shader");  
+                Background = new Resource<Shader>(path, "Renderer/Background.shader");  
             }
         }
 
@@ -38,11 +39,13 @@ namespace JESUIS.Editor.Resources
         {
             public HierarchyResources Hierarchy;
             public InspectorResources Inspector;
+            public RendererResources Renderer;
 
             public IconResources(string path)
             {
                 Hierarchy = new HierarchyResources(Path.Combine(path, "Hierarchy"));
                 Inspector = new InspectorResources(Path.Combine(path, "Inspector"));
+                Renderer = new RendererResources(Path.Combine(path, "Renderer"));
             }
         }
 
@@ -65,6 +68,23 @@ namespace JESUIS.Editor.Resources
             public InspectorResources(string path)
             {
                 Transform = new Resource<Texture2D>(path, "Transform.png");
+            }
+        }
+
+        public class RendererResources
+        {
+            public Resource<Texture2D> DragPoint;
+            public Resource<Texture2D> DragArrow;
+            public Texture2D EmptyCursor;
+
+            public RendererResources(string path)
+            {
+                DragPoint = new Resource<Texture2D>(path, "DragIcon.png");
+                DragArrow = new Resource<Texture2D>(path, "DragArrow.png");
+
+                EmptyCursor = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+                EmptyCursor.SetPixel(0, 0, new Color(0, 0, 0, 0));
+                EmptyCursor.Apply();
             }
         }
 
