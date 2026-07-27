@@ -127,5 +127,10 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 
             return new Vector2(posX, posY);
         }
+
+        public Shared.ScreenData.Types.Transform GetTransform()
+        {
+            return Data.Transform;
+        }
     }
 }
