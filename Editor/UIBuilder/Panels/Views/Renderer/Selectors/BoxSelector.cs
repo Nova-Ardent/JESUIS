@@ -1,6 +1,7 @@
 using JESUIS.Editor.Elements.Display;
 using JESUIS.Editor.Resources;
 using JESUIS.Editor.Settings;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints;
 using UnityEngine;
@@ -25,13 +26,19 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
 
         RotatedTexture cursorTexture;
 
+        EditorState editorState;
+        RendererView rendererView;
+
         VisualElement target;
 
         bool isActive = false;
 
-        public BoxSelector(VisualElement parent) 
+        public BoxSelector(RendererView rendererView, EditorState editorState) 
         {
-            parent.Add(this);
+            this.editorState = editorState;
+            this.rendererView = rendererView;
+
+            rendererView.Add(this);
 
             style.position = Position.Absolute;
             style.width = 100;

@@ -1,18 +1,18 @@
 using JESUIS.Editor.Elements.Common.VisualElements;
 using JESUIS.Editor.Helpers.Motions;
+using JESUIS.Editor.Resources;
 using JESUIS.Editor.Settings;
-using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
+using JESUIS.Shared.ScreenData.Data;
 using UnityEngine;
 using UnityEngine.UIElements;
-using JESUIS.Editor.Resources;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
 {
     public class RendererDisplay : MaterialRTTVisualElement
     {
-        EditorState editorState;
         RendererHierarchyController hierarchyController;
 
         const float MIN_ZOOM = 0.05f;
@@ -30,10 +30,9 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
         float currentWidth = 100;
         float currentHeight = 100;
 
-        public RendererDisplay(EditorState editorState, BoxSelector boxSelector) : base(ResourceLoader.Instance.Shaders.Background.Value)
+        public RendererDisplay(Shared.ScreenData.Screen currentScreen, BoxSelector boxSelector) : base(ResourceLoader.Instance.Shaders.Background.Value)
         {
-            this.editorState = editorState;
-            hierarchyController = new RendererHierarchyController(editorState, boxSelector);
+            hierarchyController = new RendererHierarchyController(currentScreen, boxSelector);
             Add(hierarchyController);
 
             style.position = Position.Absolute;
@@ -57,6 +56,16 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
             material.SetFloat("_DivisionsHorizontal", currentWidth / 10);
             material.SetFloat("_DivisionsVertical", currentHeight / 10);
             UpdateTexture();
+        }
+
+        public void OnSelectedElementChanged(BaseElement selectedElement)
+        {
+            hierarchyController.OnSelectedElementChanged(selectedElement);
+        }
+
+        public void OnElementIsDirty(ElementChanges elementChanges)
+        {
+            hierarchyController.OnElementIsDirty(elementChanges);
         }
 
         public void ChangeAspectRatio(int width, int height)

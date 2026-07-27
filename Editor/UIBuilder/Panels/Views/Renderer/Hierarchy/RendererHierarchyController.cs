@@ -1,26 +1,25 @@
-using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Shared.ScreenData.Data;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
+using JESUIS.Shared.ScreenData;
+
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 {
     public class RendererHierarchyController : BaseRendererElement
     {
+        EditorViews parentView;
         BoxSelector boxSelector;
-        EditorState editorState;
         RendererElementLoader elementLoader = RendererElementLoader.Instance;
 
         Dictionary<BaseElement, VisualElement> elementToRendererElementMap = new Dictionary<BaseElement, VisualElement>();
 
-        public RendererHierarchyController(EditorState editorState, BoxSelector boxSelector)
+        public RendererHierarchyController(Screen screen, BoxSelector boxSelector)
         {
             this.boxSelector = boxSelector;
-            this.editorState = editorState;
-            this.editorState.ListenToElementIsDirty(OnElementIsDirty);
             
             style.position = Position.Absolute;
             style.width = Length.Percent(100);
@@ -28,8 +27,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             style.left = 0;
             style.right = 0;
 
-            elementToRendererElementMap.Add(editorState.CurrentScreen.GetRootElement(), this);
-            editorState.SelectedElement.ListenTo(OnSelectedElementChanged);
+            elementToRendererElementMap.Add(screen.GetRootElement(), this);
         }
 
         public void OnSelectedElementChanged(BaseElement selectedElement)
@@ -46,7 +44,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             }
         }
 
-        public void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
+        public void OnElementIsDirty(ElementChanges elementChanges)
         {
             if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ChildAdded)
             {

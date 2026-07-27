@@ -1,8 +1,10 @@
 using JESUIS.Editor.Elements.Layout.TabBarWidgets;
 using JESUIS.Editor.Settings;
 using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
+using JESUIS.Shared.ScreenData.Data;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
@@ -22,9 +24,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         public RendererView(EditorState editorState)
         {
             this.editorState = editorState;
+            editorState.SelectedElement.ListenTo(OnSelectedElementChanged);
+            editorState.ListenToElementIsDirty(OnElementIsDirty);
 
-            boxSelector = new BoxSelector(this);
-            rendererDisplay = new RendererDisplay(editorState, boxSelector);
+            boxSelector = new BoxSelector(this, editorState);
+            rendererDisplay = new RendererDisplay(editorState.CurrentScreen, boxSelector);
 
             style.left = 0;
             style.top = 0;
@@ -38,6 +42,21 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             aspectRatioDropDown = new AspectRatioDropDown(UpdateAspectRatio);
             aspectRatioDropDown.SetOption(0, true);
+        }
+
+        void OnSelectedElementChanged(BaseElement selectedElement)
+        {
+            rendererDisplay.OnSelectedElementChanged(selectedElement);
+        }
+
+        void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
+        {
+            if (triggeringView.Type == Views.Renderer)
+            {
+                return;
+            }
+
+            rendererDisplay.OnElementIsDirty(elementChanges);
         }
 
         void UpdateAspectRatio(int width, int height) 
