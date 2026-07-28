@@ -36,9 +36,13 @@ namespace JESUIS.Editor.Elements.CompoundInputs
         EnumFieldElement<Unit> horizontalSizeField;
 
         Action onChange;
-        
+
+        Shared.ScreenData.Types.Transform targetTransform;
+
         public TransformInputElement(string name, Shared.ScreenData.Types.Transform target)
         {
+            targetTransform = target;
+
             this.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-element");
             style.borderBottomColor = Colors.TRANSFORM_INPUT_BORDER_TRIM;
 
@@ -161,6 +165,20 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             }
         }
 
+        public void UpdateInspectorElements()
+        {
+            sizeField.SetValuesWithoutNotify(targetTransform.Size.x, targetTransform.Size.y);
+            positionField.SetValuesWithoutNotify(targetTransform.Position.x, targetTransform.Position.y);
+            scaleField.SetValuesWithoutNotify(targetTransform.Scale.x, targetTransform.Scale.y);
+            rotationField.SetValueWithoutNotify(targetTransform.Rotation);
+            anchorField.SetValueWithoutNotify(targetTransform.Anchor);
+            pivotField.SetValueWithoutNotify(targetTransform.Pivot);
+            verticalPositionField.SetValueWithoutNotify(targetTransform.VerticalPosition);
+            verticalSizeField.SetValueWithoutNotify(targetTransform.VerticalSize);
+            horizontalPositionField.SetValueWithoutNotify(targetTransform.HorizontalPosition);
+            horizontalSizeField.SetValueWithoutNotify(targetTransform.HorizontalSize);  
+        }
+
         void OnGeometryChanged(GeometryChangedEvent evt)
         {
             verticalPositionField.style.width = contentRect.width - verticalPositionField.resolvedStyle.left;
@@ -169,7 +187,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             horizontalSizeField.style.width = contentRect.width - horizontalSizeField.resolvedStyle.left;
         }
 
-        public static TransformInputElement RegisterField(FieldInfo info, object target, EditorViews triggeringView, EditorState editorState)
+        public static TransformInputElement RegisterField(FieldInfo info, object target, EditorViews triggeringView, EditorState editorState, ref Action onSelectedElementUpdated)
         {
             Shared.ScreenData.Types.Transform transform = (Shared.ScreenData.Types.Transform)info.GetValue(target);
             if (transform == null)
@@ -183,6 +201,15 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             {
                 editorState.TriggerElementIsDirty(triggeringView, new ValuesUpdated(editorState.SelectedElement));
             });
+
+            if (onSelectedElementUpdated == null)
+            {
+                onSelectedElementUpdated = inputElement.UpdateInspectorElements;
+            }
+            else
+            {
+                onSelectedElementUpdated += inputElement.UpdateInspectorElements;
+            }
             return inputElement;
         }
     }

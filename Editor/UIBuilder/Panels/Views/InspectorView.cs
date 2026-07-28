@@ -16,7 +16,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
     public class InspectorView : EditorViews
     {
         const int ELEMENT_PADDING = 2;
-        
+
+        Action onSelectedElementUpdated;
         EditorState editorState;
 
         public override Views Type => Views.Inspector;
@@ -25,6 +26,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         {
             this.editorState = editorState;
             editorState.SelectedElement.ListenTo(InspectingNewElement);
+            editorState.ListenToElementIsDirty(OnElementIsDirty);
 
             style.left = 0;
             style.top = 0;
@@ -32,9 +34,24 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             style.height = Length.Percent(100);
         }
 
-        public void InspectingNewElement(BaseElement baseElement)
+        void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
+        {
+            if (triggeringView.Type == Views.Inspector)
+            {
+                return;
+            }
+
+            if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated)
+            {
+                onSelectedElementUpdated?.Invoke();
+            }
+        }
+
+        void InspectingNewElement(BaseElement baseElement)
         {
             Clear();
+            onSelectedElementUpdated = null;
+
             if (baseElement is RootElement)
             {
                 return;
@@ -52,7 +69,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
         }
 
-        public VisualElement GetInspectorElement(FieldInfo fieldInfo, object target)
+        VisualElement GetInspectorElement(FieldInfo fieldInfo, object target)
         {
             switch (fieldInfo.FieldType)
             {
@@ -65,7 +82,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type.IsEnum: return EnumFieldElement(fieldInfo, target);
 
                 // Compound Types
-                case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, editorState);
+                case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, editorState, ref onSelectedElementUpdated);
 
                 default:
                     Debug.LogWarning($"Could not create inspector element for field type {fieldInfo.FieldType}");
@@ -96,6 +113,18 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
         }
 
+        void AddOnSelectedElementUpdated(Action action)
+        {
+            if (onSelectedElementUpdated == null)
+            {
+                onSelectedElementUpdated = action;
+            }
+            else
+            {
+                onSelectedElementUpdated += action;
+            }   
+        }
+
         VisualElement RegisterStringInputField(FieldInfo info, object target)
         {
             TextInputFieldElement textField = new TextInputFieldElement(info.Name, "");
@@ -105,6 +134,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 info.SetValue(target, newText);
                 editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
+
+            AddOnSelectedElementUpdated(() => textField.SetValueWithoutNotify(info.GetValue(target)?.ToString() ?? ""));
             return textField;
         }
 
@@ -117,6 +148,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 info.SetValue(target, newText);
                 editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
+
+            AddOnSelectedElementUpdated(() => intField.SetValueWithoutNotify((int)info.GetValue(target)));
             return intField;
         }
 
@@ -129,6 +162,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 info.SetValue(target, newText);
                 editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
+
+            AddOnSelectedElementUpdated(() => floatField.SetValueWithoutNotify((float)info.GetValue(target)));
             return floatField;
         }
 
@@ -141,6 +176,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 info.SetValue(target, newValue);
                 editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
+
+            AddOnSelectedElementUpdated(() => vectorField.SetValueWithoutNotify((Vector2)info.GetValue(target)));
             return vectorField;
         }
 
@@ -153,6 +190,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 info.SetValue(target, newValue);
                 editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
+
+            AddOnSelectedElementUpdated(() => vectorField.SetValueWithoutNotify((Vector2Int)info.GetValue(target)));
             return vectorField;
         }
 
@@ -165,6 +204,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 info.SetValue(target, newValue);
                 editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
             });
+
+            AddOnSelectedElementUpdated(() => enumField.SetValueWithoutNotify((Enum)info.GetValue(target)));
             return enumField;
         }
     }

@@ -2,6 +2,7 @@ using JESUIS.Editor.Elements.Display;
 using JESUIS.Editor.Resources;
 using JESUIS.Editor.Settings;
 using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints;
 using UnityEngine;
@@ -223,6 +224,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
 
                 rendererElement.OnValuesChanged();
                 WrapToTarget();
+
+                editorState.TriggerElementIsDirty(rendererView, new ValuesUpdated(editorState.SelectedElement));
             }
         }
     }
