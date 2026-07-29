@@ -30,9 +30,9 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
         float currentWidth = 100;
         float currentHeight = 100;
 
-        public RendererDisplay(Shared.ScreenData.Screen currentScreen, BoxSelector boxSelector) : base(ResourceLoader.Instance.Shaders.Background.Value)
+        public RendererDisplay(BoxSelector boxSelector) : base(ResourceLoader.Instance.Shaders.Background.Value)
         {
-            hierarchyController = new RendererHierarchyController(currentScreen, boxSelector);
+            hierarchyController = new RendererHierarchyController(boxSelector);
             Add(hierarchyController);
 
             style.position = Position.Absolute;
@@ -56,6 +56,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
             material.SetFloat("_DivisionsHorizontal", currentWidth / 10);
             material.SetFloat("_DivisionsVertical", currentHeight / 10);
             UpdateTexture();
+        }
+
+        public void SetScreen(Shared.ScreenData.Screen screen)
+        {
+            hierarchyController.SetScreen(screen);
         }
 
         public void OnSelectedElementChanged(BaseElement selectedElement)

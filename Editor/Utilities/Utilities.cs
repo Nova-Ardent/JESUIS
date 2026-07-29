@@ -14,9 +14,7 @@ namespace JESUIS.Editor.Utilities
     {
         public static StyleSheet GetUSS(string styleSheetName = "style", [CallerFilePath] string callerPath = "")
         {
-            string dataDir = Path.GetDirectoryName(Application.dataPath);
-            string callerDir = Path.GetDirectoryName(callerPath);
-            string relativePath = Path.GetRelativePath(dataDir, callerDir);
+            string relativePath = PathUtils.GetProjectRelativePath(Path.GetDirectoryName(callerPath));
 
             string target = Path.Combine(relativePath, styleSheetName);
             StyleSheet sheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(target);

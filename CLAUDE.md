@@ -29,7 +29,7 @@ Anything referencing `UnityEditor` must stay under `Editor/`. The data model (`S
 
 ## Data model (`Shared/ScreenData/`)
 
-`Screen` (a `ScriptableObject`) owns a single `RootElement`. `BaseElement` is the node type: `Name`, a `Transform`, and a `[SerializeReference] List<BaseElement> children` — polymorphic children rely on `SerializeReference`, so new element types must be `[System.Serializable]` classes deriving from `BaseElement` (not `ScriptableObject`s).
+`Screen` (a `ScriptableObject`) owns a single `[SerializeReference] RootElement`. `BaseElement` is the node type: `Name`, a `Transform`, and a `[SerializeReference] List<BaseElement> children` exposed read-only through `GetChildren()` — polymorphic children rely on `SerializeReference`, so new element types must be `[System.Serializable]` classes deriving from `BaseElement` (not `ScriptableObject`s). Both `SerializeReference` fields are what make the `.asset` roundtrip work, so neither may be downgraded to `SerializeField`.
 
 `Types.Transform` is *not* `UnityEngine.Transform` — it is 2D and layout-oriented: `Size`, `Position`, `Scale`, `Rotation`, plus `Anchor`/`Pivot` (`Alignment`) and four independent `Unit` (Pixels/Percentage) selectors for horizontal/vertical position and size. Because both `Transform` names are in scope in most editor files, this type is almost always written fully qualified as `Shared.ScreenData.Types.Transform`.
 
@@ -40,11 +40,20 @@ Anything referencing `UnityEditor` must stay under `Editor/`. The data model (`S
 `EditorState` is the single hub shared by every view:
 
 - `ReactiveProperty<BaseElement> SelectedElement` — views subscribe via `ListenTo`.
-- `TriggerElementIsDirty(EditorViews triggeringView, ElementChanges change)` — a broadcast of `ValuesUpdated` / `ChildAdded` (`Data/StateChanges/ElementChanges.cs`).
+- `ReactiveProperty<Screen> CurrentScreen` — views build themselves in a `ListenTo` handler, *not* in their constructor, so the screen can be swapped at runtime.
+- `TriggerElementIsDirty(EditorViews triggeringView, ElementChanges change)` — a broadcast of `ValuesUpdated` / `ChildAdded` / `ChildRemoved` (`Data/StateChanges/ElementChanges.cs`).
 
 **Convention:** the sender passes itself as `triggeringView`, and every handler early-returns when the change came from itself. Forgetting this creates infinite update loops between the inspector, hierarchy, and renderer. Add a new change kind by adding to `ElementChangeType` and subclassing `ElementChanges`/`ElementChanges<T>`.
 
-There is no undo integration and no `EditorUtility.SetDirty` plumbing yet — mutations write straight into the data objects.
+There is no undo integration — mutations write straight into the data objects, and `EditorUtility.SetDirty` is only applied at save time.
+
+### Screen persistence
+
+`ScreenAssetManager` (`Editor/UIBuilder/Data/`) owns the `.asset` on disk. It subscribes to the dirty broadcast to track unsaved changes, and writes only on an explicit New / Open / Save / Save As — never on a timer, unlike `UIEditorLayoutManager`, because these calls touch the `AssetDatabase`. The last path is remembered in the `JESUIS_CurrentScreenPath` EditorPrefs key and restored on the next `CreateGUI`.
+
+`MainWindow.SetCurrentScreen` is the only place a screen is swapped, and the order there is load-bearing: **`SelectedElement` must be cleared before `CurrentScreen` is assigned**, otherwise the views rebuild their element→visual maps while a selection still points into the outgoing tree.
+
+Because `[SerializeReference]` stores class and namespace names, moving or renaming an element type orphans it in existing assets — such types need `[UnityEngine.Scripting.APIUpdating.MovedFrom]`. Note that a script recompile with unsaved changes still discards them; the asset only survives closing the window.
 
 ### Panels and layout (manual, not flexbox)
 
@@ -70,7 +79,11 @@ Views optionally contribute tab-bar widgets via `GetActiveTabOptions()` (e.g. `R
 
 Violations are reported as `Debug.LogError` at scan time, not compile time.
 
+`InstantiateRendererElement(BaseElement data)` resolves the renderer from `data.GetType()` — the *runtime* type, so a tree walked back off disk renders as the right types — and `GetRendererElementType` walks up `BaseType` until it finds a registration, which is why `EmptyElement` falls back to `BaseRendererElement`. The non-generic `IRendererElement.SetData` exists for the same reason: `resultValue is IRendererElement<T>` cannot pattern-match when `T` is only known at runtime.
+
 `BaseRendererElement.OnValuesChanged()` is where `Transform` becomes real style: it resolves Pixels/Percentage against the parent's `contentRect`, computes `anchorOffset - pivotOffset` for `left`/`top`, and sets `transformOrigin`/`rotate`/`scale`. `RendererHierarchyController` keeps the `BaseElement → VisualElement` map and is itself the renderer element for the root.
+
+`RendererHierarchyController` is also the one place renderer elements are attached and detached: `AttachRendererElement` / `DetachRendererElement` are shared by the incremental `ChildAdded`/`ChildRemoved` path and by the recursive `SetScreen` rebuild, so the two cannot drift. Detaching must unregister the parent's `GeometryChangedEvent` callback *before* removing the element — a stale callback fires `OnValuesChanged` on a parentless element and throws.
 
 `BoxSelector` + `DragPoint` are the inverse path: drag deltas are converted back through `GetRelativeDelta` (custom `VisualElement` extension) and divided by parent size when the corresponding `Unit` is `Percentage`, then written into the `Transform` and rebroadcast as `ValuesUpdated`.
 

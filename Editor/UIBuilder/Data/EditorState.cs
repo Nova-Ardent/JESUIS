@@ -12,9 +12,8 @@ namespace JESUIS.Editor.UIBuilder.Data
         Action<EditorViews, ElementChanges> elementIsDirty;
 
         public ReactiveProperty<BaseElement> SelectedElement = new ReactiveProperty<BaseElement>(null);
-        
 
-        public Screen CurrentScreen;
+        public ReactiveProperty<Screen> CurrentScreen = new ReactiveProperty<Screen>(null);
 
         public void TriggerElementIsDirty(EditorViews triggeringView, ElementChanges elementChange)
         {

@@ -15,6 +15,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
         {
         }
 
+        public virtual void SetData(BaseElement data)
+        {
+            Data = data;
+        }
+
         public virtual void OnValuesChanged()
         {
             style.position = Position.Absolute;

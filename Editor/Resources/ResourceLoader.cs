@@ -1,3 +1,4 @@
+using JESUIS.Editor.Utilities.System.PathUtils;
 using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine.Experimental.Rendering;
@@ -90,9 +91,7 @@ namespace JESUIS.Editor.Resources
 
         public ResourceLoader([CallerFilePath]string path = null)
         {
-            string dataDir = Path.GetDirectoryName(Application.dataPath);
-            string callerDir = Path.GetDirectoryName(path);
-            basePath = Path.GetRelativePath(dataDir, callerDir);
+            basePath = PathUtils.GetProjectRelativePath(Path.GetDirectoryName(path));
 
             Icons = new IconResources(Path.Combine(basePath, "Icons"));
             Shaders = new ShaderResources(Path.Combine(basePath, "Shaders"));

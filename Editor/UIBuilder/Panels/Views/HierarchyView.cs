@@ -22,15 +22,44 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         public HierarchyView(EditorState editorState)
         {
             this.editorState = editorState;
-            editorHierarchy = new Elements.Widgets.Hierarchy(editorState.CurrentScreen.GetRootElement(), GetActions, OnElementClicked);
+            editorState.CurrentScreen.ListenTo(OnCurrentScreenChanged);
             editorState.ListenToElementIsDirty(OnElementIsDirty);
 
             style.left = 0;
             style.top = 0;
             style.width = Length.Percent(100);
             style.height = Length.Percent(100);
+        }
+
+        void OnCurrentScreenChanged(Shared.ScreenData.Screen screen)
+        {
+            Clear();
+            editorHierarchy = null;
+            hierarchyItem = null;
+
+            if (screen == null)
+            {
+                return;
+            }
+
+            RootElement rootElement = screen.GetRootElement();
+
+            editorHierarchy = new Elements.Widgets.Hierarchy(rootElement, GetActions, OnElementClicked);
+            BuildSubtree(rootElement, editorHierarchy.RootItem);
+            editorHierarchy.RebuildListVisuals();
 
             Add(editorHierarchy);
+        }
+
+        void BuildSubtree(BaseElement data, HierarchyItem parentItem)
+        {
+            foreach (BaseElement child in data.GetChildren())
+            {
+                HierarchyItem item = new HierarchyItem(child, GetActions, OnElementClicked);
+                parentItem.AddChild(item);
+
+                BuildSubtree(child, item);
+            }
         }
 
         void OnElementClicked(HierarchyItem item)
@@ -49,7 +78,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated)
             {
-                hierarchyItem.UpdateLabel();
+                hierarchyItem?.UpdateLabel();
             }
         }
 
@@ -89,10 +118,46 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             if (item.Parent.TargetObject is BaseElement parentBaseElement && item.TargetObject is BaseElement baseElement)
             {
                 parentBaseElement.RemoveChild(baseElement);
+
+                // The selection would otherwise keep pointing into the subtree that just went away.
+                if (SubtreeContains(baseElement, editorState.SelectedElement.Value))
+                {
+                    editorState.SelectedElement.Value = null;
+                }
+
+                editorState.TriggerElementIsDirty(this, new ChildRemoved(parentBaseElement, baseElement));
+            }
+
+            if (hierarchyItem == item)
+            {
+                hierarchyItem = null;
             }
 
             item.Remove();
             editorHierarchy.RebuildListVisuals();
+        }
+
+        bool SubtreeContains(BaseElement subtree, BaseElement target)
+        {
+            if (target == null)
+            {
+                return false;
+            }
+
+            if (subtree == target)
+            {
+                return true;
+            }
+
+            foreach (BaseElement child in subtree.GetChildren())
+            {
+                if (SubtreeContains(child, target))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

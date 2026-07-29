@@ -24,11 +24,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         public RendererView(EditorState editorState)
         {
             this.editorState = editorState;
+            editorState.CurrentScreen.ListenTo(OnCurrentScreenChanged);
             editorState.SelectedElement.ListenTo(OnSelectedElementChanged);
             editorState.ListenToElementIsDirty(OnElementIsDirty);
 
             boxSelector = new BoxSelector(this, editorState);
-            rendererDisplay = new RendererDisplay(editorState.CurrentScreen, boxSelector);
+            rendererDisplay = new RendererDisplay(boxSelector);
 
             style.left = 0;
             style.top = 0;
@@ -42,6 +43,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             aspectRatioDropDown = new AspectRatioDropDown(UpdateAspectRatio);
             aspectRatioDropDown.SetOption(0, true);
+        }
+
+        void OnCurrentScreenChanged(Shared.ScreenData.Screen screen)
+        {
+            rendererDisplay.SetScreen(screen);
         }
 
         void OnSelectedElementChanged(BaseElement selectedElement)

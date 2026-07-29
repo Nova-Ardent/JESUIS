@@ -6,7 +6,7 @@ namespace JESUIS.Shared.ScreenData
     [System.Serializable]
     public class Screen : ScriptableObject
     {
-        RootElement rootElement = new RootElement();
+        [SerializeReference] RootElement rootElement = new RootElement();
 
         public RootElement GetRootElement()
         {

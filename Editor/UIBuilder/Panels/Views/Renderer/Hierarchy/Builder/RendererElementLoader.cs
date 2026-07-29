@@ -24,18 +24,23 @@ public class RendererElementLoader
 
     Dictionary<Type, Type> rendererElementTypes = new Dictionary<Type, Type>();
 
-    public VisualElement InstantiateRendererElement<T>(T data) where T : BaseElement
+    public VisualElement InstantiateRendererElement(BaseElement data)
     {
-        Type resultType = GetRendererElementType(typeof(T));
+        Type resultType = GetRendererElementType(data.GetType());
+        if (resultType == null)
+        {
+            return null;
+        }
+
         object resultValue = Activator.CreateInstance(resultType);
 
-        if (resultValue is IRendererElement<T> rendererElement)
+        if (resultValue is IRendererElement rendererElement)
         {
-            rendererElement.Data = data;
+            rendererElement.SetData(data);
         }
         else
         {
-            Debug.LogError($"{resultType} does not contain interface {typeof(IRendererElement<T>)}");
+            Debug.LogError($"{resultType} does not contain interface {typeof(IRendererElement)}");
         }
 
         if (resultValue is VisualElement visualElement)
@@ -47,11 +52,18 @@ public class RendererElementLoader
         return null;
     }
 
+    /// <summary>
+    /// Walks up the inheritance chain so an element type without its own renderer falls back to the
+    /// nearest registered ancestor, ultimately <see cref="BaseElement"/>.
+    /// </summary>
     public Type GetRendererElementType(Type targetType)
     {
-        if (rendererElementTypes.ContainsKey(targetType))
-            return rendererElementTypes[targetType];
-        
+        for (Type type = targetType; type != null; type = type.BaseType)
+        {
+            if (rendererElementTypes.ContainsKey(type))
+                return rendererElementTypes[type];
+        }
+
         Debug.LogError($"Target type {targetType} does not contain a designated renderer type");
         return null;
     }

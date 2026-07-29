@@ -22,6 +22,11 @@ namespace JESUIS.Shared.ScreenData.Data
             children.Remove(child);
         }
 
+        public IReadOnlyList<BaseElement> GetChildren()
+        {
+            return children;
+        }
+
         public override string ToString()
         {
             return Name;

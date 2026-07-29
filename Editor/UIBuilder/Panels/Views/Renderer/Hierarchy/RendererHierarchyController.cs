@@ -11,70 +11,160 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 {
     public class RendererHierarchyController : BaseRendererElement
     {
-        EditorViews parentView;
         BoxSelector boxSelector;
         RendererElementLoader elementLoader = RendererElementLoader.Instance;
 
         Dictionary<BaseElement, VisualElement> elementToRendererElementMap = new Dictionary<BaseElement, VisualElement>();
 
-        public RendererHierarchyController(Screen screen, BoxSelector boxSelector)
+        public RendererHierarchyController(BoxSelector boxSelector)
         {
             this.boxSelector = boxSelector;
-            
+
             style.position = Position.Absolute;
             style.width = Length.Percent(100);
             style.height = Length.Percent(100);
             style.left = 0;
             style.right = 0;
+        }
 
-            elementToRendererElementMap.Add(screen.GetRootElement(), this);
+        /// <summary>
+        /// Rebuilds the whole renderer tree from <paramref name="screen"/>. Percentage units resolve
+        /// against a parent that has not been laid out yet, so sizes stay wrong until the existing
+        /// <see cref="GeometryChangedEvent"/> chain corrects them on the next layout pass.
+        /// </summary>
+        public void SetScreen(Screen screen)
+        {
+            ClearRendererElements();
+
+            if (screen == null)
+            {
+                Data = null;
+                return;
+            }
+
+            Data = screen.GetRootElement();
+            elementToRendererElementMap.Add(Data, this);
+
+            BuildSubtree(Data, this);
+        }
+
+        /// <summary>
+        /// The controller always fills the render surface, so it deliberately ignores the root
+        /// element's transform rather than styling itself from it like every other renderer element.
+        /// </summary>
+        public override void OnValuesChanged()
+        {
         }
 
         public void OnSelectedElementChanged(BaseElement selectedElement)
         {
-            if (selectedElement == null || selectedElement is RootElement)
+            if (selectedElement == null || selectedElement is RootElement || !elementToRendererElementMap.TryGetValue(selectedElement, out VisualElement rendererElement))
             {
                 boxSelector.SetActive(false);
+                return;
             }
-            else
-            {
-                boxSelector.SetActive(true);
-                boxSelector.SetTarget(elementToRendererElementMap[selectedElement]);
-                boxSelector.BringToFront();
-            }
+
+            boxSelector.SetActive(true);
+            boxSelector.SetTarget(rendererElement);
+            boxSelector.BringToFront();
         }
 
         public void OnElementIsDirty(ElementChanges elementChanges)
         {
-            if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ChildAdded)
+            if (elementChanges is ChildAdded childAddedChange)
             {
-                if (elementChanges is ChildAdded childAddedChange)
+                if (elementToRendererElementMap.TryGetValue(childAddedChange.TargetElement, out VisualElement parentElement))
                 {
-                    VisualElement childElement = elementLoader.InstantiateRendererElement(childAddedChange.Data);
-                    VisualElement targetElement = elementToRendererElementMap[elementChanges.TargetElement];
-                    targetElement.Add(childElement);
-
-                    if (childElement is IRendererElement rendererElement)
-                    {
-                        rendererElement.OnValuesChanged();
-                        targetElement.RegisterCallback<GeometryChangedEvent>(rendererElement.OnParentGeometryChanged);
-                    }
-
-                    elementToRendererElementMap[childAddedChange.Data] = childElement;
+                    AttachRendererElement(childAddedChange.Data, parentElement);
                 }
             }
-            else if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated)
+            else if (elementChanges is ChildRemoved childRemovedChange)
             {
-                if (elementChanges is ValuesUpdated valuesUpdatedChange)
+                DetachRendererElement(childRemovedChange.Data);
+            }
+            else if (elementChanges is ValuesUpdated valuesUpdatedChange)
+            {
+                if (elementToRendererElementMap.TryGetValue(valuesUpdatedChange.TargetElement, out VisualElement targetElement) && targetElement is IRendererElement rendererElement)
                 {
-                    VisualElement targetElement = elementToRendererElementMap[valuesUpdatedChange.TargetElement];
-                    if (targetElement is IRendererElement rendererElement)
+                    rendererElement.OnValuesChanged();
+
+                    if (boxSelector.GetTarget() == targetElement)
                     {
-                        rendererElement.OnValuesChanged();
                         boxSelector.WrapToTarget();
                     }
                 }
             }
+        }
+
+        void BuildSubtree(BaseElement data, VisualElement parentElement)
+        {
+            foreach (BaseElement child in data.GetChildren())
+            {
+                VisualElement childElement = AttachRendererElement(child, parentElement);
+                if (childElement == null)
+                {
+                    continue;
+                }
+
+                BuildSubtree(child, childElement);
+            }
+        }
+
+        VisualElement AttachRendererElement(BaseElement data, VisualElement parentElement)
+        {
+            VisualElement childElement = elementLoader.InstantiateRendererElement(data);
+            if (childElement == null)
+            {
+                return null;
+            }
+
+            parentElement.Add(childElement);
+
+            if (childElement is IRendererElement rendererElement)
+            {
+                rendererElement.OnValuesChanged();
+                parentElement.RegisterCallback<GeometryChangedEvent>(rendererElement.OnParentGeometryChanged);
+            }
+
+            elementToRendererElementMap[data] = childElement;
+            return childElement;
+        }
+
+        void DetachRendererElement(BaseElement data)
+        {
+            if (!elementToRendererElementMap.TryGetValue(data, out VisualElement rendererElement))
+            {
+                return;
+            }
+
+            foreach (BaseElement child in data.GetChildren())
+            {
+                DetachRendererElement(child);
+            }
+
+            // The callback has to go before the element leaves the tree, both because the parent is
+            // needed to unregister it and because it would otherwise fire on a parentless element.
+            if (rendererElement.parent != null && rendererElement is IRendererElement renderer)
+            {
+                rendererElement.parent.UnregisterCallback<GeometryChangedEvent>(renderer.OnParentGeometryChanged);
+            }
+
+            rendererElement.RemoveFromHierarchy();
+            elementToRendererElementMap.Remove(data);
+        }
+
+        void ClearRendererElements()
+        {
+            if (Data != null)
+            {
+                foreach (BaseElement child in Data.GetChildren())
+                {
+                    DetachRendererElement(child);
+                }
+            }
+
+            elementToRendererElementMap.Clear();
+            Clear();
         }
     }
 }
