@@ -10,6 +10,9 @@ namespace JESUIS.Shared.ScreenData
 
         public RootElement GetRootElement()
         {
+            // A managed reference deserializes to null when the asset was written before the
+            // field was serialized, and every view walks the tree from here.
+            rootElement ??= new RootElement();
             return rootElement;
         }
     }

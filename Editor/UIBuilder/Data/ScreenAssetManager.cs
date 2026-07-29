@@ -83,9 +83,20 @@ namespace JESUIS.Editor.UIBuilder.Data
             string sourcePath = AssetDatabase.GetAssetPath(screen);
             if (!string.IsNullOrEmpty(sourcePath))
             {
+                // Picking the file the screen already lives in is a plain save. The copy below
+                // would otherwise delete the source out from under itself.
+                if (sourcePath == path)
+                {
+                    return Save(screen);
+                }
+
                 // CopyAsset reads the file, so pending edits have to reach disk before it runs.
                 EditorUtility.SetDirty(screen);
                 AssetDatabase.SaveAssetIfDirty(screen);
+
+                // CopyAsset refuses to write over an existing asset, and the save panel has
+                // already taken the user's confirmation to overwrite.
+                AssetDatabase.DeleteAsset(path);
 
                 if (!AssetDatabase.CopyAsset(sourcePath, path))
                 {

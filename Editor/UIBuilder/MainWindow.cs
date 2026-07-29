@@ -174,7 +174,14 @@ namespace JESUIS.Editor.UIBuilder
 
             switch (choice)
             {
-                case 0: return screenAssetManager.Save(editorState.CurrentScreen.Value) != null;
+                // Save can route through Save As, which branches the asset and hands back a
+                // different instance. Adopting it keeps the editor and the remembered path on the
+                // same screen even when the caller then backs out of what it was doing.
+                case 0:
+                    Shared.ScreenData.Screen saved = screenAssetManager.Save(editorState.CurrentScreen.Value);
+                    SetCurrentScreen(saved);
+                    return saved != null;
+
                 case 2: return true;
                 default: return false;
             }
