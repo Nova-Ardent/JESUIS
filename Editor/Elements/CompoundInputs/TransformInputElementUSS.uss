@@ -57,26 +57,26 @@
 {
 	position: absolute;
 	top: 110px;
-	left: 130px;
+	left: 140px;
 }
 
 .transform-vertical-size
 {
 	position: absolute;
 	top: 132px;
-	left: 130px;
+	left: 140px;
 }
 
 .transform-horizontal-position
 {
 	position: absolute;
 	top: 154px;
-	left: 130px;
+	left: 140px;
 }
 
 .transform-horizontal-size
 {
 	position: absolute;
 	top: 176px;
-	left: 130px;
+	left: 140px;
 }
