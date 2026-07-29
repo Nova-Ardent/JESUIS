@@ -27,6 +27,23 @@ namespace JESUIS.Shared.ScreenData.Data
             return children;
         }
 
+        /// <summary>
+        /// This element followed by every descendant, depth first. Walking the tree is a property of
+        /// the data model rather than of any one view, so every recursive consumer shares this.
+        /// </summary>
+        public IEnumerable<BaseElement> EnumerateSubtree()
+        {
+            yield return this;
+
+            foreach (BaseElement child in children)
+            {
+                foreach (BaseElement descendant in child.EnumerateSubtree())
+                {
+                    yield return descendant;
+                }
+            }
+        }
+
         public override string ToString()
         {
             return Name;

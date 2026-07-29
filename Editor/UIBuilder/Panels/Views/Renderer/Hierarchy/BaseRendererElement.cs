@@ -26,11 +26,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             style.width = GetHorizontal(Data.Transform.Size.x, Data.Transform.HorizontalSize);
             style.height = GetVertical(Data.Transform.Size.y, Data.Transform.VerticalSize);
 
-            Vector2 position = GetAnchorOffset() - GetPivotOffset();
+            Vector2 pivotOffset = GetPivotOffset();
+            Vector2 position = GetAnchorOffset() - pivotOffset;
             style.left = position.x;
             style.top = position.y;
 
-            style.transformOrigin = new TransformOrigin(GetPivotOffset().x, GetPivotOffset().y, 0);
+            style.transformOrigin = new TransformOrigin(pivotOffset.x, pivotOffset.y, 0);
 
             style.rotate = new Rotate(new Angle(Data.Transform.Rotation, AngleUnit.Degree));
             style.scale = new Scale(new Vector3(Data.Transform.Scale.x, Data.Transform.Scale.y, 1));

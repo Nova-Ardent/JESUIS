@@ -54,14 +54,19 @@ public class RendererElementLoader
 
     /// <summary>
     /// Walks up the inheritance chain so an element type without its own renderer falls back to the
-    /// nearest registered ancestor, ultimately <see cref="BaseElement"/>.
+    /// nearest registered ancestor, ultimately <see cref="BaseElement"/>. The resolved renderer is
+    /// registered against the type that was asked for, so the walk runs once per element type
+    /// rather than once per element.
     /// </summary>
     public Type GetRendererElementType(Type targetType)
     {
         for (Type type = targetType; type != null; type = type.BaseType)
         {
-            if (rendererElementTypes.ContainsKey(type))
-                return rendererElementTypes[type];
+            if (rendererElementTypes.TryGetValue(type, out Type rendererType))
+            {
+                rendererElementTypes[targetType] = rendererType;
+                return rendererType;
+            }
         }
 
         Debug.LogError($"Target type {targetType} does not contain a designated renderer type");

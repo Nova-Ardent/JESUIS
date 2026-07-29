@@ -1,7 +1,7 @@
+using JESUIS.Editor.Helpers.Utils;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Panels.Views;
 using JESUIS.Editor.Utilities.System.PathUtils;
-using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,27 +18,11 @@ namespace JESUIS.Editor.UIBuilder.Data
         const string SCREEN_EXTENSION = "asset";
         const string DEFAULT_SCREEN_NAME = "New Screen";
 
-        Action onStateChanged;
-
-        bool isDirty = false;
-
-        public bool IsDirty => isDirty;
+        public ReactiveProperty<bool> IsDirty = new ReactiveProperty<bool>(false);
 
         public ScreenAssetManager(EditorState editorState)
         {
             editorState.ListenToElementIsDirty(OnElementIsDirty);
-        }
-
-        public void RegisterOnStateChanged(Action onChange)
-        {
-            if (onStateChanged == null)
-            {
-                onStateChanged = onChange;
-            }
-            else
-            {
-                onStateChanged += onChange;
-            }
         }
 
         public Shared.ScreenData.Screen CreateNew()
@@ -69,7 +53,7 @@ namespace JESUIS.Editor.UIBuilder.Data
             }
 
             EditorUtility.SetDirty(screen);
-            AssetDatabase.SaveAssets();
+            AssetDatabase.SaveAssetIfDirty(screen);
 
             SetSyncedPath(path);
             return screen;
@@ -99,8 +83,9 @@ namespace JESUIS.Editor.UIBuilder.Data
             string sourcePath = AssetDatabase.GetAssetPath(screen);
             if (!string.IsNullOrEmpty(sourcePath))
             {
+                // CopyAsset reads the file, so pending edits have to reach disk before it runs.
                 EditorUtility.SetDirty(screen);
-                AssetDatabase.SaveAssets();
+                AssetDatabase.SaveAssetIfDirty(screen);
 
                 if (!AssetDatabase.CopyAsset(sourcePath, path))
                 {
@@ -111,8 +96,8 @@ namespace JESUIS.Editor.UIBuilder.Data
                 return Open(path);
             }
 
+            // CreateAsset writes the file itself, so no further flush is needed here.
             AssetDatabase.CreateAsset(screen, path);
-            AssetDatabase.SaveAssets();
 
             SetSyncedPath(path);
             return screen;
@@ -148,11 +133,7 @@ namespace JESUIS.Editor.UIBuilder.Data
         /// </summary>
         public Shared.ScreenData.Screen TryRestoreLastOpened()
         {
-            if (!EditorPrefs.HasKey(LAST_SCREEN_PATH_KEY))
-            {
-                return null;
-            }
-
+            // A missing key reads back as an empty path, which Load already rejects.
             string path = EditorPrefs.GetString(LAST_SCREEN_PATH_KEY);
             Shared.ScreenData.Screen screen = Load(path);
 
@@ -182,8 +163,6 @@ namespace JESUIS.Editor.UIBuilder.Data
         /// </summary>
         void SetSyncedPath(string path)
         {
-            isDirty = false;
-
             if (string.IsNullOrEmpty(path))
             {
                 EditorPrefs.DeleteKey(LAST_SCREEN_PATH_KEY);
@@ -193,18 +172,19 @@ namespace JESUIS.Editor.UIBuilder.Data
                 EditorPrefs.SetString(LAST_SCREEN_PATH_KEY, path);
             }
 
-            onStateChanged?.Invoke();
+            IsDirty.Value = false;
         }
 
         void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
         {
-            if (isDirty)
+            // This runs for every drag tick and every keystroke, so it stays a plain read once the
+            // screen is already known to be dirty.
+            if (IsDirty.Value)
             {
                 return;
             }
 
-            isDirty = true;
-            onStateChanged?.Invoke();
+            IsDirty.Value = true;
         }
     }
 }

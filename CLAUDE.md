@@ -29,7 +29,7 @@ Anything referencing `UnityEditor` must stay under `Editor/`. The data model (`S
 
 ## Data model (`Shared/ScreenData/`)
 
-`Screen` (a `ScriptableObject`) owns a single `[SerializeReference] RootElement`. `BaseElement` is the node type: `Name`, a `Transform`, and a `[SerializeReference] List<BaseElement> children` exposed read-only through `GetChildren()` — polymorphic children rely on `SerializeReference`, so new element types must be `[System.Serializable]` classes deriving from `BaseElement` (not `ScriptableObject`s). Both `SerializeReference` fields are what make the `.asset` roundtrip work, so neither may be downgraded to `SerializeField`.
+`Screen` (a `ScriptableObject`) owns a single `[SerializeReference] RootElement`. `BaseElement` is the node type: `Name`, a `Transform`, and a `[SerializeReference] List<BaseElement> children` exposed read-only through `GetChildren()` (with `EnumerateSubtree()` for the depth-first walk every recursive consumer shares) — polymorphic children rely on `SerializeReference`, so new element types must be `[System.Serializable]` classes deriving from `BaseElement` (not `ScriptableObject`s). Both `SerializeReference` fields are what make the `.asset` roundtrip work, so neither may be downgraded to `SerializeField`.
 
 `Types.Transform` is *not* `UnityEngine.Transform` — it is 2D and layout-oriented: `Size`, `Position`, `Scale`, `Rotation`, plus `Anchor`/`Pivot` (`Alignment`) and four independent `Unit` (Pixels/Percentage) selectors for horizontal/vertical position and size. Because both `Transform` names are in scope in most editor files, this type is almost always written fully qualified as `Shared.ScreenData.Types.Transform`.
 
@@ -51,7 +51,9 @@ There is no undo integration — mutations write straight into the data objects,
 
 `ScreenAssetManager` (`Editor/UIBuilder/Data/`) owns the `.asset` on disk. It subscribes to the dirty broadcast to track unsaved changes, and writes only on an explicit New / Open / Save / Save As — never on a timer, unlike `UIEditorLayoutManager`, because these calls touch the `AssetDatabase`. The last path is remembered in the `JESUIS_CurrentScreenPath` EditorPrefs key and restored on the next `CreateGUI`.
 
-`MainWindow.SetCurrentScreen` is the only place a screen is swapped, and the order there is load-bearing: **`SelectedElement` must be cleared before `CurrentScreen` is assigned**, otherwise the views rebuild their element→visual maps while a selection still points into the outgoing tree.
+`EditorState.SetCurrentScreen` is the only place a screen is swapped, and the order inside it is load-bearing: **`SelectedElement` must be cleared before `CurrentScreen` is assigned**, otherwise the views rebuild their element→visual maps while a selection still points into the outgoing tree. Assign through that method rather than writing `CurrentScreen.Value` directly. `MainWindow.SetCurrentScreen` wraps it with the null / same-instance guard (saving hands back the instance it was given) and the title refresh.
+
+Dirty state lives on `ScreenAssetManager.IsDirty`, a `ReactiveProperty<bool>` the window subscribes to for the title's `*` marker. `OnElementIsDirty` keeps an explicit early-return because it runs for every drag tick and keystroke.
 
 Because `[SerializeReference]` stores class and namespace names, moving or renaming an element type orphans it in existing assets — such types need `[UnityEngine.Scripting.APIUpdating.MovedFrom]`. Note that a script recompile with unsaved changes still discards them; the asset only survives closing the window.
 

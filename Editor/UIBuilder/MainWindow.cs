@@ -14,6 +14,7 @@ namespace JESUIS.Editor.UIBuilder
     public class MainWindow : BaseWindow<MainWindow>
     {
         const string WINDOW_NAME = "JESUIS";
+        const string UNSAVED_CHANGES_TITLE = "Unsaved Screen Changes";
 
         EditorState editorState = new EditorState();
 
@@ -32,7 +33,7 @@ namespace JESUIS.Editor.UIBuilder
         protected override void CreateGUI()
         {
             screenAssetManager = new ScreenAssetManager(editorState);
-            screenAssetManager.RegisterOnStateChanged(UpdateTitle);
+            screenAssetManager.IsDirty.ListenTo(_ => UpdateTitle());
 
             uIEditorLayoutManager = new UIEditorLayoutManager();
             viewManager = new ViewManager(editorState);
@@ -71,28 +72,18 @@ namespace JESUIS.Editor.UIBuilder
 
         private void OnDestroy()
         {
-            if (screenAssetManager == null || !screenAssetManager.IsDirty)
+            if (screenAssetManager == null)
             {
                 return;
             }
 
             // The window is already going away by the time this runs, so there is no cancel to offer.
-            bool save = EditorUtility.DisplayDialog
-                ( "Unsaved Screen Changes"
-                , $"'{GetCurrentScreenName()}' has unsaved changes. Save them before closing?"
-                , "Save"
-                , "Discard"
-                );
-
-            if (save)
-            {
-                screenAssetManager.Save(editorState.CurrentScreen.Value);
-            }
+            PromptToSaveChanges(false);
         }
 
         public void NewScreen()
         {
-            if (!PromptToSaveChanges())
+            if (!PromptToSaveChanges(true))
             {
                 return;
             }
@@ -102,7 +93,7 @@ namespace JESUIS.Editor.UIBuilder
 
         public void OpenScreen()
         {
-            if (!PromptToSaveChanges())
+            if (!PromptToSaveChanges(true))
             {
                 return;
             }
@@ -142,33 +133,40 @@ namespace JESUIS.Editor.UIBuilder
         /// </summary>
         void SetCurrentScreen(Shared.ScreenData.Screen screen)
         {
-            if (screen == null || editorState.CurrentScreen.Value == screen)
+            if (screen != null && editorState.CurrentScreen.Value != screen)
             {
-                UpdateTitle();
-                return;
+                editorState.SetCurrentScreen(screen);
             }
-
-            // Must come first: the views index their lookups by element, and a selection left
-            // pointing into the outgoing tree survives the rebuild that follows.
-            editorState.SelectedElement.Value = null;
-            editorState.CurrentScreen.Value = screen;
 
             UpdateTitle();
         }
 
         /// <summary>
-        /// Returns false when the caller should abandon whatever it was about to do.
+        /// Returns false when the caller should abandon whatever it was about to do. Callers that
+        /// have no way back pass <paramref name="allowCancel"/> as false and ignore the result.
         /// </summary>
-        bool PromptToSaveChanges()
+        bool PromptToSaveChanges(bool allowCancel)
         {
-            if (!screenAssetManager.IsDirty)
+            if (!screenAssetManager.IsDirty.Value)
             {
                 return true;
             }
 
+            string message = $"'{GetCurrentScreenName()}' has unsaved changes.";
+
+            if (!allowCancel)
+            {
+                if (EditorUtility.DisplayDialog(UNSAVED_CHANGES_TITLE, message, "Save", "Discard"))
+                {
+                    screenAssetManager.Save(editorState.CurrentScreen.Value);
+                }
+
+                return true;
+            }
+
             int choice = EditorUtility.DisplayDialogComplex
-                ( "Unsaved Screen Changes"
-                , $"'{GetCurrentScreenName()}' has unsaved changes."
+                ( UNSAVED_CHANGES_TITLE
+                , message
                 , "Save"
                 , "Cancel"
                 , "Discard"
@@ -184,7 +182,7 @@ namespace JESUIS.Editor.UIBuilder
 
         void UpdateTitle()
         {
-            string dirtyMarker = screenAssetManager.IsDirty ? "*" : "";
+            string dirtyMarker = screenAssetManager.IsDirty.Value ? "*" : "";
             titleContent = new GUIContent($"{WINDOW_NAME} - {GetCurrentScreenName()}{dirtyMarker}");
         }
 

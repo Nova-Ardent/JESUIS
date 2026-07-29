@@ -5,6 +5,7 @@ using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Shared.ScreenData.Data;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -120,7 +121,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 parentBaseElement.RemoveChild(baseElement);
 
                 // The selection would otherwise keep pointing into the subtree that just went away.
-                if (SubtreeContains(baseElement, editorState.SelectedElement.Value))
+                if (baseElement.EnumerateSubtree().Contains(editorState.SelectedElement.Value))
                 {
                     editorState.SelectedElement.Value = null;
                 }
@@ -135,29 +136,6 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             item.Remove();
             editorHierarchy.RebuildListVisuals();
-        }
-
-        bool SubtreeContains(BaseElement subtree, BaseElement target)
-        {
-            if (target == null)
-            {
-                return false;
-            }
-
-            if (subtree == target)
-            {
-                return true;
-            }
-
-            foreach (BaseElement child in subtree.GetChildren())
-            {
-                if (SubtreeContains(child, target))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

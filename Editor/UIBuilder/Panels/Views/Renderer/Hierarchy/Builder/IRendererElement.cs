@@ -18,6 +18,10 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder
 
     public interface IRendererElement<T> : IRendererElement where T : BaseElement
     {
-        public T Data { get; set; }
+        /// <summary>
+        /// Read only, so <see cref="IRendererElement.SetData"/> stays the single way the data is
+        /// assigned and implementations have only one setter to keep consistent.
+        /// </summary>
+        public T Data { get; }
     }
 }

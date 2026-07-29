@@ -15,6 +15,18 @@ namespace JESUIS.Editor.UIBuilder.Data
 
         public ReactiveProperty<Screen> CurrentScreen = new ReactiveProperty<Screen>(null);
 
+        /// <summary>
+        /// Swaps the screen every view builds itself from. The two properties are not independent:
+        /// the selection has to be dropped first, or the views rebuild their element to visual maps
+        /// while a selection still points into the outgoing tree. Assign through here rather than
+        /// writing <see cref="CurrentScreen"/> directly.
+        /// </summary>
+        public void SetCurrentScreen(Screen screen)
+        {
+            SelectedElement.Value = null;
+            CurrentScreen.Value = screen;
+        }
+
         public void TriggerElementIsDirty(EditorViews triggeringView, ElementChanges elementChange)
         {
             elementIsDirty?.Invoke(triggeringView, elementChange);

@@ -132,34 +132,39 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 
         void DetachRendererElement(BaseElement data)
         {
-            if (!elementToRendererElementMap.TryGetValue(data, out VisualElement rendererElement))
+            foreach (BaseElement element in data.EnumerateSubtree())
             {
-                return;
-            }
+                if (!elementToRendererElementMap.TryGetValue(element, out VisualElement rendererElement))
+                {
+                    continue;
+                }
 
-            foreach (BaseElement child in data.GetChildren())
-            {
-                DetachRendererElement(child);
-            }
+                // The callback has to go before the element leaves the tree, both because the parent
+                // is needed to unregister it and because it would otherwise fire on a parentless
+                // element.
+                if (rendererElement.parent != null && rendererElement is IRendererElement renderer)
+                {
+                    rendererElement.parent.UnregisterCallback<GeometryChangedEvent>(renderer.OnParentGeometryChanged);
+                }
 
-            // The callback has to go before the element leaves the tree, both because the parent is
-            // needed to unregister it and because it would otherwise fire on a parentless element.
-            if (rendererElement.parent != null && rendererElement is IRendererElement renderer)
-            {
-                rendererElement.parent.UnregisterCallback<GeometryChangedEvent>(renderer.OnParentGeometryChanged);
+                rendererElement.RemoveFromHierarchy();
+                elementToRendererElementMap.Remove(element);
             }
-
-            rendererElement.RemoveFromHierarchy();
-            elementToRendererElementMap.Remove(data);
         }
 
         void ClearRendererElements()
         {
+            // Only the direct children registered their callback on this controller, which outlives
+            // the swap; every deeper registration sits on a parent that is discarded with the
+            // subtree, so the whole tree can go in one Clear rather than node by node.
             if (Data != null)
             {
                 foreach (BaseElement child in Data.GetChildren())
                 {
-                    DetachRendererElement(child);
+                    if (elementToRendererElementMap.TryGetValue(child, out VisualElement rendererElement) && rendererElement is IRendererElement renderer)
+                    {
+                        UnregisterCallback<GeometryChangedEvent>(renderer.OnParentGeometryChanged);
+                    }
                 }
             }
 
