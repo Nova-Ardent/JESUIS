@@ -5,6 +5,7 @@ using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints;
+using JESUIS.Shared.ScreenData.Types;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.WSA;
@@ -170,22 +171,29 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
 
             if (target is IRendererElement rendererElement)
             {
+
                 Vector2 positionDelta = Vector2.zero;
                 Vector2 sizeDelta = Vector2.zero;
 
                 Shared.ScreenData.Types.Transform transform = rendererElement.GetTransform();
+
                 switch (horizontalPoint)
                 {
                     case DragEdgeHorizontal.Left:
-                        if (verticalPoint == DragEdgeVertical.Top)
-                            positionDelta = target.parent.GetRelativeDelta(target, localDelta);
-                        else
+                        if (transform.Pivot.IsLeft())
                             positionDelta = target.parent.GetRelativeDelta(target, new Vector2(localDelta.x, 0));
+                        else if (transform.Pivot.IsMiddleCol())
+                            positionDelta = target.parent.GetRelativeDelta(target, new Vector2(localDelta.x / 2, 0));
 
                         sizeDelta -= new Vector2(localDelta.x, 0);
                         break;
                     case DragEdgeHorizontal.Middle: break;
                     case DragEdgeHorizontal.Right:
+                        if (transform.Pivot.IsRight())
+                            positionDelta = target.parent.GetRelativeDelta(target, new Vector2(localDelta.x, 0));
+                        else if (transform.Pivot.IsMiddleCol())
+                            positionDelta = target.parent.GetRelativeDelta(target, new Vector2(localDelta.x / 2, 0));
+
                         sizeDelta += new Vector2(localDelta.x, 0);
                         break;
                 }
@@ -193,13 +201,20 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
                 switch (verticalPoint)
                 {
                     case DragEdgeVertical.Top:
-                        if (horizontalPoint != DragEdgeHorizontal.Left)
-                            positionDelta = target.parent.GetRelativeDelta(target, new Vector2(0, localDelta.y));
+                        if (transform.Pivot.IsTop())
+                            positionDelta += target.parent.GetRelativeDelta(target, new Vector2(0, localDelta.y));
+                        else if (transform.Pivot.IsMiddleRow())
+                            positionDelta += target.parent.GetRelativeDelta(target, new Vector2(0, localDelta.y / 2));
 
                         sizeDelta -= new Vector2(0, localDelta.y);
                         break;
                     case DragEdgeVertical.Middle: break;
                     case DragEdgeVertical.Bottom:
+                        if (transform.Pivot.IsBottom())
+                            positionDelta += target.parent.GetRelativeDelta(target, new Vector2(0, localDelta.y));
+                        else if (transform.Pivot.IsMiddleRow())
+                            positionDelta += target.parent.GetRelativeDelta(target, new Vector2(0, localDelta.y / 2));
+
                         sizeDelta += new Vector2(0, localDelta.y);
                         break;
                 }
@@ -223,7 +238,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
                 transform.Size.y += sizeDelta.y;
 
                 rendererElement.OnValuesChanged();
-                WrapToTarget();
+                WrapToTarget(); 
 
                 editorState.TriggerElementIsDirty(rendererView, new ValuesUpdated(editorState.SelectedElement));
             }
