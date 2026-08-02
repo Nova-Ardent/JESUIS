@@ -74,21 +74,37 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
 
         public void WrapToTarget()
         {
-            style.transformOrigin = new TransformOrigin(0, 0, 0);
+            if (target is IRendererElement rendererElement)
+            {
+                style.transformOrigin = new TransformOrigin(0, 0, 0);
 
-            Vector2 topLeft = container.WorldToLocal(target.LocalToWorld(Vector2.zero));
-            Vector2 topRight = container.WorldToLocal(target.LocalToWorld(new Vector2(target.style.width.value.value, 0)));
-            Vector2 bottomLeft = container.WorldToLocal(target.LocalToWorld(new Vector2(0, target.style.height.value.value)));
-            Vector2 bottomRight = container.WorldToLocal(target.LocalToWorld(new Vector2(target.style.width.value.value, target.style.height.value.value)));
-             
-            style.left = topLeft.x;
-            style.top = topLeft.y;
+                float left = target.style.left.value.value;
+                float top = target.style.top.value.value;
 
-            style.width = Vector2.Distance(topLeft, topRight) / style.scale.value.value.x; 
-            style.height = Vector2.Distance(topLeft, bottomLeft) / style.scale.value.value.y;
+                float width = target.style.width.value.value * target.style.scale.value.value.x;
+                float height = target.style.height.value.value * target.style.scale.value.value.y;
 
-            Vector2 angularDiff = topRight - topLeft;
-            style.rotate = new StyleRotate(new Rotate(new Angle(Mathf.Atan2(angularDiff.y, angularDiff.x), AngleUnit.Radian)));
+                Vector2 transformOrigin = new Vector2(left + target.style.transformOrigin.value.x.value, top + target.style.transformOrigin.value.y.value);
+
+                Vector2 localTopLeft = new Vector2(left, top).RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
+                Vector2 localTopRight = new Vector2(left + width, top).RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
+                Vector2 localBottomLeft = new Vector2(left, top + height).RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
+                Vector2 localBottomRight = new Vector2(left + width, top + height).RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
+
+                Vector2 topLeft = container.WorldToLocal(target.parent.LocalToWorld(localTopLeft));
+                Vector2 topRight = container.WorldToLocal(target.parent.LocalToWorld(localTopRight));
+                Vector2 bottomLeft = container.WorldToLocal(target.parent.LocalToWorld(localBottomLeft));
+                Vector2 bottomRight = container.WorldToLocal(target.parent.LocalToWorld(localBottomRight));
+
+                style.left = topLeft.x;
+                style.top = topLeft.y;
+
+                style.width = Vector2.Distance(topLeft, topRight) / style.scale.value.value.x;
+                style.height = Vector2.Distance(topLeft, bottomLeft) / style.scale.value.value.y;
+
+                Vector2 angularDiff = topRight - topLeft;
+                style.rotate = new StyleRotate(new Rotate(new Angle(Mathf.Atan2(angularDiff.y, angularDiff.x), AngleUnit.Radian)));
+            }
         }
 
         public void SetTarget(VisualElement targetElement)
