@@ -75,12 +75,16 @@ namespace JESUIS.Editor.Resources
         {
             public Resource<Texture2D> DragPoint;
             public Resource<Texture2D> DragArrow;
+            public Resource<Texture2D> RotatePoint;
+            public Resource<Texture2D> RotateArrow;
             public Texture2D EmptyCursor;
 
             public RendererResources(string path)
             {
                 DragPoint = new Resource<Texture2D>(path, "DragIcon.png");
                 DragArrow = new Resource<Texture2D>(path, "DragArrow.png");
+                RotatePoint = new Resource<Texture2D>(path, "RotateIcon.png");
+                RotateArrow = new Resource<Texture2D>(path, "RotateArrow.png");
 
                 EmptyCursor = new Texture2D(1, 1, TextureFormat.RGBA32, false);
                 EmptyCursor.SetPixel(0, 0, new Color(0, 0, 0, 0));

@@ -25,7 +25,10 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
         DragPoint dragPointBottomMiddle;
         DragPoint dragPointBottomRight;
 
-        RotatedTexture cursorTexture;
+        RotationPoint rotationPoint;
+
+        RotatedTexture dragCursorTexture;
+        RotatedTexture rotationCursorTexture;
 
         EditorState editorState;
         RendererView rendererView;
@@ -76,6 +79,22 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
         {
             if (target is IRendererElement rendererElement)
             {
+                Shared.ScreenData.Types.Transform transform = rendererElement.GetTransform();
+                
+                if (transform.Pivot.IsLeft())
+                    rotationPoint.style.left = 0;
+                else if (transform.Pivot.IsMiddleCol())
+                    rotationPoint.style.left = Length.Percent(50);
+                else if (transform.Pivot.IsRight())
+                    rotationPoint.style.left = Length.Percent(100);
+
+                if (transform.Pivot.IsTop())
+                    rotationPoint.style.top = 0;
+                else if (transform.Pivot.IsMiddleRow())
+                    rotationPoint.style.top = Length.Percent(50);
+                else if (transform.Pivot.IsBottom())
+                    rotationPoint.style.top = Length.Percent(100);
+
                 style.transformOrigin = new TransformOrigin(0, 0, 0);
 
                 float left = target.style.left.value.value;
@@ -151,12 +170,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
                 hotspot = new Vector2(emptyCursor.width / 2, emptyCursor.height / 2),
             };
 
-            cursorTexture = new RotatedTexture(ResourceLoader.Instance.Icons.Renderer.DragArrow.Value, 0, true);
-            cursorTexture.style.position = Position.Absolute;
-            cursorTexture.style.display = DisplayStyle.None;
-            cursorTexture.style.cursor = cursor;
-            cursorTexture.pickingMode = PickingMode.Ignore;
-            Add(cursorTexture);
+            dragCursorTexture = new RotatedTexture(ResourceLoader.Instance.Icons.Renderer.DragArrow.Value, 0, true);
+            dragCursorTexture.style.position = Position.Absolute;
+            dragCursorTexture.style.display = DisplayStyle.None;
+            dragCursorTexture.style.cursor = cursor;
+            dragCursorTexture.pickingMode = PickingMode.Ignore;
+            Add(dragCursorTexture);
 
             AddDragPoint(ref dragPointTopLeft, 45f, DragEdgeHorizontal.Left, DragEdgeVertical.Top, mouseContainer);
             AddDragPoint(ref dragPointTopMiddle, 90f, DragEdgeHorizontal.Middle, DragEdgeVertical.Top, mouseContainer);
@@ -169,12 +188,27 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
             AddDragPoint(ref dragPointBottomMiddle, 90f, DragEdgeHorizontal.Middle, DragEdgeVertical.Bottom, mouseContainer);
             AddDragPoint(ref dragPointBottomRight, 45f, DragEdgeHorizontal.Right, DragEdgeVertical.Bottom, mouseContainer);
 
-            cursorTexture.BringToFront();
+            rotationCursorTexture = new RotatedTexture(ResourceLoader.Instance.Icons.Renderer.RotateArrow.Value, 0, true);
+            rotationCursorTexture.style.position = Position.Absolute;
+            rotationCursorTexture.style.display = DisplayStyle.None;
+            rotationCursorTexture.style.cursor = cursor;
+            rotationCursorTexture.pickingMode = PickingMode.Ignore;
+            Add(rotationCursorTexture);
+
+            rotationPoint = new RotationPoint(this, rotationCursorTexture);
+            rotationPoint.style.position = Position.Absolute;
+            rotationPoint.style.left = 0;
+            rotationPoint.style.top = 0;
+            rotationPoint.RegisterOnRotate(mouseContainer, OnRotatePoint);
+            Add(rotationPoint);
+
+            dragCursorTexture.BringToFront();
+            rotationCursorTexture.BringToFront();
         }
 
         void AddDragPoint(ref DragPoint dragPoint, float defaultDragAngle, DragEdgeHorizontal horizontal, DragEdgeVertical vertical, VisualElement mouseContainer)
         {
-            dragPoint = new DragPoint(this, cursorTexture, defaultDragAngle, horizontal, vertical);
+            dragPoint = new DragPoint(this, dragCursorTexture, defaultDragAngle, horizontal, vertical);
             Add(dragPoint);
             dragPoint.RegisterOnDrag(mouseContainer, OnDragPoint);
         }
@@ -182,6 +216,22 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
         void OnTargetGeometryChanged(GeometryChangedEvent geometryChangedEvent)
         {
             WrapToTarget();
+        }
+
+        void OnRotatePoint(float angle)
+        {
+            if (target == null)
+                return;
+            
+            if (target is IRendererElement rendererElement)
+            {
+                Shared.ScreenData.Types.Transform transform = rendererElement.GetTransform();
+                transform.Rotation = angle;
+
+                rendererElement.OnValuesChanged();
+                editorState.TriggerElementIsDirty(rendererView, new ValuesUpdated(editorState.SelectedElement));
+                WrapToTarget();
+            }
         }
 
         void OnDragPoint(Vector2 localDelta, DragEdgeHorizontal horizontalPoint, DragEdgeVertical verticalPoint)

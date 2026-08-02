@@ -15,5 +15,11 @@ namespace UnityEngine
                 dir.x * sin + dir.y * cos
             ) + pivot;
         }
+
+        public static float GetAngleDegrees(this Vector2 pivot, Vector2 point)
+        {
+            Vector2 dir = point - pivot;
+            return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        }
     }
 }
