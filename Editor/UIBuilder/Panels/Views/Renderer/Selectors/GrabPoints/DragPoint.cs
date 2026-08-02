@@ -80,7 +80,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
             }
         }
 
-        public void RegisterOnDrag(Action<Vector2, DragEdgeHorizontal, DragEdgeVertical> dragHandler)
+        public void RegisterOnDrag(VisualElement mouseContainer, Action<Vector2, DragEdgeHorizontal, DragEdgeVertical> dragHandler)
         {
             if (onDrag == null) 
             {
@@ -91,8 +91,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
                 RegisterCallback<PointerLeaveEvent>(OnPointerLeave);
                 RegisterCallback<PointerMoveEvent>(OnPointerMoveOnDragPoint);
 
-                parent.parent.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                parent.parent.RegisterCallback<PointerUpEvent>(OnPointerUp);
+                mouseContainer.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+                mouseContainer.RegisterCallback<PointerUpEvent>(OnPointerUp);
             }
             else
             {

@@ -17,7 +17,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         public override Views Type => Views.Renderer;
 
         BoxSelector boxSelector;
+        
         RendererDisplay rendererDisplay;
+        VisualElement boxSelectedContainer;
+
+        RendererController controller;
 
         AspectRatioDropDown aspectRatioDropDown;
 
@@ -27,8 +31,13 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             editorState.SelectedElement.ListenTo(OnSelectedElementChanged);
             editorState.ListenToElementIsDirty(OnElementIsDirty);
 
-            boxSelector = new BoxSelector(this, editorState);
+            boxSelectedContainer = new VisualElement();
+            boxSelector = new BoxSelector(this, boxSelectedContainer, editorState);
             rendererDisplay = new RendererDisplay(editorState.CurrentScreen, boxSelector);
+
+            controller = new RendererController(this, rendererDisplay, boxSelectedContainer);
+            controller.RegisterOnRatioChanged(rendererDisplay.OnChangeAspectRatio);
+            controller.RegisterZoomChanged(boxSelector.OnZoomChanged);
 
             style.left = 0;
             style.top = 0;
@@ -38,10 +47,15 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             style.backgroundColor = Colors.RENDERER_BACKGROUND_COLOR;
 
             Add(rendererDisplay);
-            Add(boxSelector);
+            Add(boxSelectedContainer);
+            boxSelectedContainer.Add(boxSelector);
 
-            aspectRatioDropDown = new AspectRatioDropDown(UpdateAspectRatio);
-            aspectRatioDropDown.SetOption(0, true);
+            aspectRatioDropDown = new AspectRatioDropDown(controller.ChangeAspectRatio);
+
+            RegisterCallbackOnce<GeometryChangedEvent>(OnGeometryReady);
+            RegisterCallbackOnce<GeometryChangedEvent>(OnGeometryChanged);
+            boxSelector.InitializeDragPoints(this);
+            boxSelector.OnZoomChanged();
         }
 
         void OnSelectedElementChanged(BaseElement selectedElement)
@@ -58,15 +72,20 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             rendererDisplay.OnElementIsDirty(elementChanges);
         }
-
-        void UpdateAspectRatio(int width, int height) 
-        {
-            rendererDisplay.ChangeAspectRatio(width, height);
-        }
         
         public override IEnumerable<TabElement> GetActiveTabOptions()
         {
             yield return aspectRatioDropDown;
+        }
+
+        void OnGeometryReady(GeometryChangedEvent evt)
+        {
+            aspectRatioDropDown.SetOption(0, true);
+        }
+
+        void OnGeometryChanged(GeometryChangedEvent evt)
+        {
+            controller.UpdateTransform();
         }
     }
 }
