@@ -11,7 +11,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder
         public RendererElementAttribute(Type elementType)
         {
             ElementType = elementType;
-            if (!elementType.IsAssignableFrom(typeof(BaseElement)))
+            if (!typeof(BaseElement).IsAssignableFrom(elementType))
             {
                 Debug.LogError($"Renderer has invalid type argument, needs to be subclass of {typeof(BaseElement)}");
             }

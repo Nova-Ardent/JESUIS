@@ -26,7 +26,8 @@ public class RendererElementLoader
 
     public VisualElement InstantiateRendererElement<T>(T data) where T : BaseElement
     {
-        Type resultType = GetRendererElementType(typeof(T));
+        Type type = data.GetType();
+        Type resultType = GetRendererElementType(type);
         object resultValue = Activator.CreateInstance(resultType);
 
         if (resultValue is IRendererElement<T> rendererElement)
@@ -52,8 +53,7 @@ public class RendererElementLoader
         if (rendererElementTypes.ContainsKey(targetType))
             return rendererElementTypes[targetType];
         
-        Debug.LogError($"Target type {targetType} does not contain a designated renderer type");
-        return null;
+        throw new Exception($"Target type {targetType} does not contain a designated renderer type");
     }
 
     public void Build()
@@ -82,7 +82,12 @@ public class RendererElementLoader
                 RendererElementAttribute rendererAttribute = (RendererElementAttribute)Attribute.GetCustomAttribute(type, typeof(RendererElementAttribute));
                 Type rendererAttributeTarget = rendererAttribute.ElementType;
 
-                Type[] genericArguments = type.GetInterfaces().First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRendererElement<>)).GetGenericArguments();
+                List<Type> genericArguments = new List<Type>();
+                foreach (var currentInterface in type.GetInterfaces().Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRendererElement<>)))
+                {
+                    genericArguments.AddRange(currentInterface.GetGenericArguments());
+                }
+
                 if (!genericArguments.Any(x => x == rendererAttributeTarget))
                 {
                     Debug.LogError($"IRendererElement interface generic does not match attribute passed type for {type}");
@@ -95,7 +100,7 @@ public class RendererElementLoader
                     continue;
                 }
 
-                rendererElementTypes[rendererAttributeTarget] = type;
+                rendererElementTypes[rendererAttributeTarget] = type; 
             }
         }
     }
