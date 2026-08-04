@@ -11,7 +11,7 @@ namespace JESUIS.Editor.Elements.Input
     {
         ColorField colorField;
 
-        public Color defaultValue;
+        Color defaultValue;
         public Color CurrentValue { get; private set; }
 
         Action<Color> onValueChanged;
