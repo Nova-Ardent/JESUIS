@@ -1,5 +1,6 @@
 using JESUIS.Editor.Elements.CompoundInputs;
 using JESUIS.Editor.Elements.Input;
+using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Shared.ScreenData.Data;
@@ -57,15 +58,30 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
-            foreach (var field in GetAllFields(baseElement.GetType()).DistinctBy(x => x.Name))
+            SetFieldsOfTarget(this, baseElement.GetType(), baseElement);
+        }
+
+        void SetFieldsOfTarget(VisualElement targetElement, Type type, object target)
+        {
+            if (target == null)
             {
-                VisualElement visualElement = GetInspectorElement(field, baseElement);
+                Debug.LogError($"target for type {type} is null");
+                return;
+            }
+
+            foreach (var field in GetAllFields(type).DistinctBy(x => x.Name))
+            {
+                VisualElement visualElement = GetInspectorElement(field, target);
                 if (visualElement == null)
                     continue;
 
-                visualElement.style.marginTop = ELEMENT_PADDING / 2;
-                visualElement.style.marginBottom = ELEMENT_PADDING / 2;
-                Add(visualElement);
+                if (visualElement is not Container)
+                {
+                    visualElement.style.marginTop = ELEMENT_PADDING / 2;
+                    visualElement.style.marginBottom = ELEMENT_PADDING / 2;
+                }
+
+                targetElement.Add(visualElement);
             }
         }
 
@@ -89,6 +105,13 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, editorState, ref onSelectedElementUpdated);
 
                 default:
+                    if (fieldInfo.FieldType.IsDefined(typeof(System.SerializableAttribute), true))
+                    {
+                        Container container = new Container(fieldInfo.FieldType.Name, fieldInfo.Name);
+                        SetFieldsOfTarget(container, fieldInfo.FieldType, fieldInfo.GetValue(target));
+                        return container;
+                    }
+
                     Debug.LogWarning($"Could not create inspector element for field type {fieldInfo.FieldType}");
                     return null;
             }

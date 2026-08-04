@@ -36,7 +36,7 @@ namespace JESUIS.Editor.Settings
         public static readonly Color HEADER_TRIM_TOP = new Color(0.0784313725490196f, 0.0784313725490196f, 0.0784313725490196f);
         public static readonly Color HEADER_TRIM_BOTTOM = new Color(0.18823529411764706f, 0.18823529411764706f, 0.18823529411764706f);
 
-        public static readonly Color TRANSFORM_INPUT_BORDER_TRIM = new Color(0.0784313725490196f, 0.0784313725490196f, 0.0784313725490196f);
+        public static readonly Color CONTAINER_BORDER_TRIM = new Color(0.0784313725490196f, 0.0784313725490196f, 0.0784313725490196f);
 
         public static readonly Color ALIGNMENT_SELECTOR_BACKING = new Color(0.4f, 0.4f, 0.4f);
         public static readonly Color ALIGNMENT_SELECTOR_PIN_UNSELECTED = new Color(0.5f, 0.5f, 0.5f);

@@ -15,7 +15,7 @@ using JESUIS.Editor.Resources;
 
 namespace JESUIS.Editor.Elements.CompoundInputs
 {
-    public class TransformInputElement : VisualElement
+    public class TransformInputElement : Container
     {
         public const int BOTTOM_PADDING = 6;
         public const int ELEMENT_PADDING = 2;
@@ -39,16 +39,11 @@ namespace JESUIS.Editor.Elements.CompoundInputs
 
         Shared.ScreenData.Types.Transform targetTransform;
 
-        public TransformInputElement(string name, Shared.ScreenData.Types.Transform target)
+        public TransformInputElement(string name, Shared.ScreenData.Types.Transform target) : base("Transform", name)
         {
             targetTransform = target;
 
             this.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-element");
-            style.borderBottomColor = Colors.TRANSFORM_INPUT_BORDER_TRIM;
-
-            Header header = new Header("Transform", name, ResourceLoader.Instance.Icons.Inspector.Transform.Value);
-            header.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-element-header");
-            Add(header);
 
             sizeField = new Vector2fFieldElement("Size", "W", "H");
             sizeField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-size");
