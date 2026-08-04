@@ -93,24 +93,27 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         IEnumerable<FieldInfo> GetAllFields(Type type)
         {
-            while (type != null)
-            {
-                foreach (var fieldInfo in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                {
-                    if (fieldInfo.IsPublic)
-                    {
-                        yield return fieldInfo;
-                        continue;
-                    }
+            if (type == null)
+                yield break;
 
-                    if (fieldInfo.IsDefined(typeof(SerializeField), true))
-                    {
-                        yield return fieldInfo;
-                        continue;
-                    }
+            foreach (var fieldInfo in GetAllFields(type.BaseType))
+            {
+                yield return fieldInfo;
+            }
+
+            foreach (var fieldInfo in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (fieldInfo.IsPublic)
+                {
+                    yield return fieldInfo;
+                    continue;
                 }
 
-                type = type.BaseType;
+                if (fieldInfo.IsDefined(typeof(SerializeField), true))
+                {
+                    yield return fieldInfo;
+                    continue;
+                }
             }
         }
 
