@@ -18,6 +18,7 @@ namespace JESUIS.Editor.Elements.Input
         public ObjectFieldElement(string labelText) : base(labelText)
         {
             objectField = new ObjectField();
+            objectField.objectType = typeof(T);
             objectField.AddStyle(InputFieldsUSS.StyleSheetInstance, "object-field");
             objectField.RegisterValueChangedCallback(OnValueChanged);
 

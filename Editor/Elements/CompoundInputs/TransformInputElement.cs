@@ -39,7 +39,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
 
         Shared.ScreenData.Types.Transform targetTransform;
 
-        public TransformInputElement(string name, Shared.ScreenData.Types.Transform target) : base("Transform", name)
+        public TransformInputElement(string name, Shared.ScreenData.Types.Transform target) : base("Transform", name, ResourceLoader.Instance.Icons.Inspector.Transform.Value)
         {
             targetTransform = target;
 

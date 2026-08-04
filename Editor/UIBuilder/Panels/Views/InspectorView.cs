@@ -1,6 +1,7 @@
 using JESUIS.Editor.Elements.CompoundInputs;
 using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.Elements.Layout;
+using JESUIS.Editor.Resources;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Shared.ScreenData.Data;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static JESUIS.Shared.ScreenData.Data.TextureElement;
 
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
@@ -107,7 +109,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 default:
                     if (fieldInfo.FieldType.IsDefined(typeof(System.SerializableAttribute), true))
                     {
-                        Container container = new Container(fieldInfo.FieldType.Name, fieldInfo.Name);
+                        Container container = new Container(fieldInfo.FieldType.Name, fieldInfo.Name, GetTextureForFieldType(fieldInfo.FieldType));
                         SetFieldsOfTarget(container, fieldInfo.FieldType, fieldInfo.GetValue(target));
                         return container;
                     }
@@ -115,6 +117,15 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                     Debug.LogWarning($"Could not create inspector element for field type {fieldInfo.FieldType}");
                     return null;
             }
+        }
+
+        Texture2D GetTextureForFieldType(Type type)
+        {
+            return type switch
+            {
+                var t when t == typeof(ImageData) => ResourceLoader.Instance.Icons.Hierarchy.Image.Value,
+                _ => null
+            };
         }
 
         IEnumerable<FieldInfo> GetAllFields(Type type)

@@ -9,9 +9,9 @@ namespace JESUIS.Editor.Elements.Layout
 {
     public class Container : VisualElement
     {
-        public Container(string containerName, string name)
+        public Container(string containerName, string name, Texture2D texture2D)
         {
-            Header header = new Header(containerName, name, ResourceLoader.Instance.Icons.Inspector.Transform.Value);
+            Header header = new Header(containerName, name, texture2D);
             header.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-element-header");
             Add(header);
 

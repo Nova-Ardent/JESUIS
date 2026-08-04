@@ -7,9 +7,9 @@ namespace JESUIS.Shared.ScreenData.Data
     {
         [System.Serializable]
         public class ImageData
-        {
+        { 
             public Texture2D Texture;
-            public Color Color;
+            public Color Color = Color.white;
         }
 
         [SerializeField] public ImageData Image = new ImageData();

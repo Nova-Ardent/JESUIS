@@ -17,5 +17,15 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
                 base.Data = value;
             }
         }
+
+        public override void OnValuesChanged()
+        {
+            base.OnValuesChanged();
+
+            TextureElement data = (TextureElement)Data;
+
+            style.backgroundImage = data.Image.Texture;
+            style.unityBackgroundImageTintColor = data.Image.Color;
+        }
     }
 }

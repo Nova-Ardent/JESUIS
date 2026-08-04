@@ -17,7 +17,6 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 
         public virtual void OnValuesChanged()
         {
-            style.backgroundColor = new Color(0.5f, 0, 0, 0.5f);
             style.position = Position.Absolute;
             style.width = GetHorizontal(Data.Transform.Size.x, Data.Transform.HorizontalSize);
             style.height = GetVertical(Data.Transform.Size.y, Data.Transform.VerticalSize);
