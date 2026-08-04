@@ -58,6 +58,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             if (item.TargetObject is BaseElement)
             {
                 yield return new NamedAction("Add Empty", () => AddEmpty(item), true);
+                yield return new NamedAction("Add Texture", () => AddTexture(item), true);
             }
 
             if (item.TargetObject is BaseElement && item.TargetObject is not RootElement)
@@ -77,6 +78,24 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 item.AddChild(new HierarchyItem(newEmpty, GetActions, OnElementClicked));
                 editorHierarchy.RebuildListVisuals();
                 editorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newEmpty));
+            }
+            else
+            {
+                Debug.LogError("Target object is not a BaseElement.");
+            }
+        }
+
+        void AddTexture(HierarchyItem item)
+        {
+            TextureElement newTexture = new TextureElement();
+            newTexture.SetName("New Texture");
+
+            if (item.TargetObject is BaseElement baseElement)
+            {
+                baseElement.AddChild(newTexture);
+                item.AddChild(new HierarchyItem(newTexture, GetActions, OnElementClicked));
+                editorHierarchy.RebuildListVisuals();
+                editorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newTexture));
             }
             else
             {
