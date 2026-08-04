@@ -35,8 +35,8 @@ namespace JESUIS.Editor.Elements.Input
 
         public void SetValue(T newValue)
         {
-            CurrentValue = newValue;
-            inputField.value = newValue.ToString();
+            SetValueWithoutNotify(newValue);
+            onValueChanged?.Invoke(CurrentValue);
         }
 
         public void RegisterOnValueChanged(Action<T> onChange)

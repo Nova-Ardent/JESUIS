@@ -80,6 +80,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type == typeof(Vector2): return Vector2fFieldElement(fieldInfo, target);
                 case var type when type == typeof(Vector2Int): return Vector2iFieldElement(fieldInfo, target);
                 case var type when type.IsEnum: return EnumFieldElement(fieldInfo, target);
+                case var type when type == typeof(Color): return ColorFieldElement(fieldInfo, target);
 
                 // Compound Types
                 case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, editorState, ref onSelectedElementUpdated);
@@ -207,6 +208,20 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             AddOnSelectedElementUpdated(() => enumField.SetValueWithoutNotify((Enum)info.GetValue(target)));
             return enumField;
+        }
+
+        VisualElement ColorFieldElement(FieldInfo info, object target)
+        {
+            ColorFieldElement colorField = new ColorFieldElement(info.Name, (Color)info.GetValue(target));
+            colorField.SetValueWithoutNotify((Color)info.GetValue(target));
+            colorField.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => colorField.SetValueWithoutNotify((Color)info.GetValue(target)));
+            return colorField;
         }
     }
 }
