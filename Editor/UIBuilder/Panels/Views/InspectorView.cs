@@ -82,6 +82,9 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type.IsEnum: return EnumFieldElement(fieldInfo, target);
                 case var type when type == typeof(Color): return ColorFieldElement(fieldInfo, target);
 
+                // Unity types
+                case var type when type == typeof(UnityEngine.Texture2D): return ObjectFieldElement<UnityEngine.Texture2D>(fieldInfo, target);
+
                 // Compound Types
                 case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, editorState, ref onSelectedElementUpdated);
 
@@ -126,7 +129,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             else
             {
                 onSelectedElementUpdated += action;
-            }   
+            }
         }
 
         VisualElement RegisterStringInputField(FieldInfo info, object target)
@@ -225,6 +228,20 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             AddOnSelectedElementUpdated(() => colorField.SetValueWithoutNotify((Color)info.GetValue(target)));
             return colorField;
+        }
+
+        VisualElement ObjectFieldElement<T>(FieldInfo info, object target) where T : UnityEngine.Object
+        {
+            ObjectFieldElement<T> objectField = new ObjectFieldElement<T>(info.Name);
+            objectField.SetValueWithoutNotify((T)info.GetValue(target));
+            objectField.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => objectField.SetValueWithoutNotify((T)info.GetValue(target)));
+            return objectField;
         }
     }
 }
