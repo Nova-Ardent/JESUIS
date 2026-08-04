@@ -39,6 +39,16 @@ namespace JESUIS.Editor.Elements.Input
             onValueChanged?.Invoke(CurrentValue);
         }
 
+        public void SetToDefaultWithoutNotify()
+        {
+            SetValueWithoutNotify(defaultValue);
+        }
+
+        public void SetToDefault()
+        {
+            SetValue(defaultValue);
+        }
+
         public void RegisterOnValueChanged(Action<T> onChange)
         {
             if (onValueChanged == null)
