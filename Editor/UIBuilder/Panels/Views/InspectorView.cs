@@ -55,6 +55,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             Clear();
             onSelectedElementUpdated = null;
 
+            if (baseElement == null)
+            {
+                return;
+            }
+
             if (baseElement is RootElement)
             {
                 return;

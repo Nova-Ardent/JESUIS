@@ -8,6 +8,7 @@ namespace JESUIS.Editor.UIBuilder.Data.StateChanges
         {
             ValueUpdated,
             ChildAdded,
+            ElementRemoved,
         }
 
         public abstract ElementChangeType ChangeType { get; }
@@ -44,6 +45,15 @@ namespace JESUIS.Editor.UIBuilder.Data.StateChanges
         public override ElementChangeType ChangeType => ElementChangeType.ChildAdded;
 
         public ChildAdded(BaseElement target, BaseElement childElement) : base(target, childElement)
+        {
+        }
+    }
+
+    public class ElementRemoved : ElementChanges
+    {
+        public override ElementChangeType ChangeType => ElementChangeType.ElementRemoved;
+
+        public ElementRemoved(BaseElement target) : base(target)
         {
         }
     }

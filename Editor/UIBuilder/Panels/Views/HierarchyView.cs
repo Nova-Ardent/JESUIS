@@ -108,10 +108,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             if (item.Parent.TargetObject is BaseElement parentBaseElement && item.TargetObject is BaseElement baseElement)
             {
                 parentBaseElement.RemoveChild(baseElement);
-            }
 
-            item.Remove();
-            editorHierarchy.RebuildListVisuals();
+                item.Remove();
+                editorHierarchy.RebuildListVisuals();
+                editorState.TriggerElementIsDirty(this, new ElementRemoved(baseElement));
+                editorState.SelectedElement.Value = null;
+            }
         }
     }
 }

@@ -63,6 +63,15 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
                     elementToRendererElementMap[childAddedChange.Data] = childElement;
                 }
             }
+            else if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ElementRemoved)
+            {
+                if (elementChanges is ElementRemoved childRemovedChange)
+                {
+                    VisualElement targetElement = elementToRendererElementMap[elementChanges.TargetElement];
+                    targetElement.parent.Remove(targetElement);
+                    elementToRendererElementMap.Remove(elementChanges.TargetElement);
+                }
+            }
             else if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated)
             {
                 if (elementChanges is ValuesUpdated valuesUpdatedChange)
