@@ -1,17 +1,16 @@
 using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Elements.SpecialInputs;
-using JESUIS.Editor.Settings;
-using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.Resources;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views;
 using JESUIS.Editor.Utilities.StyleSheets;
 using JESUIS.Shared.ScreenData.Types;
-using System;
 using System.Reflection;
-using UnityEngine;
+using System;
 using UnityEngine.UIElements;
-using JESUIS.Editor.Resources;
+using UnityEngine;
 
 namespace JESUIS.Editor.Elements.CompoundInputs
 {

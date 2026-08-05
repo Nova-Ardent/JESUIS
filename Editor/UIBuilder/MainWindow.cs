@@ -2,8 +2,8 @@ using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Elements.Window;
 using JESUIS.Editor.Helpers;
 using JESUIS.Editor.UIBuilder.Data;
-using JESUIS.Editor.UIBuilder.Panels;
 using JESUIS.Editor.UIBuilder.Panels.Views;
+using JESUIS.Editor.UIBuilder.Panels;
 using System.Collections.Generic;
 using UnityEditor;
 

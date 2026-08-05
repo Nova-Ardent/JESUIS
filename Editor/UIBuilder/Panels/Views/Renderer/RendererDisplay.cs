@@ -1,14 +1,11 @@
 using JESUIS.Editor.Elements.Common.VisualElements;
-using JESUIS.Editor.Helpers.Motions;
 using JESUIS.Editor.Resources;
 using JESUIS.Editor.Settings;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
 using JESUIS.Shared.ScreenData.Data;
-using System;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
 {

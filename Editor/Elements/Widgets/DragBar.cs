@@ -2,8 +2,8 @@ using JESUIS.Editor.Elements.Interfaces;
 using JESUIS.Editor.Settings;
 using System;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace JESUIS.Editor.Elements.Widgets
 {

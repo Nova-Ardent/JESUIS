@@ -1,11 +1,10 @@
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
-using JESUIS.Shared.ScreenData.Data;
-using System.Collections.Generic;
-using UnityEngine.UIElements;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
+using JESUIS.Shared.ScreenData.Data;
 using JESUIS.Shared.ScreenData;
-
+using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 {

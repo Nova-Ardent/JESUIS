@@ -1,9 +1,9 @@
-﻿using UnityEngine.UIElements;
-using UnityEngine;
-using System;
+﻿using JESUIS.Editor.Settings;
 using JESUIS.Shared.ScreenData.Types;
-using JESUIS.Editor.Settings;
 using System.Linq;
+using System;
+using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace JESUIS.Editor.Elements.SpecialInputs
 {

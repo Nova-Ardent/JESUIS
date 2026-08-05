@@ -1,12 +1,11 @@
-using JESUIS.Editor.Utilities.System.PathUtils;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace JESUIS.Editor.Utilities
 {

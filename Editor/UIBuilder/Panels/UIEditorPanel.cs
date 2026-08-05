@@ -1,11 +1,12 @@
-using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Elements.Layout.TabBarWidgets;
+using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Elements.Panel;
 using JESUIS.Editor.Helpers;
 using JESUIS.Editor.UIBuilder.Panels.Views;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
+
 using static JESUIS.Editor.Utilities.Utilities;
 
 namespace JESUIS.Editor.UIBuilder.Panels

@@ -1,9 +1,8 @@
 using JESUIS.Editor.Utilities.StyleSheets;
 using System;
 using UnityEditor.UIElements;
-using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace JESUIS.Editor.Elements.Input
 {

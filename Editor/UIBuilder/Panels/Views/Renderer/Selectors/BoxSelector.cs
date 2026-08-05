@@ -1,13 +1,14 @@
 using JESUIS.Editor.Elements.Display;
 using JESUIS.Editor.Resources;
 using JESUIS.Editor.Settings;
-using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints;
 using JESUIS.Shared.ScreenData.Types;
-using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine;
+
 using static JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints.DragPoint;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors

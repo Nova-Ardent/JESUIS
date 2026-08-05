@@ -2,17 +2,17 @@ using JESUIS.Editor.Elements.CompoundInputs;
 using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Resources;
-using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.Data;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
+using System;
 using UnityEngine.UIElements;
-using static JESUIS.Shared.ScreenData.Data.TextureElement;
+using UnityEngine;
 
+using static JESUIS.Shared.ScreenData.Data.TextureElement;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {

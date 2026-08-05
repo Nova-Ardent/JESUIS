@@ -1,6 +1,6 @@
+using System;
 using UnityEngine.UIElements;
 using UnityEngine;
-using System;
 
 namespace JESUIS.Editor.Helpers.Motions
 {

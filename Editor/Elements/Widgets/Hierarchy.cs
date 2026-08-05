@@ -1,12 +1,10 @@
-using JESUIS.Editor.Settings;
-using System.Collections.Generic;
-using System.IO;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
-using System;
 using JESUIS.Editor.Helpers;
 using JESUIS.Editor.Resources;
+using JESUIS.Editor.Settings;
+using System.Collections.Generic;
+using System;
+using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace JESUIS.Editor.Elements.Widgets
 {

@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace UnityEngine.UIElements
 {
     public static class VisualElementExtensions

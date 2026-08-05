@@ -1,8 +1,8 @@
 using JESUIS.Editor.Helpers.Utils;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Panels.Views;
-using JESUIS.Shared.ScreenData;
 using JESUIS.Shared.ScreenData.Data;
+using JESUIS.Shared.ScreenData;
 using System;
 
 namespace JESUIS.Editor.UIBuilder.Data

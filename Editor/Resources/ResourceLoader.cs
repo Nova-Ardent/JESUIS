@@ -1,6 +1,5 @@
 using System.IO;
 using System.Runtime.CompilerServices;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine;
 
 namespace JESUIS.Editor.Resources
