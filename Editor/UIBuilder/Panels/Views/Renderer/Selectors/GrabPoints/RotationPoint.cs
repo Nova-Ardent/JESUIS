@@ -9,7 +9,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
 {
     public class RotationPoint : VisualElement
     {
-        public const int WIDTH = 10;
+        public const int WIDTH = 12;
         public const int LENGTH = 50;
 
         VisualElement bar;
@@ -25,6 +25,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
         bool isDragging = false;
         Vector2 initialRelativePoint = Vector2.zero;
 
+        float currentCursorAngle = 0;
+
         public RotationPoint(BoxSelector parentSelector, RotatedTexture cursorTexture)
         {
             this.parentSelector = parentSelector;
@@ -36,7 +38,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
             bar = new VisualElement();
             bar.style.position = Position.Absolute;
             bar.style.width = 2;
-            bar.style.height = LENGTH - 10;
+            bar.style.height = LENGTH - WIDTH;
             bar.style.left = 4;
             bar.style.top = 5;
             bar.style.backgroundColor = Colors.RENDERER_BOX_SELECTOR_COLOR;
@@ -66,7 +68,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
             bar.pickingMode = PickingMode.Ignore;
             tail.pickingMode = PickingMode.Ignore;
 
-            style.translate = new StyleTranslate(new Translate(-WIDTH / 2, -LENGTH + 5));
+            style.translate = new StyleTranslate(new Translate(-WIDTH / 2, -LENGTH + WIDTH / 2));
+            style.transformOrigin = new TransformOrigin(WIDTH / 2, LENGTH - WIDTH / 2, 0);
         }
 
         public void RegisterOnRotate(VisualElement mouseContainer, Action<float> rotateHandler)
@@ -89,6 +92,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
             }
         }
 
+        public void SetCursorAngle(float angle)
+        {
+            currentCursorAngle = angle;
+        }
+
         void UpdateCursorState()
         {
             if (isHovering || isDragging)
@@ -108,7 +116,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
                 Vector2 localMousePosition = this.parent.WorldToLocal(mousePosition);
                 cursorTexture.style.left = localMousePosition.x;
                 cursorTexture.style.top = localMousePosition.y;
-                cursorTexture.SetRotation(0);
+                cursorTexture.SetRotation(currentCursorAngle);
             }
         }
 

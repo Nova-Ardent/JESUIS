@@ -22,10 +22,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
             Bottom,
         }
 
-        public const int WIDTH = 10;
-        public const int HEIGHT = 10;
+        public const int WIDTH = 12;
+        public const int HEIGHT = 12;
 
         float defaultDragAngle = 0;
+        float currentDragAngle = 0;
 
         bool isHovering = false;
         bool isDragging = false;
@@ -100,6 +101,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
             }
         }
 
+        public void SetDragCursorAngle(float angle)
+        {
+            currentDragAngle = angle;
+        }
+
         void UpdateCursorState()
         {
             if (isHovering || isDragging)
@@ -119,7 +125,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints
                 Vector2 localMousePosition = this.parent.WorldToLocal(mousePosition);
                 cursorTexture.style.left = localMousePosition.x;
                 cursorTexture.style.top = localMousePosition.y;
-                cursorTexture.SetRotation(defaultDragAngle);
+                cursorTexture.SetRotation(defaultDragAngle + currentDragAngle);
             }
         }
 

@@ -2,6 +2,12 @@ namespace UnityEngine.UIElements
 {
     public static class VisualElementExtensions
     {
+        public static void SetPosition(this VisualElement element, Vector2 position)
+        {
+            element.style.left = position.x;
+            element.style.top = position.y;
+        }
+
         public static Vector2 GetRelativeDelta(this VisualElement element, Vector2 delta)
         {
             Vector2 previousLocal = element.WorldToLocal(-delta);

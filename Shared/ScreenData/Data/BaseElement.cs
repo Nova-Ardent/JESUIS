@@ -7,12 +7,16 @@ namespace JESUIS.Shared.ScreenData.Data
     public class BaseElement
     {
         [SerializeField] public string Name = "";
-        [SerializeField] public Types.Transform Transform = new Types.Transform();
+        [SerializeReference] public Types.Transform Transform = new Types.Transform();
 
+        [SerializeReference] BaseElement parent = null;
         [SerializeReference] List<BaseElement> children = new List<BaseElement>(); 
 
         public void AddChild(BaseElement child)
         {
+            child.parent = this;
+            child.Transform.parent = this.Transform;
+
             children.Add(child);
         }
 
@@ -20,6 +24,16 @@ namespace JESUIS.Shared.ScreenData.Data
         {
             children.Remove(child);
         }
+
+        public BaseElement GetParent()
+        {
+            return parent;
+        } 
+
+        public IEnumerable<BaseElement> GetChildren()
+        {
+            return children;
+        } 
 
         public override string ToString()
         {

@@ -1,10 +1,10 @@
 using JESUIS.Editor.Elements.Display;
 using JESUIS.Editor.Resources;
-using JESUIS.Editor.Settings;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy.Builder;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.DragPoints;
+using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors.Edges;
 using JESUIS.Shared.ScreenData.Types;
 using UnityEngine.UIElements;
 using UnityEngine;
@@ -15,17 +15,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
 {
     public class BoxSelector : VisualElement
     {
-        DragPoint dragPointTopLeft;
-        DragPoint dragPointTopMiddle;
-        DragPoint dragPointTopRight;
-
-        DragPoint dragPointMiddleLeft;
-        DragPoint dragPointMiddleRight;
-
-        DragPoint dragPointBottomLeft;
-        DragPoint dragPointBottomMiddle;
-        DragPoint dragPointBottomRight;
-
+        BoxSelectorEdge[] boxSelectorEdges = new BoxSelectorEdge[4];
+        DragPoint[,] dragPoints = new DragPoint[3, 3];
         RotationPoint rotationPoint;
 
         RotatedTexture dragCursorTexture;
@@ -47,19 +38,59 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
             this.container = container;
 
             style.position = Position.Absolute;
-            style.width = 100;
-            style.height = 100;
-            style.display = DisplayStyle.None;
+            style.left = 0;
+            style.top = 0;
+        }
 
-            style.borderTopWidth = 2; 
-            style.borderBottomWidth = 2;
-            style.borderLeftWidth = 2;
-            style.borderRightWidth = 2;
+        public void InitializeDragPoints(VisualElement mouseContainer)
+        {
+            // we're doing a virtual cursor, so we can rotate it.
+            Texture2D emptyCursor = ResourceLoader.Instance.Icons.Renderer.EmptyCursor;
+            var cursor = new UnityEngine.UIElements.Cursor
+            {
+                texture = ResourceLoader.Instance.Icons.Renderer.EmptyCursor,
+                hotspot = new Vector2(emptyCursor.width / 2, emptyCursor.height / 2),
+            };
 
-            style.borderTopColor = Colors.RENDERER_BOX_SELECTOR_COLOR;
-            style.borderBottomColor = Colors.RENDERER_BOX_SELECTOR_COLOR;
-            style.borderLeftColor = Colors.RENDERER_BOX_SELECTOR_COLOR;
-            style.borderRightColor = Colors.RENDERER_BOX_SELECTOR_COLOR;
+            dragCursorTexture = new RotatedTexture(ResourceLoader.Instance.Icons.Renderer.DragArrow.Value, 0, true);
+            dragCursorTexture.style.position = Position.Absolute;
+            dragCursorTexture.style.display = DisplayStyle.None;
+            dragCursorTexture.style.cursor = cursor;
+            dragCursorTexture.pickingMode = PickingMode.Ignore;
+            Add(dragCursorTexture);
+
+            for (int i = 0; i < 4; i++)
+            {
+                boxSelectorEdges[i] = new BoxSelectorEdge();
+                Add(boxSelectorEdges[i]);
+            }
+
+            AddDragPoint(ref dragPoints[0, 0], 45f, DragEdgeHorizontal.Left, DragEdgeVertical.Top, mouseContainer);
+            AddDragPoint(ref dragPoints[2, 0], -45f, DragEdgeHorizontal.Right, DragEdgeVertical.Top, mouseContainer);
+            AddDragPoint(ref dragPoints[0, 2], -45f, DragEdgeHorizontal.Left, DragEdgeVertical.Bottom, mouseContainer);
+            AddDragPoint(ref dragPoints[2, 2], 45f, DragEdgeHorizontal.Right, DragEdgeVertical.Bottom, mouseContainer);
+
+            AddDragPoint(ref dragPoints[1, 0], 90f, DragEdgeHorizontal.Middle, DragEdgeVertical.Top, mouseContainer);
+            AddDragPoint(ref dragPoints[0, 1], 0f, DragEdgeHorizontal.Left, DragEdgeVertical.Middle, mouseContainer);
+            AddDragPoint(ref dragPoints[2, 1], 0f, DragEdgeHorizontal.Right, DragEdgeVertical.Middle, mouseContainer);
+            AddDragPoint(ref dragPoints[1, 2], 90f, DragEdgeHorizontal.Middle, DragEdgeVertical.Bottom, mouseContainer);
+
+            rotationCursorTexture = new RotatedTexture(ResourceLoader.Instance.Icons.Renderer.RotateArrow.Value, 0, true);
+            rotationCursorTexture.style.position = Position.Absolute;
+            rotationCursorTexture.style.display = DisplayStyle.None;
+            rotationCursorTexture.style.cursor = cursor;
+            rotationCursorTexture.pickingMode = PickingMode.Ignore;
+            Add(rotationCursorTexture);
+
+            rotationPoint = new RotationPoint(this, rotationCursorTexture);
+            rotationPoint.style.position = Position.Absolute;
+            rotationPoint.style.left = 0;
+            rotationPoint.style.top = 0;
+            rotationPoint.RegisterOnRotate(mouseContainer, OnRotatePoint);
+            Add(rotationPoint);
+
+            dragCursorTexture.BringToFront();
+            rotationCursorTexture.BringToFront();
         }
 
         public bool GetActive()
@@ -77,53 +108,81 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
         }
 
         public void WrapToTarget()
-        {
+        {   
+            if (target == null)
+                return;
+        
             if (target is IRendererElement rendererElement)
             {
                 Shared.ScreenData.Types.Transform transform = rendererElement.GetTransform();
+
+                Vector2 localPosition = transform.GetLocalPosition();
+                Vector2 scaledSize = transform.GetScaledLocalWidth();
+                Vector2 pivot = transform.GetPivotOffset();
+                Vector2 transformOrigin = new Vector2(localPosition.x + pivot.x, localPosition.y + pivot.y);
+
+                Vector2[,] cornerPositions = new Vector2[,]
+                {
+                    {
+                        new Vector2(localPosition.x, localPosition.y),
+                        new Vector2(localPosition.x, localPosition.y + scaledSize.y),
+                    },
+                    {
+                        new Vector2(localPosition.x + scaledSize.x, localPosition.y),
+                        new Vector2(localPosition.x + scaledSize.x, localPosition.y + scaledSize.y),
+                    }
+                };
+
+                for (int x = 0; x < 2; x++)
+                {
+                    for (int y = 0; y < 2; y++)
+                    {
+                        Vector2 rotatedPoint = cornerPositions[x, y].RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
+                        cornerPositions[x, y] = this.WorldToLocal(target.parent.LocalToWorld(rotatedPoint));
+
+                        dragPoints[x * 2, y * 2].SetPosition(cornerPositions[x, y]);
+                    }
+                }
+
+                dragPoints[1, 0].SetPosition((cornerPositions[0, 0] + cornerPositions[1, 0]) / 2);
+                dragPoints[0, 1].SetPosition((cornerPositions[0, 0] + cornerPositions[0, 1]) / 2);
+                dragPoints[2, 1].SetPosition((cornerPositions[1, 0] + cornerPositions[1, 1]) / 2);
+                dragPoints[1, 2].SetPosition((cornerPositions[0, 1] + cornerPositions[1, 1]) / 2);
+
+                Shared.ScreenData.Types.Transform rotationIter = transform;
+                float rotation = 0;
+                do
+                {
+                    rotation += rotationIter.Rotation;
+                    rotationIter = rotationIter.parent;
+                } while (rotationIter != null);
+
+                foreach (DragPoint dragPoint in dragPoints)
+                {
+                    if (dragPoint != null)
+                        dragPoint.SetDragCursorAngle(rotation);
+                }
                 
-                if (transform.Pivot.IsLeft())
-                    rotationPoint.style.left = 0;
-                else if (transform.Pivot.IsMiddleCol())
-                    rotationPoint.style.left = Length.Percent(50);
-                else if (transform.Pivot.IsRight())
-                    rotationPoint.style.left = Length.Percent(100);
+                rotationPoint.style.rotate = new Rotate(new Angle(rotation, AngleUnit.Degree));
+                rotationPoint.SetCursorAngle(rotation);
 
-                if (transform.Pivot.IsTop())
-                    rotationPoint.style.top = 0;
-                else if (transform.Pivot.IsMiddleRow())
-                    rotationPoint.style.top = Length.Percent(50);
-                else if (transform.Pivot.IsBottom())
-                    rotationPoint.style.top = Length.Percent(100);
+                boxSelectorEdges[0].SetEdgeData(cornerPositions[0, 0], cornerPositions[1, 0]);
+                boxSelectorEdges[1].SetEdgeData(cornerPositions[0, 0], cornerPositions[0, 1]);
+                boxSelectorEdges[2].SetEdgeData(cornerPositions[1, 0], cornerPositions[1, 1]);
+                boxSelectorEdges[3].SetEdgeData(cornerPositions[0, 1], cornerPositions[1, 1]);
 
-                style.transformOrigin = new TransformOrigin(0, 0, 0);
-
-                float left = target.style.left.value.value;
-                float top = target.style.top.value.value;
-
-                float width = target.style.width.value.value * target.style.scale.value.value.x;
-                float height = target.style.height.value.value * target.style.scale.value.value.y;
-
-                Vector2 transformOrigin = new Vector2(left + target.style.transformOrigin.value.x.value, top + target.style.transformOrigin.value.y.value);
-
-                Vector2 localTopLeft = new Vector2(left, top).RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
-                Vector2 localTopRight = new Vector2(left + width, top).RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
-                Vector2 localBottomLeft = new Vector2(left, top + height).RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
-                Vector2 localBottomRight = new Vector2(left + width, top + height).RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
-
-                Vector2 topLeft = container.WorldToLocal(target.parent.LocalToWorld(localTopLeft));
-                Vector2 topRight = container.WorldToLocal(target.parent.LocalToWorld(localTopRight));
-                Vector2 bottomLeft = container.WorldToLocal(target.parent.LocalToWorld(localBottomLeft));
-                Vector2 bottomRight = container.WorldToLocal(target.parent.LocalToWorld(localBottomRight));
-
-                style.left = topLeft.x;
-                style.top = topLeft.y;
-
-                style.width = Vector2.Distance(topLeft, topRight) / style.scale.value.value.x;
-                style.height = Vector2.Distance(topLeft, bottomLeft) / style.scale.value.value.y;
-
-                Vector2 angularDiff = topRight - topLeft;
-                style.rotate = new StyleRotate(new Rotate(new Angle(Mathf.Atan2(angularDiff.y, angularDiff.x), AngleUnit.Radian)));
+                switch (transform.Pivot)
+                {
+                    case Alignment.TopLeft:     rotationPoint.SetPosition(cornerPositions[0, 0]); break;
+                    case Alignment.Top:         rotationPoint.SetPosition((cornerPositions[0, 0] + cornerPositions[1, 0]) / 2); break;
+                    case Alignment.TopRight:    rotationPoint.SetPosition(cornerPositions[1, 0]); break;
+                    case Alignment.Left:        rotationPoint.SetPosition((cornerPositions[0, 0] + cornerPositions[0, 1]) / 2); break;
+                    case Alignment.Middle:      rotationPoint.SetPosition((cornerPositions[0, 0] + cornerPositions[1, 1]) / 2); break;
+                    case Alignment.Right:       rotationPoint.SetPosition((cornerPositions[1, 0] + cornerPositions[1, 1]) / 2); break;
+                    case Alignment.BottomLeft:  rotationPoint.SetPosition(cornerPositions[0, 1]); break;
+                    case Alignment.Bottom:      rotationPoint.SetPosition((cornerPositions[0, 1] + cornerPositions[1, 1]) / 2); break;
+                    case Alignment.BottomRight: rotationPoint.SetPosition(cornerPositions[1, 1]); break;
+                }
             }
         }
 
@@ -159,52 +218,6 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
         public VisualElement GetTarget()
         {
             return target;
-        }
-
-        public void InitializeDragPoints(VisualElement mouseContainer)
-        {
-            // we're doing a virtual cursor, so we can rotate it.
-            Texture2D emptyCursor = ResourceLoader.Instance.Icons.Renderer.EmptyCursor;
-            var cursor = new UnityEngine.UIElements.Cursor
-            {
-                texture = ResourceLoader.Instance.Icons.Renderer.EmptyCursor,
-                hotspot = new Vector2(emptyCursor.width / 2, emptyCursor.height / 2),
-            };
-
-            dragCursorTexture = new RotatedTexture(ResourceLoader.Instance.Icons.Renderer.DragArrow.Value, 0, true);
-            dragCursorTexture.style.position = Position.Absolute;
-            dragCursorTexture.style.display = DisplayStyle.None;
-            dragCursorTexture.style.cursor = cursor;
-            dragCursorTexture.pickingMode = PickingMode.Ignore;
-            Add(dragCursorTexture);
-
-            AddDragPoint(ref dragPointTopLeft, 45f, DragEdgeHorizontal.Left, DragEdgeVertical.Top, mouseContainer);
-            AddDragPoint(ref dragPointTopMiddle, 90f, DragEdgeHorizontal.Middle, DragEdgeVertical.Top, mouseContainer);
-            AddDragPoint(ref dragPointTopRight, -45f, DragEdgeHorizontal.Right, DragEdgeVertical.Top, mouseContainer);
-
-            AddDragPoint(ref dragPointMiddleLeft, 0f, DragEdgeHorizontal.Left, DragEdgeVertical.Middle, mouseContainer);
-            AddDragPoint(ref dragPointMiddleRight, 0f, DragEdgeHorizontal.Right, DragEdgeVertical.Middle, mouseContainer);
-
-            AddDragPoint(ref dragPointBottomLeft, -45f, DragEdgeHorizontal.Left, DragEdgeVertical.Bottom, mouseContainer);
-            AddDragPoint(ref dragPointBottomMiddle, 90f, DragEdgeHorizontal.Middle, DragEdgeVertical.Bottom, mouseContainer);
-            AddDragPoint(ref dragPointBottomRight, 45f, DragEdgeHorizontal.Right, DragEdgeVertical.Bottom, mouseContainer);
-
-            rotationCursorTexture = new RotatedTexture(ResourceLoader.Instance.Icons.Renderer.RotateArrow.Value, 0, true);
-            rotationCursorTexture.style.position = Position.Absolute;
-            rotationCursorTexture.style.display = DisplayStyle.None;
-            rotationCursorTexture.style.cursor = cursor;
-            rotationCursorTexture.pickingMode = PickingMode.Ignore;
-            Add(rotationCursorTexture);
-
-            rotationPoint = new RotationPoint(this, rotationCursorTexture);
-            rotationPoint.style.position = Position.Absolute;
-            rotationPoint.style.left = 0;
-            rotationPoint.style.top = 0;
-            rotationPoint.RegisterOnRotate(mouseContainer, OnRotatePoint);
-            Add(rotationPoint);
-
-            dragCursorTexture.BringToFront();
-            rotationCursorTexture.BringToFront();
         }
 
         void AddDragPoint(ref DragPoint dragPoint, float defaultDragAngle, DragEdgeHorizontal horizontal, DragEdgeVertical vertical, VisualElement mouseContainer)
