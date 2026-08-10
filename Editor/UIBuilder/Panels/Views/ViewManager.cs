@@ -9,11 +9,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         Action<EditorViews.Views> onViewChanged;
 
-        public EditorViews NoneView { get => new EditorViews(); }
-        
+        public EditorViews NoneView { get => new EditorViews(editorState); }
         public HierarchyView CurrentHierarchyView { get; private set; }
         public InspectorView CurrentInspectorView { get; private set; }
         public RendererView CurrentRendererView { get; private set; }
+        public FileView CurrentFileView { get; private set; }
 
         public ViewManager(EditorState editorState)
         {
@@ -22,12 +22,17 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             CurrentHierarchyView = new HierarchyView(editorState);
             CurrentInspectorView = new InspectorView(editorState);
             CurrentRendererView = new RendererView(editorState);
+            CurrentFileView = new FileView(editorState);
         }
 
         public EditorViews GetView(EditorViews.Views view, bool triggerOnChange = true)
         {
             switch (view)
             {
+                case EditorViews.Views.File:
+                    onViewChanged?.Invoke(view);
+                    return CurrentFileView;
+
                 case EditorViews.Views.Hierarchy:
                     onViewChanged?.Invoke(view);
                     return CurrentHierarchyView;

@@ -148,6 +148,12 @@ namespace JESUIS.Editor.Elements.Widgets
             }
         }
 
+        public void RemoveChildren()
+        {
+            ChildItems.Clear();
+            RemoveCollapseIcon();
+        }
+
         public void Remove()
         {
             Parent.ChildItems.Remove(this);

@@ -21,23 +21,18 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         const int ELEMENT_PADDING = 2;
 
         Action onSelectedElementUpdated;
-        EditorState editorState;
 
         public override Views Type => Views.Inspector;
 
-        public InspectorView(EditorState editorState)
+        public InspectorView(EditorState editorState) : base(editorState)
         {
-            this.editorState = editorState;
-            editorState.SelectedElement.ListenTo(InspectingNewElement);
-            editorState.ListenToElementIsDirty(OnElementIsDirty);
-
             style.left = 0;
             style.top = 0;
             style.width = Length.Percent(100);
             style.height = Length.Percent(100);
         }
 
-        void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
+        protected override void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
         {
             if (triggeringView.Type == Views.Inspector)
             {
@@ -50,7 +45,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
         }
 
-        void InspectingNewElement(BaseElement baseElement)
+        protected override void OnSelectedElementChanged(BaseElement baseElement)
         {
             Clear();
             onSelectedElementUpdated = null;
@@ -66,6 +61,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
 
             SetFieldsOfTarget(this, baseElement.GetType(), baseElement);
+        }
+
+        protected override void OnCurrentScreenChanged(Shared.ScreenData.Screen currentScreen)
+        {
+            OnSelectedElementChanged(null);
         }
 
         void SetFieldsOfTarget(VisualElement targetElement, Type type, object target)
@@ -109,7 +109,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type == typeof(UnityEngine.Texture2D): return ObjectFieldElement<UnityEngine.Texture2D>(fieldInfo, target);
 
                 // Compound Types
-                case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, editorState, ref onSelectedElementUpdated);
+                case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, CurrentEditorState, ref onSelectedElementUpdated);
 
                 default:
                     if (fieldInfo.FieldType.IsDefined(typeof(System.SerializableAttribute), true))
@@ -178,7 +178,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             textField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
-                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
             });
 
             AddOnSelectedElementUpdated(() => textField.SetValueWithoutNotify(info.GetValue(target)?.ToString() ?? ""));
@@ -192,7 +192,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             intField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
-                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
             });
 
             AddOnSelectedElementUpdated(() => intField.SetValueWithoutNotify((int)info.GetValue(target)));
@@ -206,7 +206,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             floatField.RegisterOnValueChanged(newText =>
             {
                 info.SetValue(target, newText);
-                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
             });
 
             AddOnSelectedElementUpdated(() => floatField.SetValueWithoutNotify((float)info.GetValue(target)));
@@ -220,7 +220,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             vectorField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
-                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
             });
 
             AddOnSelectedElementUpdated(() => vectorField.SetValueWithoutNotify((Vector2)info.GetValue(target)));
@@ -234,7 +234,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             vectorField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
-                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
             });
 
             AddOnSelectedElementUpdated(() => vectorField.SetValueWithoutNotify((Vector2Int)info.GetValue(target)));
@@ -248,7 +248,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             enumField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
-                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
             });
 
             AddOnSelectedElementUpdated(() => enumField.SetValueWithoutNotify((Enum)info.GetValue(target)));
@@ -262,7 +262,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             colorField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
-                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
             });
 
             AddOnSelectedElementUpdated(() => colorField.SetValueWithoutNotify((Color)info.GetValue(target)));
@@ -276,7 +276,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             objectField.RegisterOnValueChanged(newValue =>
             {
                 info.SetValue(target, newValue);
-                editorState.TriggerElementIsDirty(this, new ValuesUpdated(editorState.SelectedElement));
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
             });
 
             AddOnSelectedElementUpdated(() => objectField.SetValueWithoutNotify((T)info.GetValue(target)));

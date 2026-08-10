@@ -31,16 +31,22 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
             hierarchyController.OnElementIsDirty(elementChanges);
         }
 
+        public void OnCurrentScreenChanged(Shared.ScreenData.Screen currentScreen)
+        {
+            hierarchyController.OnCurrentScreenChanged(currentScreen);
+        }
+
         public void OnChangeAspectRatio(int width, int height)
         {
             SetSize(width, height);
-
             Material material = GetMaterial();
             material.SetColor("_Color1", Colors.RENDERER_CHECKERBACKGROUND_LIGHT_COLOR);
             material.SetColor("_Color2", Colors.RENDERER_CHECKERBACKGROUND_DARK_COLOR);
             material.SetFloat("_DivisionsHorizontal", width / 10);
             material.SetFloat("_DivisionsVertical", height / 10);
             UpdateTexture();
+
+            hierarchyController.OnChangeAspectRatio(width, height);
         }
     }
 }

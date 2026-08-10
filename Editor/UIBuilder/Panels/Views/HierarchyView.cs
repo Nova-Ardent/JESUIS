@@ -1,35 +1,32 @@
 using JESUIS.Editor.Elements.Widgets;
 using JESUIS.Editor.Helpers;
-using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.Data;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
     public class HierarchyView : EditorViews
     {
-        EditorState editorState;
         HierarchyItem hierarchyItem;
 
         public override Views Type { get => Views.Hierarchy; }
 
         Elements.Widgets.Hierarchy editorHierarchy;
 
-        public HierarchyView(EditorState editorState)
+        public HierarchyView(EditorState editorState) : base(editorState)
         {
-            this.editorState = editorState;
-            editorHierarchy = new Elements.Widgets.Hierarchy(editorState.CurrentScreen.GetRootElement(), GetActions, OnElementClicked);
-            editorState.ListenToElementIsDirty(OnElementIsDirty);
+            editorHierarchy = new Elements.Widgets.Hierarchy(editorState.CurrentScreen.Value.GetRootElement(), GetActions, OnElementClicked);
+            Add(editorHierarchy);
 
             style.left = 0;
             style.top = 0;
             style.width = Length.Percent(100);
             style.height = Length.Percent(100);
 
-            Add(editorHierarchy);
         }
 
         void OnElementClicked(HierarchyItem item)
@@ -37,11 +34,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             if (item.TargetObject is BaseElement baseElement)
             {
                 hierarchyItem = item;
-                editorState.SelectedElement.Value = baseElement;
+                CurrentEditorState.SelectedElement.Value = baseElement;
             }
         }
 
-        void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
+        protected override void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
         {
             if (triggeringView == this)
                 return;
@@ -49,6 +46,27 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated)
             {
                 hierarchyItem.UpdateLabel();
+            }
+        }
+
+        protected override void OnCurrentScreenChanged(Shared.ScreenData.Screen currentScreen)
+        {
+            Clear();
+            editorHierarchy = new Elements.Widgets.Hierarchy(currentScreen.GetRootElement(), GetActions, OnElementClicked);
+            Add(editorHierarchy);
+
+            RebuildHierarchy(currentScreen.GetRootElement(), editorHierarchy.RootItem);
+
+            editorHierarchy.RebuildListVisuals();
+        }
+
+        void RebuildHierarchy(BaseElement baseElement, HierarchyItem hierarchyItem)
+        {
+            foreach (BaseElement childElement in baseElement.GetChildren())
+            {
+                HierarchyItem childHierarchyItem = new HierarchyItem(childElement, GetActions, OnElementClicked);
+                hierarchyItem.AddChild(childHierarchyItem);
+                RebuildHierarchy(childElement, childHierarchyItem);
             }
         }
 
@@ -76,7 +94,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 baseElement.AddChild(newEmpty);
                 item.AddChild(new HierarchyItem(newEmpty, GetActions, OnElementClicked));
                 editorHierarchy.RebuildListVisuals();
-                editorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newEmpty));
+                CurrentEditorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newEmpty));
             }
             else
             {
@@ -94,7 +112,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 baseElement.AddChild(newTexture);
                 item.AddChild(new HierarchyItem(newTexture, GetActions, OnElementClicked));
                 editorHierarchy.RebuildListVisuals();
-                editorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newTexture));
+                CurrentEditorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newTexture));
             }
             else
             {
@@ -110,8 +128,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
                 item.Remove();
                 editorHierarchy.RebuildListVisuals();
-                editorState.TriggerElementIsDirty(this, new ElementRemoved(baseElement));
-                editorState.SelectedElement.Value = null;
+                CurrentEditorState.TriggerElementIsDirty(this, new ElementRemoved(baseElement));
+                CurrentEditorState.SelectedElement.Value = null;
             }
         }
     }

@@ -26,7 +26,8 @@ namespace JESUIS.Editor.UIBuilder
 
         protected override void CreateGUI()
         {
-            editorState.CurrentScreen = CreateInstance<Shared.ScreenData.Screen>();
+            editorState.CurrentScreen.Value = CreateInstance<Shared.ScreenData.Screen>();
+            editorState.CurrentScreen.Value.name = "Unsaved Screen";
 
             uIEditorLayoutManager = new UIEditorLayoutManager();
             viewManager = new ViewManager(editorState);

@@ -5,6 +5,7 @@ using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors;
 using JESUIS.Editor.UIBuilder.Panels.Views.Renderer;
 using JESUIS.Shared.ScreenData.Data;
+using JESUIS.Shared.ScreenData;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
@@ -12,8 +13,6 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
     public class RendererView : EditorViews
     {
-        EditorState editorState;
-
         public override Views Type => Views.Renderer;
 
         BoxSelector boxSelector;
@@ -25,12 +24,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         AspectRatioDropDown aspectRatioDropDown;
 
-        public RendererView(EditorState editorState)
+        public RendererView(EditorState editorState) : base(editorState)
         {
-            this.editorState = editorState;
-            editorState.SelectedElement.ListenTo(OnSelectedElementChanged);
-            editorState.ListenToElementIsDirty(OnElementIsDirty);
-
             boxSelectedContainer = new VisualElement();
             boxSelector = new BoxSelector(this, boxSelectedContainer, editorState);
             rendererDisplay = new RendererDisplay(editorState.CurrentScreen, boxSelector);
@@ -54,16 +49,18 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             RegisterCallbackOnce<GeometryChangedEvent>(OnGeometryReady);
             RegisterCallbackOnce<GeometryChangedEvent>(OnGeometryChanged);
+            
             boxSelector.InitializeDragPoints(this);
             boxSelector.OnZoomChanged();
+            boxSelector.SetActive(false);
         }
 
-        void OnSelectedElementChanged(BaseElement selectedElement)
+        protected override void OnSelectedElementChanged(BaseElement selectedElement)
         {
             rendererDisplay.OnSelectedElementChanged(selectedElement);
         }
 
-        void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
+        protected override void OnElementIsDirty(EditorViews triggeringView, ElementChanges elementChanges)
         {
             if (triggeringView.Type == Views.Renderer)
             {
@@ -71,6 +68,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
 
             rendererDisplay.OnElementIsDirty(elementChanges);
+        }
+
+        protected override void OnCurrentScreenChanged(Screen currentScreen)
+        {
+            rendererDisplay.OnCurrentScreenChanged(currentScreen);
         }
         
         public override IEnumerable<TabElement> GetActiveTabOptions()
