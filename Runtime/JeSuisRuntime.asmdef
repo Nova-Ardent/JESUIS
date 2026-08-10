@@ -1,0 +1,16 @@
+{
+    "name": "JeSuisRuntime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7ceb00e693ad67b4583b2e3d63a1c3f6"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
