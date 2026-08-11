@@ -116,9 +116,9 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
             {
                 Shared.ScreenData.Types.Transform transform = rendererElement.GetTransform();
 
-                Vector2 localPosition = transform.GetLocalPosition();
-                Vector2 scaledSize = transform.GetScaledLocalWidth();
-                Vector2 pivot = transform.GetPivotOffset();
+                Vector2 localPosition = transform.GetLocalScaledPosition();
+                Vector2 scaledSize = transform.GetScaledLocalSize();
+                Vector2 pivot = transform.GetLocalScaledPivot();
                 Vector2 transformOrigin = new Vector2(localPosition.x + pivot.x, localPosition.y + pivot.y);
 
                 Vector2[,] cornerPositions = new Vector2[,]

@@ -21,16 +21,29 @@ namespace JESUIS.Shared.ScreenData.Types
         public Unit HorizontalPosition;
         public Unit HorizontalSize;
 
+        public Vector2 GetLocalScaledPosition()
+        {
+            Vector2 pivotOffset = GetLocalScaledPivot();
+            Vector2 position = GetAnchorOffset() - pivotOffset;
+            return position;
+        }
+
+        public Vector2 GetScaledLocalSize()
+        {
+            return new Vector2(GetLocalUnitWidth() * Scale.x, GetLocalUnitHeight() * Scale.y);
+        }
+
+        public Vector2 GetLocalScaledPivot()
+        {
+            return new Vector2(GetPivotOffset().x * Scale.x, GetPivotOffset().y * Scale.y);
+        }
+
+
         public Vector2 GetLocalPosition()
         {
             Vector2 pivotOffset = GetPivotOffset();
             Vector2 position = GetAnchorOffset() - pivotOffset;
             return position;
-        }
-
-        public Vector2 GetScaledLocalWidth()
-        {
-            return new Vector2(GetLocalUnitWidth() * Scale.x, GetLocalUnitHeight() * Scale.y);
         }
 
         public float GetLocalUnitPositionX()
