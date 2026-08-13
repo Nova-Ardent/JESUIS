@@ -1,9 +1,10 @@
 using JESUIS.Editor.Helpers.Utils;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Panels.Views;
-using JESUIS.Shared.ScreenData.Data;
 using JESUIS.Shared.ScreenData;
+using JESUIS.Shared.ScreenData.Data;
 using System;
+using UnityEditor;
 
 namespace JESUIS.Editor.UIBuilder.Data
 {
@@ -28,6 +29,17 @@ namespace JESUIS.Editor.UIBuilder.Data
             else
             {
                 elementIsDirty += action;
+            }
+        }
+
+        public void BeforeAssemblyReload()
+        {
+            if (CurrentScreen.Value != null) 
+            {
+                if (EditorUtility.IsPersistent(CurrentScreen.Value))
+                    UnityEngine.Resources.UnloadAsset(CurrentScreen.Value);
+                else
+                    UnityEngine.Object.DestroyImmediate(CurrentScreen.Value, true);
             }
         }
     }

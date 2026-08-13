@@ -2,6 +2,7 @@ using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Data;
 using System.IO;
+using System;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
@@ -10,7 +11,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
     public class FileView : EditorViews
     {
-        ObjectFieldElement<Shared.ScreenData.Screen> CurrentFile = new ObjectFieldElement<Shared.ScreenData.Screen>("Current Screen");
+        const string UnsavedScreenID = "Unsaved Screen";
+
+        ObjectFieldElement<Shared.ScreenData.Screen> currentFile = new ObjectFieldElement<Shared.ScreenData.Screen>("Current Screen");
+        TextInputFieldElement currentFileUID = new TextInputFieldElement("Id: ", UnsavedScreenID);
+
         ButtonElement saveButton = new ButtonElement("Save");
         ButtonElement saveAsButton = new ButtonElement("Save As");
 
@@ -25,20 +30,36 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             style.width = Length.Percent(100);
             style.height = Length.Percent(100);
 
-            CurrentFile.SetValueWithoutNotify(editorState.CurrentScreen);
-            CurrentFile.RegisterOnValueChanged(screen =>
+            currentFile.SetValueWithoutNotify(editorState.CurrentScreen);
+            currentFile.RegisterOnValueChanged(screen =>
             {
                 if (screen == null)
                 {
                     screen = ScriptableObject.CreateInstance<Shared.ScreenData.Screen>();
                     screen.name = "Unsaved Screen";
-                    CurrentFile.SetValueWithoutNotify(screen);
-                } 
+                    screen.Uid = Guid.NewGuid().ToString("N");
+                    currentFileUID.SetValueWithoutNotify(screen.Uid);
+                    currentFile.SetValueWithoutNotify(screen);
+                }
+                else
+                {
+                    currentFileUID.SetValueWithoutNotify(screen.Uid);
+                }
 
+                if (CurrentEditorState.CurrentScreen.Value != null)
+                {
+                    if (EditorUtility.IsPersistent(CurrentEditorState.CurrentScreen.Value))
+                        UnityEngine.Resources.UnloadAsset(CurrentEditorState.CurrentScreen.Value);
+                    else
+                        UnityEngine.Object.DestroyImmediate(CurrentEditorState.CurrentScreen.Value, true);
+                }
                 CurrentEditorState.CurrentScreen.Value = screen;
             });
-            Add(CurrentFile);
+            Add(currentFile);
 
+            currentFileUID.SetValueWithoutNotify(editorState.CurrentScreen.Value.Uid); 
+            Add(currentFileUID); 
+            
             saveButtonContainer.style.flexDirection = FlexDirection.Row;
             Add(saveButtonContainer);
 
@@ -57,47 +78,47 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         void SaveButtonClicked()
         {
-            if (CurrentFile.CurrentValue == null)
+            if (currentFile.CurrentValue == null)
                 return;
 
-            string assetPath = AssetDatabase.GetAssetPath(CurrentFile.CurrentValue);
+            string assetPath = AssetDatabase.GetAssetPath(currentFile.CurrentValue);
             if (string.IsNullOrEmpty(assetPath) || !File.Exists(assetPath))
             {
                 SaveAsButtonClicked();
                 return;
             }
 
-            EditorUtility.SetDirty(CurrentFile.CurrentValue);
+            EditorUtility.SetDirty(currentFile.CurrentValue);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
 
         void SaveAsButtonClicked()
         {
-            if (CurrentFile.CurrentValue == null)
+            if (currentFile.CurrentValue == null)
                 return;
 
             string path = EditorUtility.SaveFilePanelInProject(
                 "Save ScriptableObject",
-                CurrentFile.CurrentValue.name,
+                currentFile.CurrentValue.name,
                 "asset",
                 "Choose where to save the asset.");
 
             if (string.IsNullOrEmpty(path))
                 return;
 
-            ScriptableObject asset = CurrentFile.CurrentValue;
+            ScriptableObject asset = currentFile.CurrentValue;
 
             if (AssetDatabase.Contains(asset))
             {
-                asset = Object.Instantiate(asset);
+                asset = UnityEngine.Object.Instantiate(asset);
             }
 
             AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            CurrentFile.SetValue((Shared.ScreenData.Screen)asset);
+            currentFile.SetValue((Shared.ScreenData.Screen)asset);
         }
     }
 }

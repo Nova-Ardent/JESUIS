@@ -14,12 +14,13 @@ namespace JESUIS.Editor.Elements.Input
         
         Action<T> onValueChanged;
 
-        public InputFieldElement(string labelText, T defaultValue = default(T), bool isSubElement = false) : base(labelText, isSubElement)
+        public InputFieldElement(string labelText, T defaultValue = default(T), bool isSubElement = false, bool isReadonly = false) : base(labelText, isSubElement)
         {
             inputField = new TextField();
             inputField.AddStyle(InputFieldsUSS.StyleSheetInstance, "input-field");
             inputField.isDelayed = true;
             inputField.RegisterValueChangedCallback(OnValueChanged);
+            inputField.isReadOnly = isReadonly;
 
             FieldContainer.Add(inputField); 
 

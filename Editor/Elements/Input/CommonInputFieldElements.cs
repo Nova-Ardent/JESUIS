@@ -2,7 +2,7 @@ namespace JESUIS.Editor.Elements.Input
 {
     public class TextInputFieldElement : InputFieldElement<string>
     {
-        public TextInputFieldElement(string labelText, string defaultValue, bool isSubField = false) : base(labelText, defaultValue, isSubField)
+        public TextInputFieldElement(string labelText, string defaultValue, bool isSubField = false, bool isReadonly = false) : base(labelText, defaultValue, isSubField)
         {
         }
 

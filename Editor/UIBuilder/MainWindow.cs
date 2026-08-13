@@ -5,6 +5,7 @@ using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Panels.Views;
 using JESUIS.Editor.UIBuilder.Panels;
 using System.Collections.Generic;
+using System;
 using UnityEditor;
 
 namespace JESUIS.Editor.UIBuilder
@@ -28,6 +29,8 @@ namespace JESUIS.Editor.UIBuilder
         {
             editorState.CurrentScreen.Value = CreateInstance<Shared.ScreenData.Screen>();
             editorState.CurrentScreen.Value.name = "Unsaved Screen";
+            editorState.CurrentScreen.Value.Uid = Guid.NewGuid().ToString("N");
+            AssemblyReloadEvents.beforeAssemblyReload += editorState.BeforeAssemblyReload;
 
             uIEditorLayoutManager = new UIEditorLayoutManager();
             viewManager = new ViewManager(editorState);
