@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace JESUIS.Shared.ScreenData
 {
+    [System.Serializable]
     public class ScreenMetaData : ScriptableObject
     {
         [SerializeField] public string Uid;
-
 
 #if UNITY_EDITOR
         private void OnValidate()
