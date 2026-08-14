@@ -8,6 +8,11 @@ namespace JESUIS.Shared.ScreenData
     {
         [SerializeField] public string Uid;
 
+        public void Initialize()
+        {
+            Uid = Guid.NewGuid().ToString("N");
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {

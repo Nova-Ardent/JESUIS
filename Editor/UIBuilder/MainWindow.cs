@@ -29,7 +29,9 @@ namespace JESUIS.Editor.UIBuilder
         {
             editorState.CurrentScreen.Value = CreateInstance<Shared.ScreenData.Screen>();
             editorState.CurrentScreen.Value.name = "Unsaved Screen";
-            editorState.CurrentScreen.Value.Uid = Guid.NewGuid().ToString("N");
+            editorState.CurrentScreen.Value.ScreenMetaData = CreateInstance<Shared.ScreenData.ScreenMetaData>();
+            editorState.CurrentScreen.Value.ScreenMetaData.Initialize();
+
             AssemblyReloadEvents.beforeAssemblyReload += editorState.BeforeAssemblyReload;
 
             uIEditorLayoutManager = new UIEditorLayoutManager();

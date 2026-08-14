@@ -6,6 +6,7 @@ using System;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
+using JESUIS.Shared.ScreenData;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
@@ -37,27 +38,26 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 {
                     screen = ScriptableObject.CreateInstance<Shared.ScreenData.Screen>();
                     screen.name = "Unsaved Screen";
-                    screen.Uid = Guid.NewGuid().ToString("N");
-                    currentFileUID.SetValueWithoutNotify(screen.Uid);
+                    screen.ScreenMetaData = ScriptableObject.CreateInstance<Shared.ScreenData.ScreenMetaData>();
+                    screen.ScreenMetaData.Initialize();
+
+                    currentFileUID.SetValueWithoutNotify(screen.ScreenMetaData.Uid);
                     currentFile.SetValueWithoutNotify(screen);
                 }
                 else
                 {
-                    currentFileUID.SetValueWithoutNotify(screen.Uid);
+                    currentFileUID.SetValueWithoutNotify(screen.ScreenMetaData.Uid);
                 }
 
                 if (CurrentEditorState.CurrentScreen.Value != null)
                 {
-                    if (EditorUtility.IsPersistent(CurrentEditorState.CurrentScreen.Value))
-                        UnityEngine.Resources.UnloadAsset(CurrentEditorState.CurrentScreen.Value);
-                    else
-                        UnityEngine.Object.DestroyImmediate(CurrentEditorState.CurrentScreen.Value, true);
+                    Shared.ScreenData.Screen.UnloadScreen(CurrentEditorState.CurrentScreen.Value);
                 }
                 CurrentEditorState.CurrentScreen.Value = screen;
             });
             Add(currentFile);
 
-            currentFileUID.SetValueWithoutNotify(editorState.CurrentScreen.Value.Uid); 
+            currentFileUID.SetValueWithoutNotify(editorState.CurrentScreen.Value.ScreenMetaData.Uid); 
             Add(currentFileUID); 
             
             saveButtonContainer.style.flexDirection = FlexDirection.Row;
@@ -88,7 +88,9 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
+            EditorUtility.SetDirty(currentFile.CurrentValue.ScreenMetaData);
             EditorUtility.SetDirty(currentFile.CurrentValue);
+            
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -107,18 +109,35 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             if (string.IsNullOrEmpty(path))
                 return;
 
-            ScriptableObject asset = currentFile.CurrentValue;
+            string metaDatapath = InsertMetadataSuffix(path);
+
+            ScriptableObject asset = currentFile.CurrentValue; 
+            ScriptableObject assetMetaData = currentFile.CurrentValue.ScreenMetaData;
 
             if (AssetDatabase.Contains(asset))
             {
-                asset = UnityEngine.Object.Instantiate(asset);
+                asset = ScriptableObject.Instantiate(asset);
+                assetMetaData = ScriptableObject.Instantiate(assetMetaData);
+
+                Shared.ScreenData.Screen.UnloadScreen(currentFile.CurrentValue);
             }
 
+            AssetDatabase.CreateAsset(assetMetaData, metaDatapath);
             AssetDatabase.CreateAsset(asset, path);
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
             currentFile.SetValue((Shared.ScreenData.Screen)asset);
+        }
+
+        static string InsertMetadataSuffix(string path)
+        {
+            string directory = Path.GetDirectoryName(path);
+            string filename = Path.GetFileNameWithoutExtension(path);
+            string extension = Path.GetExtension(path);
+
+            return Path.Combine(directory ?? "", $"{filename}_metadata{extension}");
         }
     }
 }
