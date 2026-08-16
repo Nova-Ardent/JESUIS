@@ -88,6 +88,9 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
+            currentFile.CurrentValue.ScreenMetaData.TryUpdatePath(Path.GetDirectoryName(assetPath));
+            currentFile.CurrentValue.ScreenMetaData.FileName = Path.GetFileName(assetPath);
+
             EditorUtility.SetDirty(currentFile.CurrentValue.ScreenMetaData);
             EditorUtility.SetDirty(currentFile.CurrentValue);
             
@@ -111,18 +114,25 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
             string metaDatapath = InsertMetadataSuffix(path);
 
-            ScriptableObject asset = currentFile.CurrentValue; 
-            ScriptableObject assetMetaData = currentFile.CurrentValue.ScreenMetaData;
+            JESUIS.Shared.ScreenData.Screen asset = currentFile.CurrentValue; 
+            JESUIS.Shared.ScreenData.ScreenMetaData assetMetaData = currentFile.CurrentValue.ScreenMetaData;
+
+            currentFile.CurrentValue.ScreenMetaData.TryUpdatePath(Path.GetDirectoryName(path));
+            currentFile.CurrentValue.ScreenMetaData.FileName = Path.GetFileName(path);
 
             if (AssetDatabase.Contains(asset))
             {
                 asset = ScriptableObject.Instantiate(asset);
                 assetMetaData = ScriptableObject.Instantiate(assetMetaData);
+                assetMetaData.Initialize();
+                Debug.LogWarning("New instance of a screen was created, check UID matches for layout loading in game.");
 
                 Shared.ScreenData.Screen.UnloadScreen(currentFile.CurrentValue);
             }
 
             AssetDatabase.CreateAsset(assetMetaData, metaDatapath);
+
+            asset.ScreenMetaData = assetMetaData;
             AssetDatabase.CreateAsset(asset, path);
 
             AssetDatabase.SaveAssets();
