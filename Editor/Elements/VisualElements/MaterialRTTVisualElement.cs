@@ -28,6 +28,13 @@ namespace JESUIS.Editor.Elements.Common.VisualElements
             UpdateIndexArray();
         }
 
+        ~MaterialRTTVisualElement()
+        {
+            renderTexture?.Release();
+            UnityEngine.Object.DestroyImmediate(renderTexture);
+            UnityEngine.Object.DestroyImmediate(material);
+        }
+
         void UpdateIndexArray()
         {
             indices = new ushort[6] { 0, 1, 2, 2, 3, 0 };
@@ -91,16 +98,14 @@ namespace JESUIS.Editor.Elements.Common.VisualElements
         {
             schedule.Execute(() =>
             {
+                if (material == null)
+                {
+                    material = new Material(shader);
+                }
+
                 Graphics.Blit(Texture2D.whiteTexture, renderTexture, material);
                 MarkDirtyRepaint();
             });
-        }
-
-        ~MaterialRTTVisualElement()
-        {
-            renderTexture?.Release();
-            UnityEngine.Object.DestroyImmediate(renderTexture);
-            UnityEngine.Object.DestroyImmediate(material);
         }
 
         void OnGenerateVisualContent(MeshGenerationContext ctx)

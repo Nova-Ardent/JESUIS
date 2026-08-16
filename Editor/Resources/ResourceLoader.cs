@@ -76,7 +76,22 @@ namespace JESUIS.Editor.Resources
             public Resource<Texture2D> DragArrow;
             public Resource<Texture2D> RotatePoint;
             public Resource<Texture2D> RotateArrow;
-            public Texture2D EmptyCursor;
+
+            Texture2D emptyCursor;
+            public Texture2D EmptyCursor
+            {
+                get
+                {
+                    if (emptyCursor == null)
+                    {
+                        emptyCursor = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+                        emptyCursor.SetPixel(0, 0, new Color(0, 0, 0, 0));
+                        emptyCursor.Apply();
+                    }
+
+                    return emptyCursor;
+                }
+            }
 
             public RendererResources(string path)
             {
@@ -84,10 +99,6 @@ namespace JESUIS.Editor.Resources
                 DragArrow = new Resource<Texture2D>(path, "DragArrow.png");
                 RotatePoint = new Resource<Texture2D>(path, "RotateIcon.png");
                 RotateArrow = new Resource<Texture2D>(path, "RotateArrow.png");
-
-                EmptyCursor = new Texture2D(1, 1, TextureFormat.RGBA32, false);
-                EmptyCursor.SetPixel(0, 0, new Color(0, 0, 0, 0));
-                EmptyCursor.Apply();
             }
         }
 
