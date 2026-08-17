@@ -8,6 +8,7 @@ namespace JESUIS.Runtime.Screen.Layout
 {
     public class BaseLayout : MonoBehaviour, IPoolable<BaseLayout>
     {
+        private Vector2 lastKnownSize;
         private BaseElement baseElement;
         [SerializeField] protected RectTransform Transform;
 
@@ -28,7 +29,7 @@ namespace JESUIS.Runtime.Screen.Layout
             owningPool.Release(this);
         }
 
-        void UpdateTransform()
+        public void UpdateTransform()
         {
             Vector2 pivot = Vector2.zero;
             if (baseElement.Transform.Pivot.IsMiddleCol())
@@ -56,12 +57,45 @@ namespace JESUIS.Runtime.Screen.Layout
             Transform.anchorMin = new Vector2(anchor.x, 1 - anchor.y);
             Transform.anchorMax = new Vector2(anchor.x, 1 - anchor.y);
 
-            Transform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, baseElement.Transform.Size.x);
-            Transform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, baseElement.Transform.Size.y);
+            RectTransform parent = (RectTransform)Transform.parent;
+            Vector2 size = baseElement.Transform.Size;
+
+            if (baseElement.Transform.HorizontalSize == Unit.Percentage && parent != null)
+                size.x *= parent.sizeDelta.x / 100f;
+            if (baseElement.Transform.VerticalSize == Unit.Percentage && parent != null)
+                size.y *= parent.sizeDelta.y / 100f;
+
+            Transform.sizeDelta = size;
+
+            Vector2 localPosition = new Vector2(baseElement.Transform.Position.x, -baseElement.Transform.Position.y);
+            if (baseElement.Transform.HorizontalPosition == Unit.Percentage && parent != null)
+                localPosition.x *= parent.sizeDelta.x / 100f;
+            if (baseElement.Transform.VerticalPosition == Unit.Percentage && parent != null)
+                localPosition.y *= parent.sizeDelta.y / 100f;
+
+            Transform.anchoredPosition = localPosition;
 
             Transform.localScale = baseElement.Transform.Scale;
-            Transform.anchoredPosition = baseElement.Transform.Position;
             Transform.localRotation = Quaternion.Euler(0, 0, baseElement.Transform.Rotation);
+        }
+
+        public void UpdateChildren()
+        {
+            if (Mathf.Approximately(lastKnownSize.x, Transform.sizeDelta.x) && Mathf.Approximately(lastKnownSize.y, Transform.sizeDelta.y))
+            {
+                return;
+            }
+
+            lastKnownSize = Transform.sizeDelta;
+            foreach (UnityEngine.Transform child in Transform)
+            {
+                BaseLayout layout = child.GetComponent<BaseLayout>();
+                if (layout != null)
+                {
+                    layout.UpdateTransform();
+                    layout.UpdateChildren();
+                }
+            }
         }
     }
 }

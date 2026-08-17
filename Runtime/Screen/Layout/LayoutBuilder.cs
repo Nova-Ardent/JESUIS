@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using JESUIS.Runtime.Utilities;
 using JESUIS.Shared.ScreenData.Data;
+using UnityEngine.PlayerLoop;
 
 namespace JESUIS.Runtime.Screen.Layout
 {
@@ -12,11 +13,18 @@ namespace JESUIS.Runtime.Screen.Layout
         ObjectPool<BaseLayout> emptyLayouts;
         ObjectPool<BaseLayout> textureLayout;
 
+
         GameObject screenContainer;
+
         GameObject objectPoolContainer;
 
         LayoutLoader layoutLoader = new LayoutLoader();
         List<BaseLayout> activeElements = new List<BaseLayout>();
+
+        public void OnUpdate()
+        {
+            rootLayout.UpdateChildren();
+        }
 
         public void Initialize(GameObject screenContainer)
         {

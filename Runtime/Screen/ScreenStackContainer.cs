@@ -30,6 +30,8 @@ namespace JESUIS.Runtime.Screen
             {
                 CurrentScreen.OnUpdate();
             }
+
+            layoutBuilder.OnUpdate();
         }
 
         public IEnumerator AsyncUpdate()
