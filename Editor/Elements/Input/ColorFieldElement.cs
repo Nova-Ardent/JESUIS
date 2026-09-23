@@ -15,7 +15,7 @@ namespace JESUIS.Editor.Elements.Input
 
         Action<Color> onValueChanged;
 
-        public ColorFieldElement(string labelText, Color defaultValue) : base(labelText)
+        public ColorFieldElement(string labelText, Color defaultValue, LabelType elementType = LabelType.Main) : base(labelText, elementType)
         {
             colorField = new ColorField();
             colorField.AddStyle(InputFieldsUSS.StyleSheetInstance, "color-field");

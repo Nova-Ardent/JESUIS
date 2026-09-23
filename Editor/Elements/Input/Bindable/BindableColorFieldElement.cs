@@ -24,7 +24,7 @@ namespace JESUIS.Editor.Elements.Input.Bindable
             bindingContainer.Add(bindingElement);
             Add(bindingContainer);
 
-            colorField = new ColorFieldElement(labelText, color);
+            colorField = new ColorFieldElement(labelText, color, LabelledFieldElement.LabelType.MainUnpadded);
             inputContainer.Add(colorField);
             Add(inputContainer);
 
