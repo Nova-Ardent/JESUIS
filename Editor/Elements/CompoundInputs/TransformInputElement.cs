@@ -25,8 +25,8 @@ namespace JESUIS.Editor.Elements.CompoundInputs
         BindableVector2fFieldElement scaleField;
         BindableFloatInputFieldElement rotationField;
 
-        AlignmentSelector anchorField;
-        AlignmentSelector pivotField;
+        BindableAlignmentSelector anchorField;
+        BindableAlignmentSelector pivotField;
 
         BindableEnumFieldElement<Unit> verticalPositionField;
         BindableEnumFieldElement<Unit> verticalSizeField;
@@ -84,9 +84,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(rotationField);
 
-            anchorField = new AlignmentSelector("Anchor");
+            anchorField = new BindableAlignmentSelector("Anchor");
             anchorField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-anchor");
-            anchorField.SetValueWithoutNotify(target.Anchor);
+            anchorField.SetWithoutNotify(target.Anchor);
             anchorField.RegisterOnValueChanged((newValue) =>
             {
                 target.Anchor = newValue;
@@ -94,9 +94,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(anchorField);
 
-            pivotField = new AlignmentSelector("Pivot");
+            pivotField = new BindableAlignmentSelector("Pivot");
             pivotField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-pivot");
-            pivotField.SetValueWithoutNotify(target.Pivot);
+            pivotField.SetWithoutNotify(target.Pivot);
             pivotField.RegisterOnValueChanged((newValue) =>
             {
                 target.Pivot = newValue;
@@ -166,8 +166,8 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             scaleField.SetValueWithoutNotify(targetTransform.Scale.Value.x, targetTransform.Scale.Value.y);
             rotationField.SetValueWithoutNotify(targetTransform.Rotation.Value);
 
-            anchorField.SetValueWithoutNotify(targetTransform.Anchor);
-            pivotField.SetValueWithoutNotify(targetTransform.Pivot);
+            anchorField.SetValueWithoutNotify(targetTransform.Anchor.Value);
+            pivotField.SetValueWithoutNotify(targetTransform.Pivot.Value);
 
             verticalPositionField.SetValueWithoutNotify(targetTransform.VerticalPosition.Value);
             verticalSizeField.SetValueWithoutNotify(targetTransform.VerticalSize.Value);

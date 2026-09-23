@@ -13,8 +13,8 @@ namespace JESUIS.Shared.ScreenData.Types
         public Bindable<Vector2> Scale = new Bindable<Vector2>() { Value = new Vector2(1, 1) };
         public Bindable<float> Rotation = new Bindable<float>() { Value = 0f };
 
-        public Alignment Anchor;
-        public Alignment Pivot;
+        public Bindable<Alignment> Anchor;
+        public Bindable<Alignment> Pivot;
 
         public Bindable<Unit> VerticalPosition = new Bindable<Unit>() { Value = Unit.Pixels };
         public Bindable<Unit> VerticalSize = new Bindable<Unit>() { Value = Unit.Pixels };
@@ -72,7 +72,7 @@ namespace JESUIS.Shared.ScreenData.Types
             float posX = GetLocalUnitPositionX();
             float posY = GetLocalUnitPositionY();
 
-            switch (Anchor)
+            switch (Anchor.Value)
             {
                 default:
                     break;
@@ -89,7 +89,7 @@ namespace JESUIS.Shared.ScreenData.Types
                     break;
             }
 
-            switch (Anchor)
+            switch (Anchor.Value)
             {
                 default:
                     break;
@@ -113,7 +113,7 @@ namespace JESUIS.Shared.ScreenData.Types
             float posX = 0;
             float posY = 0;
 
-            switch (Pivot)
+            switch (Pivot.Value)
             {
                 default:
                     break;
@@ -130,7 +130,7 @@ namespace JESUIS.Shared.ScreenData.Types
                     break;
             }
 
-            switch (Pivot)
+            switch (Pivot.Value)
             {
                 default:
                     break;

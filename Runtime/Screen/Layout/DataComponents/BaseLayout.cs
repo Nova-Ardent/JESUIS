@@ -32,25 +32,25 @@ namespace JESUIS.Runtime.Screen.Layout
         public void UpdateTransform()
         {
             Vector2 pivot = Vector2.zero;
-            if (baseElement.Transform.Pivot.IsMiddleCol())
+            if (baseElement.Transform.Pivot.Value.IsMiddleCol())
                 pivot = new Vector2(0.5f, 0);
-            else if (baseElement.Transform.Pivot.IsRight())
+            else if (baseElement.Transform.Pivot.Value.IsRight())
                 pivot = new Vector2(1, 0);
 
-            if (baseElement.Transform.Pivot.IsMiddleRow())
+            if (baseElement.Transform.Pivot.Value.IsMiddleRow())
                 pivot += new Vector2(0, 0.5f);
-            else if (baseElement.Transform.Pivot.IsBottom())
+            else if (baseElement.Transform.Pivot.Value.IsBottom())
                 pivot += new Vector2(0, 1.0f);
 
             Vector2 anchor = Vector2.zero;
-            if (baseElement.Transform.Anchor.IsMiddleCol())
+            if (baseElement.Transform.Anchor.Value.IsMiddleCol())
                 anchor = new Vector2(0.5f, 0);
-            else if (baseElement.Transform.Anchor.IsRight())
+            else if (baseElement.Transform.Anchor.Value.IsRight())
                 anchor = new Vector2(1, 0);
 
-            if (baseElement.Transform.Anchor.IsMiddleRow())
+            if (baseElement.Transform.Anchor.Value.IsMiddleRow())
                 anchor += new Vector2(0, 0.5f);
-            else if (baseElement.Transform.Anchor.IsBottom())
+            else if (baseElement.Transform.Anchor.Value.IsBottom())
                 anchor += new Vector2(0, 1.0f);
 
             Transform.pivot = new Vector2(pivot.x, 1 - pivot.y);

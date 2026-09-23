@@ -4,6 +4,8 @@ using System.Linq;
 using System;
 using UnityEngine.UIElements;
 using UnityEngine;
+using JESUIS.Editor.Elements.Input.Bindable;
+using JESUIS.Shared.ScreenData.DataBindings;
 
 namespace JESUIS.Editor.Elements.SpecialInputs
 {
@@ -43,6 +45,102 @@ namespace JESUIS.Editor.Elements.SpecialInputs
         public void RegisterOnValueChanged(Action<Alignment> onChange)
         {
             alignmentTool.RegisterOnValueChanged(onChange);
+        }
+    }
+
+    public class BindableAlignmentSelector : VisualElement
+    {
+        public const int LABEL_HEIGHT = 20;
+        public const int PADDING = 5;
+
+        public Label label;
+        public BindingElement<Alignment> bindingElement;
+        public AlignmentTool alignmentTool;
+
+        Action<Bindable<Alignment>> onValueChanged;
+
+        public BindableAlignmentSelector(string name)
+        {
+            style.width = AlignmentTool.SIZE + PADDING * 2;
+            style.height = AlignmentTool.SIZE + PADDING * 2 + LABEL_HEIGHT;
+
+            alignmentTool = new AlignmentTool();
+            alignmentTool.style.position = Position.Absolute;
+            alignmentTool.style.top = PADDING + LABEL_HEIGHT;
+            alignmentTool.style.left = PADDING;
+            Add(alignmentTool);
+
+            bindingElement = new BindingElement<Alignment>();
+            bindingElement.style.position = Position.Absolute;
+            bindingElement.style.top = 0;
+            bindingElement.style.left = -9;
+            Add(bindingElement);
+
+            label = new Label();
+            label.text = name;
+            label.style.position = Position.Absolute;
+            label.style.left = 9;
+            label.style.height = LABEL_HEIGHT;
+            label.style.width = AlignmentTool.SIZE - 18;
+            Add(label);
+        }
+
+        public void SetWithoutNotify(Bindable<Alignment> bindable)
+        {
+            SetBindingWithoutNotify(bindable.UIDHigh, bindable.UIDLow);
+            SetValueWithoutNotify(bindable.Value);
+        }
+
+        public void Set(Bindable<Alignment> bindable)
+        {
+            SetBindingWithoutNotify(bindable.UIDHigh, bindable.UIDLow);
+            SetValue(bindable.Value);
+        }
+
+        public void SetBindingWithoutNotify(ulong uidHigh, ulong uidLow)
+        {
+            bindingElement.SetBindingWithoutNotify(uidHigh, uidLow);
+        }
+
+        public void SetValueWithoutNotify(Alignment alignment)
+        {
+            alignmentTool.SetValueWithoutNotify(alignment);
+        }
+
+        public void SetValue(Alignment alignment)
+        {
+            alignmentTool.SetValue(alignment);
+        }
+
+        public void RegisterOnValueChanged(Action<Bindable<Alignment>> onChange)
+        {
+            if (onValueChanged == null)
+            {
+                onValueChanged = onChange;
+                alignmentTool.RegisterOnValueChanged(val =>
+                {
+                    onValueChanged?.Invoke(new Bindable<Alignment>
+                    {
+                        Value = val,
+                        UIDHigh = bindingElement.UIDHigh,
+                        UIDLow = bindingElement.UIDLow
+                    });
+                });
+
+                bindingElement.RegisterOnValueChanged(() =>
+                {
+                    onValueChanged?.Invoke(new Bindable<Alignment>
+                    {
+                        Value = alignmentTool.GetValue(),
+                        UIDHigh = bindingElement.UIDHigh,
+                        UIDLow = bindingElement.UIDLow
+                    });
+                });
+            }
+            else
+            {
+                onValueChanged += onChange;
+            }
         }
     }
 
@@ -123,6 +221,16 @@ namespace JESUIS.Editor.Elements.SpecialInputs
             style.height = SIZE;
 
             CreatePins();
+        }
+
+        public Alignment GetValue()
+        {
+            return activePin.GetAlignment();
+        }
+
+        public void SetValue(Alignment alignment)
+        {
+            ValueChanged(alignment, alignmentPins.Cast<AlignmentPin>().First(x => x.GetAlignment() == alignment), true);
         }
 
         public void SetValueWithoutNotify(Alignment alignment)
