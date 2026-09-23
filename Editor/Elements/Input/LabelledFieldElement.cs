@@ -5,6 +5,13 @@ namespace JESUIS.Editor.Elements.Input
 {
     public class LabelledFieldElement : VisualElement
     {
+        public enum LabelType
+        {
+            Main,
+            MainUnpadded,
+            Sub,
+        }
+
         public const int DEFAULT_LABEL_PERCENT_WIDTH = 40;
         public const int DEFAULT_INPUT_FIELD_PERCENT_WIDTH = 60;
         public const int DEFAULT_LABEL_PADDING_LEFT = 25;
@@ -14,16 +21,20 @@ namespace JESUIS.Editor.Elements.Input
         Label label;
         protected VisualElement FieldContainer {  get; private set; }
 
-        public LabelledFieldElement(string labelText, bool isSubElement = false)
+        public LabelledFieldElement(string labelText, LabelType elementType = LabelType.Main)
         {;
             this.AddStyle(InputFieldsUSS.StyleSheetInstance, "labelled-field-element");
 
             label = new Label(labelText);
             label.AddStyle(InputFieldsUSS.StyleSheetInstance, "labelled-field-label-common");
 
-            if (isSubElement)
+            if (elementType == LabelType.Sub)
             {
                 label.AddToClassList("labelled-field-label-sub");
+            }
+            else if (elementType == LabelType.MainUnpadded)
+            {
+                label.AddToClassList("labelled-field-label-main-unpadded");
             }
             else
             {
@@ -35,7 +46,7 @@ namespace JESUIS.Editor.Elements.Input
             FieldContainer = new VisualElement();
             FieldContainer.AddStyle(InputFieldsUSS.StyleSheetInstance, "field-container-common");
 
-            if (isSubElement)
+            if (elementType == LabelType.Sub)
             {
                 FieldContainer.AddToClassList("field-container-sub");
             }

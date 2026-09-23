@@ -14,7 +14,7 @@ namespace JESUIS.Editor.Elements.Input
         
         Action<T> onValueChanged;
 
-        public InputFieldElement(string labelText, T defaultValue = default(T), bool isSubElement = false, bool isReadonly = false) : base(labelText, isSubElement)
+        public InputFieldElement(string labelText, T defaultValue = default(T), LabelType elementType = LabelType.Main, bool isReadonly = false) : base(labelText, elementType)
         {
             inputField = new TextField();
             inputField.AddStyle(InputFieldsUSS.StyleSheetInstance, "input-field");
@@ -84,12 +84,16 @@ namespace JESUIS.Editor.Elements.Input
     {
         protected InputFieldElement<I> input1;
         protected InputFieldElement<J> input2;
+        Action<I, J> onValueChanged;
 
-        public InputFieldElement(string labelText, string subLabel1, string subLabel2) : this(labelText, subLabel1, default(I), subLabel2, default(J))
+        public I CurrentValue1 { get => input1.CurrentValue; }
+        public J CurrentValue2 { get => input2.CurrentValue; }
+
+        public InputFieldElement(string labelText, string subLabel1, string subLabel2, LabelType elementType = LabelType.Main) : this(labelText, subLabel1, default(I), subLabel2, default(J), elementType)
         {
         }
 
-        public InputFieldElement(string labelText, string subLabel1, I default1, string subLabel2, J default2) : base(labelText)
+        public InputFieldElement(string labelText, string subLabel1, I default1, string subLabel2, J default2, LabelType elementType = LabelType.Main) : base(labelText, elementType)
         {
             input1 = CreateInputOne(subLabel1, default1);
             input1.style.position = Position.Absolute;
@@ -110,6 +114,12 @@ namespace JESUIS.Editor.Elements.Input
             FieldContainer.Add(input2);
         }
 
+        public void SetValue(I value1, J value2)
+        {
+            input1.SetValueWithoutNotify(value1);
+            input2.SetValue(value2);
+        }
+
         public void SetValuesWithoutNotify(I value1, J value2)
         {
             input1.SetValueWithoutNotify(value1);
@@ -119,16 +129,30 @@ namespace JESUIS.Editor.Elements.Input
         void OnValueOneChanged(I newValue)
         {
             OnChange(newValue, input2.CurrentValue);
+            onValueChanged?.Invoke(newValue, input2.CurrentValue);
         }
 
         void OnValueTwoChanged(J newValue)
         {
             OnChange(input1.CurrentValue, newValue);
+            onValueChanged?.Invoke(input1.CurrentValue, newValue);
         }
 
         protected abstract void OnChange(I i, J j);
 
         protected abstract InputFieldElement<I> CreateInputOne(string subLabel, I defaultValue);
         protected abstract InputFieldElement<J> CreateInputTwo(string subLabel, J defaultValue);
+
+        public void RegisterOnValueChanged(Action<I, J> onChange)
+        {
+            if (onValueChanged == null)
+            {
+                onValueChanged = onChange;
+            }
+            else
+            {
+                onValueChanged += onChange;
+            }
+        }
     }
 }

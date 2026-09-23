@@ -38,8 +38,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             currentScreenWidth = width;
             currentScreenHeight = height;
 
-            currentScreen.GetRootElement().Transform.Size.x = width;
-            currentScreen.GetRootElement().Transform.Size.y = height;
+            currentScreen.GetRootElement().Transform.Size.Value.x = width;
+            currentScreen.GetRootElement().Transform.Size.Value.y = height;
 
             RestructureViewElements(currentScreen.GetRootElement());
             boxSelector.WrapToTarget();

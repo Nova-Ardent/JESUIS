@@ -63,10 +63,12 @@ namespace JESUIS.Editor.Resources
         public class InspectorResources
         {
             public Resource<Texture2D> Transform;
+            public Resource<Texture2D> Binding;
 
             public InspectorResources(string path)
             {
                 Transform = new Resource<Texture2D>(path, "Transform.png");
+                Binding = new Resource<Texture2D>(path, "Binding.png");
             }
         }
 

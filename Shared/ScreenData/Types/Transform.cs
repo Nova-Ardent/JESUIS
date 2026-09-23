@@ -1,3 +1,4 @@
+using JESUIS.Shared.ScreenData.DataBindings;
 using UnityEngine;
 
 namespace JESUIS.Shared.ScreenData.Types
@@ -7,19 +8,19 @@ namespace JESUIS.Shared.ScreenData.Types
     {
         [SerializeReference] public Transform parent;
 
-        public Vector2 Size = new Vector2(100, 100);
-        public Vector2 Position;
-        public Vector2 Scale = new Vector2(1, 1);
-        public float Rotation;
+        public Bindable<Vector2> Size = new Bindable<Vector2>() { Value = new Vector2(100, 100) };
+        public Bindable<Vector2> Position = new Bindable<Vector2>() { Value = new Vector2(0, 0) };
+        public Bindable<Vector2> Scale = new Bindable<Vector2>() { Value = new Vector2(1, 1) };
+        public Bindable<float> Rotation = new Bindable<float>() { Value = 0f };
 
         public Alignment Anchor;
         public Alignment Pivot;
 
-        public Unit VerticalPosition;
-        public Unit VerticalSize;
+        public Bindable<Unit> VerticalPosition = new Bindable<Unit>() { Value = Unit.Pixels };
+        public Bindable<Unit> VerticalSize = new Bindable<Unit>() { Value = Unit.Pixels };
 
-        public Unit HorizontalPosition;
-        public Unit HorizontalSize;
+        public Bindable<Unit> HorizontalPosition = new Bindable<Unit>() { Value = Unit.Pixels };
+        public Bindable<Unit> HorizontalSize = new Bindable<Unit>() { Value = Unit.Pixels };
 
         public Vector2 GetLocalScaledPosition()
         {
@@ -30,12 +31,12 @@ namespace JESUIS.Shared.ScreenData.Types
 
         public Vector2 GetScaledLocalSize()
         {
-            return new Vector2(GetLocalUnitWidth() * Scale.x, GetLocalUnitHeight() * Scale.y);
+            return new Vector2(GetLocalUnitWidth() * Scale.Value.x, GetLocalUnitHeight() * Scale.Value.y);
         }
 
         public Vector2 GetLocalScaledPivot()
         {
-            return new Vector2(GetPivotOffset().x * Scale.x, GetPivotOffset().y * Scale.y);
+            return new Vector2(GetPivotOffset().x * Scale.Value.x, GetPivotOffset().y * Scale.Value.y);
         }
 
 
@@ -48,22 +49,22 @@ namespace JESUIS.Shared.ScreenData.Types
 
         public float GetLocalUnitPositionX()
         {
-            return GetLocalUnitX(Position.x, HorizontalPosition);
+            return GetLocalUnitX(Position.Value.x, HorizontalPosition.Value);
         }
 
         public float GetLocalUnitPositionY()
         {
-            return GetLocalUnitY(Position.y, VerticalPosition);
+            return GetLocalUnitY(Position.Value.y, VerticalPosition.Value);
         }
 
         public float GetLocalUnitWidth()
         {
-            return GetLocalUnitX(Size.x, HorizontalSize);
+            return GetLocalUnitX(Size.Value.x, HorizontalSize.Value);
         }
 
         public float GetLocalUnitHeight()
         {
-            return GetLocalUnitY(Size.y, VerticalSize);
+            return GetLocalUnitY(Size.Value.y, VerticalSize.Value);
         }
 
         public Vector2 GetAnchorOffset()
@@ -150,12 +151,12 @@ namespace JESUIS.Shared.ScreenData.Types
 
         float GetLocalUnitX(float position, Unit unit)
         {
-            return unit == Unit.Pixels ? position : parent.Size.x * position / 100;
+            return unit == Unit.Pixels ? position : parent.Size.Value.x * position / 100;
         }
 
         float GetLocalUnitY(float position, Unit unit)
         {
-            return unit == Unit.Pixels ? position : parent.Size.y * position / 100;
+            return unit == Unit.Pixels ? position : parent.Size.Value.y * position / 100;
         }
     }
 }

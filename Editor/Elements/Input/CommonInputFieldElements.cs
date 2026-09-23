@@ -2,7 +2,7 @@ namespace JESUIS.Editor.Elements.Input
 {
     public class TextInputFieldElement : InputFieldElement<string>
     {
-        public TextInputFieldElement(string labelText, string defaultValue, bool isSubField = false, bool isReadonly = false) : base(labelText, defaultValue, isSubField)
+        public TextInputFieldElement(string labelText, string defaultValue, LabelType elementType = LabelType.Main, bool isReadonly = false) : base(labelText, defaultValue, elementType)
         {
         }
 
@@ -14,7 +14,7 @@ namespace JESUIS.Editor.Elements.Input
 
     public class IntInputFieldElement : InputFieldElement<int>
     {
-        public IntInputFieldElement(string labelText, int defaultValue, bool isSubField = false) : base(labelText, defaultValue, isSubField)
+        public IntInputFieldElement(string labelText, int defaultValue, LabelType elementType = LabelType.Main) : base(labelText, defaultValue, elementType)
         {
         }
 
@@ -35,7 +35,7 @@ namespace JESUIS.Editor.Elements.Input
 
     public class FloatInputFieldElement : InputFieldElement<float>
     {
-        public FloatInputFieldElement(string labelText, float defaultValue, bool isSubField = false) : base(labelText, defaultValue, isSubField)
+        public FloatInputFieldElement(string labelText, float defaultValue, LabelType elementType = LabelType.Main) : base(labelText, defaultValue, elementType)
         {
         }
 

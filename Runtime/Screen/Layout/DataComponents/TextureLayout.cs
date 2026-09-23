@@ -12,8 +12,8 @@ namespace JESUIS.Runtime.Screen.Layout
         {
             if (baseElement is TextureElement textureElement)
             {
-                rawImage.texture = textureElement.Image.Texture;
-                rawImage.color = textureElement.Image.Color;
+                rawImage.texture = textureElement.Image.Texture.Value;
+                rawImage.color = textureElement.Image.Color.Value;
             }
             base.SetLayout(baseElement);
         }

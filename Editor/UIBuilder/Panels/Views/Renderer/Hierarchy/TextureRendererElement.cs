@@ -24,8 +24,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 
             TextureElement data = (TextureElement)Data;
 
-            style.backgroundImage = data.Image.Texture;
-            style.unityBackgroundImageTintColor = data.Image.Color;
+            style.backgroundImage = data.Image.Texture.Value;
+            style.unityBackgroundImageTintColor = data.Image.Color.Value;
         }
     }
 }

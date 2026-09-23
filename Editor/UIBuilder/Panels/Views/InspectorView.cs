@@ -1,18 +1,19 @@
 using JESUIS.Editor.Elements.CompoundInputs;
+using JESUIS.Editor.Elements.Input.Bindable;
 using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Resources;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.Data;
+using JESUIS.Shared.ScreenData.DataBindings;
+using static JESUIS.Shared.ScreenData.Data.TextureElement;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System;
 using UnityEngine.UIElements;
 using UnityEngine;
-
-using static JESUIS.Shared.ScreenData.Data.TextureElement;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
@@ -111,6 +112,23 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 // Compound Types
                 case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, CurrentEditorState, ref onSelectedElementUpdated);
 
+                // Bindable Types
+                case var type when type == typeof(Bindable<string>): return RegisterStringBindableInputField(fieldInfo, target);
+                case var type when type == typeof(Bindable<int>): return RegisterIntBindableInputField(fieldInfo, target);
+                case var type when type == typeof(Bindable<float>): return RegisterFloatBindableInputField(fieldInfo, target);
+                case var type when type == typeof(Bindable<Vector2>): return Vector2fBindableFieldElement(fieldInfo, target);
+                case var type when type == typeof(Bindable<Vector2Int>): return Vector2iBindableFieldElement(fieldInfo, target);
+                case var type when type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Bindable<>) && type.GetGenericArguments()[0].IsEnum: 
+                    return EnumBindableFieldElement(fieldInfo, target);
+                case var type when type == typeof(Bindable<Color>): return ColorBindableFieldElement(fieldInfo, target);
+
+                // Unity Bindable Types
+                case var type when type == typeof(Bindable<UnityEngine.Texture2D>): return ObjectBindableFieldElement<UnityEngine.Texture2D>(fieldInfo, target);
+
+                case var type when type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Bindable<>): 
+                    Debug.LogError($"found bindable type {type}, but not sure how to handle it. Please implement handling for this type.");
+                    return null;
+                    
                 default:
                     if (fieldInfo.FieldType.IsDefined(typeof(System.SerializableAttribute), true))
                     {
@@ -171,6 +189,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
         }
 
+        // COMMON INPUT FIELDS
         VisualElement RegisterStringInputField(FieldInfo info, object target)
         {
             TextInputFieldElement textField = new TextInputFieldElement(info.Name, "");
@@ -282,5 +301,137 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             AddOnSelectedElementUpdated(() => objectField.SetValueWithoutNotify((T)info.GetValue(target)));
             return objectField;
         }
+        // COMMON INPUT FIELDS
+
+        // BINDABLE INPUT FIELDS
+        VisualElement RegisterStringBindableInputField(FieldInfo info, object target)
+        {
+            BindableTextInputFieldElement textField = new BindableTextInputFieldElement(info.Name, "");
+
+            textField.SetTextBindingWithoutNotify((Bindable<string>)info.GetValue(target));
+            textField.RegisterOnValueChanged(newBindable =>
+            {
+                info.SetValue(target, newBindable);
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() =>
+            {
+                textField.SetTextBindingWithoutNotify((Bindable<string>)info.GetValue(target));
+            });
+            return textField; 
+        }
+
+        VisualElement RegisterIntBindableInputField(FieldInfo info, object target)
+        {
+            BindableIntInputFieldElement intField = new BindableIntInputFieldElement(info.Name, 0);
+            intField.SetWithoutNotify((Bindable<int>)info.GetValue(target));
+            intField.RegisterOnValueChanged(newText =>
+            {
+                info.SetValue(target, newText);
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => intField.SetWithoutNotify((Bindable<int>)info.GetValue(target)));
+            return intField;
+        }
+
+        VisualElement RegisterFloatBindableInputField(FieldInfo info, object target)
+        {
+            BindableFloatInputFieldElement intField = new BindableFloatInputFieldElement(info.Name, 0);
+            intField.SetWithoutNotify((Bindable<float>)info.GetValue(target));
+            intField.RegisterOnValueChanged(newText =>
+            {
+                info.SetValue(target, newText);
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => intField.SetWithoutNotify((Bindable<float>)info.GetValue(target)));
+            return intField;
+        }
+
+        VisualElement Vector2fBindableFieldElement(FieldInfo info, object target)
+        {
+            BindableVector2fFieldElement vectorField = new BindableVector2fFieldElement(info.Name);
+            vectorField.Set((Bindable<Vector2>)info.GetValue(target));
+            vectorField.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => vectorField.Set((Bindable<Vector2>)info.GetValue(target)));
+            return vectorField;
+        }
+
+        VisualElement Vector2iBindableFieldElement(FieldInfo info, object target)
+        {
+            BindableVector2iFieldElement vectorField = new BindableVector2iFieldElement(info.Name);
+            vectorField.Set((Bindable<Vector2Int>)info.GetValue(target));
+            vectorField.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => vectorField.Set((Bindable<Vector2Int>)info.GetValue(target)));
+            return vectorField;
+        }
+
+        VisualElement EnumBindableFieldElement(FieldInfo info, object target)
+        {
+            Shared.ScreenData.DataBindings.IBindable bindable = (Shared.ScreenData.DataBindings.IBindable)info.GetValue(target);
+            BindableEnumFieldElement<Enum> enumField = new BindableEnumFieldElement<Enum>(info.Name, (Enum)bindable.GetBindingValue(), bindable.GetBindingValue().GetType());
+            enumField.SetValueWithoutNotify((Enum)bindable.GetBindingValue());
+            enumField.SetBindingWithoutNotify(bindable.UIDHigh, bindable.UIDLow);
+
+            enumField.RegisterOnValueChanged(newValue =>
+            {
+                bindable.SetBindingValue(newValue.Value);
+                bindable.UIDHigh = newValue.UIDHigh;
+                bindable.UIDLow = newValue.UIDLow;
+
+                info.SetValue(target, bindable);
+                
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() =>
+            {
+                Shared.ScreenData.DataBindings.IBindable updatedBindable = (Shared.ScreenData.DataBindings.IBindable)info.GetValue(target);
+                enumField.SetValueWithoutNotify((Enum)updatedBindable.GetBindingValue());
+                enumField.SetBindingWithoutNotify(updatedBindable.UIDHigh, updatedBindable.UIDLow);
+            });
+            return enumField;
+        }
+
+        VisualElement ColorBindableFieldElement(FieldInfo info, object target)
+        {
+            BindableColorFieldElement colorFieldElement = new BindableColorFieldElement(info.Name, Color.white);
+            colorFieldElement.Set((Bindable<Color>)info.GetValue(target));
+            colorFieldElement.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => colorFieldElement.Set((Bindable<Color>)info.GetValue(target)));
+            return colorFieldElement;
+        }
+
+        VisualElement ObjectBindableFieldElement<T>(FieldInfo info, object target) where T : UnityEngine.Object
+        {
+            BindableObjectFieldElement<T> objectField = new BindableObjectFieldElement<T>(info.Name);
+            objectField.Set((Bindable<T>)info.GetValue(target));
+            objectField.RegisterOnValueChanged(newValue =>
+            {
+                info.SetValue(target, newValue);
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => objectField.Set((Bindable<T>)info.GetValue(target)));
+            return objectField;
+        }
+        // BINDABLE INPUT FIELDS
     }
 }

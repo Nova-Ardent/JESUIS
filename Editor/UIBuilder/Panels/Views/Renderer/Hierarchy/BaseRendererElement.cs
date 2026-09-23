@@ -27,8 +27,8 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             Vector2 pivot = Data.Transform.GetPivotOffset();
             style.transformOrigin = new TransformOrigin(pivot.x, pivot.y, 0);
 
-            style.rotate = new Rotate(new Angle(Data.Transform.Rotation, AngleUnit.Degree));
-            style.scale = new Scale(new Vector3(Data.Transform.Scale.x, Data.Transform.Scale.y, 1));
+            style.rotate = new Rotate(new Angle(Data.Transform.Rotation.Value, AngleUnit.Degree));
+            style.scale = new Scale(new Vector3(Data.Transform.Scale.Value.x, Data.Transform.Scale.Value.y, 1));
         }
 
         public void OnParentGeometryChanged(GeometryChangedEvent geometryChangedEvent)

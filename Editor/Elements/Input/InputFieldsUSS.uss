@@ -21,6 +21,11 @@
     padding-left: 25px;
 }
 
+.labelled-field-label-main-unpadded
+{
+    width: 40%;
+}
+
 .labelled-field-label-sub
 {
     width: 15px;

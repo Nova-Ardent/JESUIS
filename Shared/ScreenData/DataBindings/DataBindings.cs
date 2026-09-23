@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,6 +29,25 @@ namespace JESUIS.Shared.ScreenData.DataBindings
             }
         }
 
+        public static DataBinding<T> GetDataBinding<T>(System.Guid uid)
+        {
+            return (DataBinding<T>)GetDataBinding(typeof(T), uid);
+        }
+
+        public static DataBinding GetDataBinding(Type type, System.Guid uid)
+        {
+            if (!bindings.ContainsKey(type))
+            {
+                return null;
+            }
+
+            if (bindings[type].ContainsKey(uid))
+            {
+                return (DataBinding)bindings[type][uid];
+            }
+            return null;
+        }
+
         public static IEnumerable<DataBinding<T>> GetDataBindingsOfType<T>()
         {
             if (!bindings.ContainsKey(typeof(T)))
@@ -40,7 +59,18 @@ namespace JESUIS.Shared.ScreenData.DataBindings
             }
         }
 
-        public static void BuildDataContainer(Type type)
+        public static IEnumerable<DataBinding> GetDataBindingsOfType(Type type)
+        {
+            if (!bindings.ContainsKey(type))
+                yield break;
+
+            foreach (DataBinding binding in bindings[type].Values)
+            {
+                yield return binding;
+            }
+        }
+
+        public static void BuildDataContainer(Type type) 
         {
             foreach (var member in type.GetMembers(
                         BindingFlags.Public |

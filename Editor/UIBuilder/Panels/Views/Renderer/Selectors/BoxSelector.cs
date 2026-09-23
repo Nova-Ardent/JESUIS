@@ -137,7 +137,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
                 {
                     for (int y = 0; y < 2; y++)
                     {
-                        Vector2 rotatedPoint = cornerPositions[x, y].RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation);
+                        Vector2 rotatedPoint = cornerPositions[x, y].RotatePoint(transformOrigin, rendererElement.GetTransform().Rotation.Value);
                         cornerPositions[x, y] = this.WorldToLocal(target.parent.LocalToWorld(rotatedPoint));
 
                         dragPoints[x * 2, y * 2].SetPosition(cornerPositions[x, y]);
@@ -153,7 +153,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
                 float rotation = 0;
                 do
                 {
-                    rotation += rotationIter.Rotation;
+                    rotation += rotationIter.Rotation.Value;
                     rotationIter = rotationIter.parent;
                 } while (rotationIter != null);
 
@@ -240,7 +240,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
             if (target is IRendererElement rendererElement)
             {
                 Shared.ScreenData.Types.Transform transform = rendererElement.GetTransform();
-                transform.Rotation = angle;
+                transform.Rotation.Value = angle;
 
                 rendererElement.OnValuesChanged();
                 editorState.TriggerElementIsDirty(rendererView, new ValuesUpdated(editorState.SelectedElement));
@@ -303,22 +303,22 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Selectors
                 }
 
 
-                if (transform.HorizontalPosition == Shared.ScreenData.Types.Unit.Percentage)
+                if (transform.HorizontalPosition.Value == Shared.ScreenData.Types.Unit.Percentage)
                     positionDelta.x = 100 * positionDelta.x / target.parent.contentRect.width;
 
-                if (transform.VerticalPosition == Shared.ScreenData.Types.Unit.Percentage)
+                if (transform.VerticalPosition.Value == Shared.ScreenData.Types.Unit.Percentage)
                     positionDelta.y = 100 * positionDelta.y / target.parent.contentRect.height;
 
-                if (transform.HorizontalSize == Shared.ScreenData.Types.Unit.Percentage)
+                if (transform.HorizontalSize.Value == Shared.ScreenData.Types.Unit.Percentage)
                     sizeDelta.x = 100 * sizeDelta.x / target.parent.contentRect.width;
 
-                if (transform.VerticalSize == Shared.ScreenData.Types.Unit.Percentage)
+                if (transform.VerticalSize.Value == Shared.ScreenData.Types.Unit.Percentage)
                     sizeDelta.y = 100 * sizeDelta.y / target.parent.contentRect.height;
 
-                transform.Position.x += positionDelta.x;
-                transform.Position.y += positionDelta.y;
-                transform.Size.x += sizeDelta.x;
-                transform.Size.y += sizeDelta.y;
+                transform.Position.Value.x += positionDelta.x;
+                transform.Position.Value.y += positionDelta.y;
+                transform.Size.Value.x += sizeDelta.x;
+                transform.Size.Value.y += sizeDelta.y;
 
                 rendererElement.OnValuesChanged();
                 editorState.TriggerElementIsDirty(rendererView, new ValuesUpdated(editorState.SelectedElement));

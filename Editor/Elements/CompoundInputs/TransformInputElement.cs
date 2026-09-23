@@ -1,4 +1,4 @@
-using JESUIS.Editor.Elements.Input;
+using JESUIS.Editor.Elements.Input.Bindable;
 using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Elements.SpecialInputs;
 using JESUIS.Editor.Resources;
@@ -20,19 +20,19 @@ namespace JESUIS.Editor.Elements.CompoundInputs
         public const int ELEMENT_PADDING = 2;
         public const int ALIGNMENT_PADDING = 20;
 
-        Vector2fFieldElement sizeField;
-        Vector2fFieldElement positionField;
-        Vector2fFieldElement scaleField;
-        FloatInputFieldElement rotationField;
+        BindableVector2fFieldElement sizeField;
+        BindableVector2fFieldElement positionField;
+        BindableVector2fFieldElement scaleField;
+        BindableFloatInputFieldElement rotationField;
 
         AlignmentSelector anchorField;
         AlignmentSelector pivotField;
 
-        EnumFieldElement<Unit> verticalPositionField;
-        EnumFieldElement<Unit> verticalSizeField;
+        BindableEnumFieldElement<Unit> verticalPositionField;
+        BindableEnumFieldElement<Unit> verticalSizeField;
 
-        EnumFieldElement<Unit> horizontalPositionField;
-        EnumFieldElement<Unit> horizontalSizeField;
+        BindableEnumFieldElement<Unit> horizontalPositionField;
+        BindableEnumFieldElement<Unit> horizontalSizeField;
 
         Action onChange;
 
@@ -44,9 +44,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
 
             this.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-element");
 
-            sizeField = new Vector2fFieldElement("Size", "W", "H");
+            sizeField = new BindableVector2fFieldElement("Size", "W", "H");
             sizeField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-size");
-            sizeField.SetValuesWithoutNotify(target.Size.x, target.Size.y);
+            sizeField.SetWithoutNotify(target.Size);
             sizeField.RegisterOnValueChanged((newValue) =>
             {
                 target.Size = newValue;
@@ -54,9 +54,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(sizeField);
 
-            positionField = new Vector2fFieldElement("Position");
+            positionField = new BindableVector2fFieldElement("Position");
             positionField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-position");
-            positionField.SetValuesWithoutNotify(target.Position.x, target.Position.y);
+            positionField.SetWithoutNotify(target.Position);
             positionField.RegisterOnValueChanged((newValue) =>
             {
                 target.Position = newValue;
@@ -64,9 +64,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(positionField);
 
-            scaleField = new Vector2fFieldElement("Scale");
+            scaleField = new BindableVector2fFieldElement("Scale");
             scaleField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-scale");
-            scaleField.SetValuesWithoutNotify(target.Scale.x, target.Scale.y);
+            scaleField.SetWithoutNotify(target.Scale);
             scaleField.RegisterOnValueChanged((newValue) =>
             {
                 target.Scale = newValue;
@@ -74,9 +74,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(scaleField);
 
-            rotationField = new FloatInputFieldElement("Rotation", 0, false);
+            rotationField = new BindableFloatInputFieldElement("Rotation", 0);
             rotationField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-rotation");
-            rotationField.SetValueWithoutNotify(target.Rotation);
+            rotationField.SetWithoutNotify(target.Rotation);
             rotationField.RegisterOnValueChanged((newValue) =>
             {
                 target.Rotation = newValue;
@@ -104,9 +104,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(pivotField);
 
-            verticalPositionField = new EnumFieldElement<Unit>("Vert Pos", Unit.Pixels);
+            verticalPositionField = new BindableEnumFieldElement<Unit>("Vert Pos", Unit.Pixels);
             verticalPositionField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-vertical-position");
-            verticalPositionField.SetValueWithoutNotify(target.VerticalPosition);
+            verticalPositionField.SetWithoutNotify(target.VerticalPosition);
             verticalPositionField.RegisterOnValueChanged((newValue) =>
             {
                 target.VerticalPosition = newValue;
@@ -114,9 +114,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(verticalPositionField);
 
-            verticalSizeField = new EnumFieldElement<Unit>("Vert Size", Unit.Pixels);
+            verticalSizeField = new BindableEnumFieldElement<Unit>("Vert Size", Unit.Pixels);
             verticalSizeField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-vertical-size");
-            verticalSizeField.SetValueWithoutNotify(target.VerticalSize);
+            verticalSizeField.SetValueWithoutNotify(target.VerticalSize.Value);
             verticalSizeField.RegisterOnValueChanged((newValue) =>
             {
                 target.VerticalSize = newValue;
@@ -124,9 +124,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(verticalSizeField);
 
-            horizontalPositionField = new EnumFieldElement<Unit>("Horz Pos", Unit.Pixels);
+            horizontalPositionField = new BindableEnumFieldElement<Unit>("Horz Pos", Unit.Pixels);
             horizontalPositionField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-horizontal-position");
-            horizontalPositionField.SetValueWithoutNotify(target.HorizontalPosition);
+            horizontalPositionField.SetWithoutNotify(target.HorizontalPosition);
             horizontalPositionField.RegisterOnValueChanged((newValue) =>
             {
                 target.HorizontalPosition = newValue;
@@ -134,9 +134,9 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             });
             Add(horizontalPositionField);
 
-            horizontalSizeField = new EnumFieldElement<Unit>("Horz Size", Unit.Pixels);
+            horizontalSizeField = new BindableEnumFieldElement<Unit>("Horz Size", Unit.Pixels);
             horizontalSizeField.AddStyle(TransformInputElementUSS.StyleSheetInstance, "transform-horizontal-size"); 
-            horizontalSizeField.SetValueWithoutNotify(target.HorizontalSize);
+            horizontalSizeField.SetWithoutNotify(target.HorizontalSize);
             horizontalSizeField.RegisterOnValueChanged((newValue) =>
             {
                 target.HorizontalSize = newValue;
@@ -161,24 +161,26 @@ namespace JESUIS.Editor.Elements.CompoundInputs
 
         public void UpdateInspectorElements()
         {
-            sizeField.SetValuesWithoutNotify(targetTransform.Size.x, targetTransform.Size.y);
-            positionField.SetValuesWithoutNotify(targetTransform.Position.x, targetTransform.Position.y);
-            scaleField.SetValuesWithoutNotify(targetTransform.Scale.x, targetTransform.Scale.y);
-            rotationField.SetValueWithoutNotify(targetTransform.Rotation);
+            sizeField.SetValueWithoutNotify(targetTransform.Size.Value.x, targetTransform.Size.Value.y);
+            positionField.SetValueWithoutNotify(targetTransform.Position.Value.x, targetTransform.Position.Value.y);
+            scaleField.SetValueWithoutNotify(targetTransform.Scale.Value.x, targetTransform.Scale.Value.y);
+            rotationField.SetValueWithoutNotify(targetTransform.Rotation.Value);
+
             anchorField.SetValueWithoutNotify(targetTransform.Anchor);
             pivotField.SetValueWithoutNotify(targetTransform.Pivot);
-            verticalPositionField.SetValueWithoutNotify(targetTransform.VerticalPosition);
-            verticalSizeField.SetValueWithoutNotify(targetTransform.VerticalSize);
-            horizontalPositionField.SetValueWithoutNotify(targetTransform.HorizontalPosition);
-            horizontalSizeField.SetValueWithoutNotify(targetTransform.HorizontalSize);  
+
+            verticalPositionField.SetValueWithoutNotify(targetTransform.VerticalPosition.Value);
+            verticalSizeField.SetValueWithoutNotify(targetTransform.VerticalSize.Value);
+            horizontalPositionField.SetValueWithoutNotify(targetTransform.HorizontalPosition.Value);
+            horizontalSizeField.SetValueWithoutNotify(targetTransform.HorizontalSize.Value);  
         }
 
         void OnGeometryChanged(GeometryChangedEvent evt)
         {
-            verticalPositionField.style.width = contentRect.width - verticalPositionField.resolvedStyle.left;
-            verticalSizeField.style.width = contentRect.width - verticalSizeField.resolvedStyle.left;
-            horizontalPositionField.style.width = contentRect.width - horizontalPositionField.resolvedStyle.left;
-            horizontalSizeField.style.width = contentRect.width - horizontalSizeField.resolvedStyle.left;
+            verticalPositionField.style.width = contentRect.width - verticalPositionField.resolvedStyle.left + 10;
+            verticalSizeField.style.width = contentRect.width - verticalSizeField.resolvedStyle.left + 10;
+            horizontalPositionField.style.width = contentRect.width - horizontalPositionField.resolvedStyle.left + 10;
+            horizontalSizeField.style.width = contentRect.width - horizontalSizeField.resolvedStyle.left + 10;
         }
 
         public static TransformInputElement RegisterField(FieldInfo info, object target, EditorViews triggeringView, EditorState editorState, ref Action onSelectedElementUpdated)

@@ -8,7 +8,7 @@ namespace JESUIS.Editor.Elements.Input
         public Vector2 CurrentValue { get; private set; }
         Action<Vector2> onValueChanged;
 
-        public Vector2fFieldElement(string labelText, string XLabel = "X", string YLabel = "Y") : base(labelText, XLabel, YLabel)
+        public Vector2fFieldElement(string labelText, string XLabel = "X", string YLabel = "Y", LabelType elementType = LabelType.Main) : base(labelText, XLabel, YLabel, elementType)
         {
         }
 
@@ -20,12 +20,12 @@ namespace JESUIS.Editor.Elements.Input
 
         protected override InputFieldElement<float> CreateInputOne(string subLabel, float defaultValue)
         {
-            return new FloatInputFieldElement(subLabel, defaultValue, true);
+            return new FloatInputFieldElement(subLabel, defaultValue, LabelType.Sub);
         }
 
         protected override InputFieldElement<float> CreateInputTwo(string subLabel, float defaultValue)
         {
-            return new FloatInputFieldElement(subLabel, defaultValue, true);
+            return new FloatInputFieldElement(subLabel, defaultValue, LabelType.Sub);
         }
 
         public void RegisterOnValueChanged(Action<Vector2> onChange)
@@ -52,7 +52,7 @@ namespace JESUIS.Editor.Elements.Input
         public Vector2Int CurrentValue { get; private set; }
         Action<Vector2Int> onValueChanged;
 
-        public Vector2iFieldElement(string labelText) : base(labelText, "X", "Y")
+        public Vector2iFieldElement(string labelText, LabelType elementType = LabelType.Main) : base(labelText, "X", "Y", elementType)
         {
         }
 
@@ -64,12 +64,12 @@ namespace JESUIS.Editor.Elements.Input
 
         protected override InputFieldElement<int> CreateInputOne(string subLabel, int defaultValue)
         {
-            return new IntInputFieldElement(subLabel, defaultValue, true);
+            return new IntInputFieldElement(subLabel, defaultValue, LabelType.Sub);
         }
 
         protected override InputFieldElement<int> CreateInputTwo(string subLabel, int defaultValue)
         {
-            return new IntInputFieldElement(subLabel, defaultValue, true);
+            return new IntInputFieldElement(subLabel, defaultValue, LabelType.Sub);
         }
 
         public void RegisterOnValueChanged(Action<Vector2Int> onChange)

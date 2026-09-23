@@ -58,25 +58,25 @@ namespace JESUIS.Runtime.Screen.Layout
             Transform.anchorMax = new Vector2(anchor.x, 1 - anchor.y);
 
             RectTransform parent = (RectTransform)Transform.parent;
-            Vector2 size = baseElement.Transform.Size;
+            Vector2 size = baseElement.Transform.Size.Value;
 
-            if (baseElement.Transform.HorizontalSize == Unit.Percentage && parent != null)
+            if (baseElement.Transform.HorizontalSize.Value == Unit.Percentage && parent != null)
                 size.x *= parent.sizeDelta.x / 100f;
-            if (baseElement.Transform.VerticalSize == Unit.Percentage && parent != null)
+            if (baseElement.Transform.VerticalSize.Value == Unit.Percentage && parent != null)
                 size.y *= parent.sizeDelta.y / 100f;
 
             Transform.sizeDelta = size;
 
-            Vector2 localPosition = new Vector2(baseElement.Transform.Position.x, -baseElement.Transform.Position.y);
-            if (baseElement.Transform.HorizontalPosition == Unit.Percentage && parent != null)
+            Vector2 localPosition = new Vector2(baseElement.Transform.Position.Value.x, -baseElement.Transform.Position.Value.y);
+            if (baseElement.Transform.HorizontalPosition.Value == Unit.Percentage && parent != null)
                 localPosition.x *= parent.sizeDelta.x / 100f;
-            if (baseElement.Transform.VerticalPosition == Unit.Percentage && parent != null)
+            if (baseElement.Transform.VerticalPosition.Value == Unit.Percentage && parent != null)
                 localPosition.y *= parent.sizeDelta.y / 100f;
 
             Transform.anchoredPosition = localPosition;
 
-            Transform.localScale = baseElement.Transform.Scale;
-            Transform.localRotation = Quaternion.Euler(0, 0, baseElement.Transform.Rotation);
+            Transform.localScale = baseElement.Transform.Scale.Value;
+            Transform.localRotation = Quaternion.Euler(0, 0, baseElement.Transform.Rotation.Value);
         }
 
         public void UpdateChildren()

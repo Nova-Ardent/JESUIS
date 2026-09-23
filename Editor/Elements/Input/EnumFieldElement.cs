@@ -14,8 +14,9 @@ namespace JESUIS.Editor.Elements.Input
     {
         EnumField enumField;
         Action<T> onValueChanged;
+        public T CurrentValue { get; private set; }
 
-        public EnumFieldElement(string labelText, T defaultValue) : base(labelText)
+        public EnumFieldElement(string labelText, T defaultValue, LabelType labelType = LabelType.Main) : base(labelText, labelType)
         {
             enumField = new EnumField(defaultValue);
 
@@ -31,6 +32,7 @@ namespace JESUIS.Editor.Elements.Input
 
         public void SetValueWithoutNotify(T value)
         {
+            CurrentValue = value;
             enumField.SetValueWithoutNotify(value);
         }
 
@@ -48,6 +50,7 @@ namespace JESUIS.Editor.Elements.Input
 
         void OnValueChanged(ChangeEvent<Enum> changeEvent)
         {
+            CurrentValue = (T)changeEvent.newValue;
             onValueChanged?.Invoke((T)changeEvent.newValue);
         }
     }
