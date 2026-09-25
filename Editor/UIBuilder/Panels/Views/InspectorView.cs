@@ -197,7 +197,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         {
             Shared.ScreenData.Types.Transform transform = (Shared.ScreenData.Types.Transform)info.GetValue(target);
 
-            BindableVector2fFieldElement vectorField = new BindableVector2fFieldElement(info.Name);
+            BindableVector2fFieldElement vectorField = new BindableVector2fFieldElement("Size", "W", "H");
             vectorField.Set(transform.Size);
             vectorField.RegisterOnValueChanged(newValue =>
             {
