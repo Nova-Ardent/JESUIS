@@ -97,6 +97,9 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
 
         protected override void OnCurrentScreenChanged(JESUIS.Shared.ScreenData.Screen currentScreen)
         {
+            OnChangeAspectRatio
+                ( Mathf.RoundToInt(currentScreen.GetRootElement().Transform.Size.Value.x)
+                , Mathf.RoundToInt(currentScreen.GetRootElement().Transform.Size.Value.y));
             rendererDisplay.OnCurrentScreenChanged(currentScreen);
         }
         
