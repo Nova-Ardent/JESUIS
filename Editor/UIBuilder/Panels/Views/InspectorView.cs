@@ -1,21 +1,19 @@
 using JESUIS.Editor.Elements.CompoundInputs;
-using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.Elements.Input.Bindable;
+using JESUIS.Editor.Elements.Input;
 using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Resources;
-using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Editor.UIBuilder.Data.StateChanges;
+using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.Data;
 using JESUIS.Shared.ScreenData.DataBindings;
-using JESUIS.Shared.ScreenData.Types;
-using System;
+using static JESUIS.Shared.ScreenData.Data.TextureElement;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
+using System;
 using UnityEngine.UIElements;
-using static JESUIS.Shared.ScreenData.Data.TextureElement;
-using static PlasticGui.WorkspaceWindow.Merge.MergeInProgress;
+using UnityEngine;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
