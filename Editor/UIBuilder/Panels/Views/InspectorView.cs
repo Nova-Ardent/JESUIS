@@ -1,19 +1,21 @@
 using JESUIS.Editor.Elements.CompoundInputs;
-using JESUIS.Editor.Elements.Input.Bindable;
 using JESUIS.Editor.Elements.Input;
+using JESUIS.Editor.Elements.Input.Bindable;
 using JESUIS.Editor.Elements.Layout;
 using JESUIS.Editor.Resources;
-using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Data;
+using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Shared.ScreenData.Data;
 using JESUIS.Shared.ScreenData.DataBindings;
-using static JESUIS.Shared.ScreenData.Data.TextureElement;
+using JESUIS.Shared.ScreenData.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System;
-using UnityEngine.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static JESUIS.Shared.ScreenData.Data.TextureElement;
+using static PlasticGui.WorkspaceWindow.Merge.MergeInProgress;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
@@ -40,7 +42,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
-            if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated)
+            if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated && elementChanges.TargetElement == CurrentEditorState.SelectedElement.Value)
             {
                 onSelectedElementUpdated?.Invoke();
             }
@@ -56,11 +58,6 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
-            if (baseElement is RootElement)
-            {
-                return;
-            }
-
             SetFieldsOfTarget(this, baseElement.GetType(), baseElement);
         }
 
@@ -69,17 +66,17 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             OnSelectedElementChanged(null);
         }
 
-        void SetFieldsOfTarget(VisualElement targetElement, Type type, object target)
+        void SetFieldsOfTarget(VisualElement targetElement, Type targetType, object target)
         {
             if (target == null)
             {
-                Debug.LogError($"target for type {type} is null");
+                Debug.LogError($"target for type {targetType} is null");
                 return;
             }
 
-            foreach (var field in GetAllFields(type).DistinctBy(x => x.Name))
+            foreach (var field in GetAllFields(targetType).DistinctBy(x => x.Name))
             {
-                VisualElement visualElement = GetInspectorElement(field, target);
+                VisualElement visualElement = GetInspectorElement(field, targetType, target);
                 if (visualElement == null)
                     continue;
 
@@ -93,7 +90,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             }
         }
 
-        VisualElement GetInspectorElement(FieldInfo fieldInfo, object target)
+        VisualElement GetInspectorElement(FieldInfo fieldInfo, Type targetType, object target)
         {
             switch (fieldInfo.FieldType)
             {
@@ -110,7 +107,15 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type == typeof(UnityEngine.Texture2D): return ObjectFieldElement<UnityEngine.Texture2D>(fieldInfo, target);
 
                 // Compound Types
-                case var type when type == typeof(Shared.ScreenData.Types.Transform): return TransformInputElement.RegisterField(fieldInfo, target, this, CurrentEditorState, ref onSelectedElementUpdated);
+                case var type when type == typeof(Shared.ScreenData.Types.Transform):
+                    if (targetType == typeof(RootElement))
+                    {
+                        return RootTransformFieldElement(fieldInfo, target);
+                    }
+                    else
+                    {
+                        return TransformInputElement.RegisterField(fieldInfo, target, this, CurrentEditorState, ref onSelectedElementUpdated);
+                    }
 
                 // Bindable Types
                 case var type when type == typeof(Bindable<string>): return RegisterStringBindableInputField(fieldInfo, target);
@@ -190,6 +195,22 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         }
 
         // COMMON INPUT FIELDS
+        VisualElement RootTransformFieldElement(FieldInfo info, object target)
+        {
+            Shared.ScreenData.Types.Transform transform = (Shared.ScreenData.Types.Transform)info.GetValue(target);
+
+            BindableVector2fFieldElement vectorField = new BindableVector2fFieldElement(info.Name);
+            vectorField.Set(transform.Size);
+            vectorField.RegisterOnValueChanged(newValue =>
+            {
+                transform.Size = newValue;
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            });
+
+            AddOnSelectedElementUpdated(() => vectorField.Set(transform.Size));
+            return vectorField;
+        }
+
         VisualElement RegisterStringInputField(FieldInfo info, object target)
         {
             TextInputFieldElement textField = new TextInputFieldElement(info.Name, "");

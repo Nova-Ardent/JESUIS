@@ -16,6 +16,11 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
 
         public virtual void OnValuesChanged()
         {
+            if (Data == null)
+            {
+                return;
+            }
+
             style.position = Position.Absolute;
 
             Vector2 localPosition = Data.Transform.GetLocalPosition();

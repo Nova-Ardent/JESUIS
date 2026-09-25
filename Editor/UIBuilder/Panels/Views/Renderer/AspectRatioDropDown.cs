@@ -31,22 +31,45 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer
             [AspectRatio("Iphone 17", 1206, 2622)] Iphone17,
             [AspectRatio("Iphone 15", 1179, 2556)] Iphone15,
             [AspectRatio("Pixel 10", 1080, 2424)] Pixel10,
+            [AspectRatio("Custom", 0, 0)] Custom,
         }
 
         public AspectRatioDropDown(Action<int, int> onSelection) : base(150, GetActions(onSelection))
         {
         }
 
-        static IEnumerable<NamedAction> GetActions(Action<int, int> onSelection)
+        public void SetAspectRatio(int width, int height)
         {
-            foreach(AspectRatioOptions option in Utilities.Utilities.GetEnums<AspectRatioOptions>())
+            int i = 0;
+            foreach (AspectRatioOptions option in Utilities.Utilities.GetEnums<AspectRatioOptions>())
             {
-                AspectRatioAttribute attibute = (AspectRatioAttribute)Attribute.GetCustomAttribute(
+                AspectRatioAttribute attribute = (AspectRatioAttribute)Attribute.GetCustomAttribute(
                     typeof(AspectRatioOptions).GetField(option.ToString()),
                     typeof(AspectRatioAttribute)
                 );
 
-                yield return new NamedAction(attibute.DisplayName, () => onSelection(attibute.Width, attibute.Height), true);
+                if (attribute.Width == width && attribute.Height == height)
+                {
+                    this.SetOption(i, false);
+                    return;
+                }
+
+                i++;
+            }
+
+            this.SetOption(i - 1, false);
+        }
+
+        static IEnumerable<NamedAction> GetActions(Action<int, int> onSelection)
+        {
+            foreach(AspectRatioOptions option in Utilities.Utilities.GetEnums<AspectRatioOptions>())
+            {
+                AspectRatioAttribute attribute = (AspectRatioAttribute)Attribute.GetCustomAttribute(
+                    typeof(AspectRatioOptions).GetField(option.ToString()),
+                    typeof(AspectRatioAttribute)
+                );
+
+                yield return new NamedAction(attribute.DisplayName, () => onSelection(attribute.Width, attribute.Height), true);
             }
         }
     }

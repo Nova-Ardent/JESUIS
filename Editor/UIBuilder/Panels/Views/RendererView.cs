@@ -8,6 +8,7 @@ using JESUIS.Shared.ScreenData.Data;
 using JESUIS.Shared.ScreenData;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
+using UnityEngine;
 
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
@@ -45,7 +46,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             Add(boxSelectedContainer);
             boxSelectedContainer.Add(boxSelector);
 
-            aspectRatioDropDown = new AspectRatioDropDown(controller.ChangeAspectRatio);
+            aspectRatioDropDown = new AspectRatioDropDown(OnChangeAspectRatio);
 
             RegisterCallbackOnce<GeometryChangedEvent>(OnGeometryReady);
             RegisterCallbackOnce<GeometryChangedEvent>(OnGeometryChanged);
@@ -53,6 +54,21 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             boxSelector.InitializeDragPoints(this);
             boxSelector.OnZoomChanged();
             boxSelector.SetActive(false);
+        }
+
+        void OnChangeAspectRatio(int width, int height)
+        {
+            aspectRatioDropDown.SetAspectRatio(width, height);
+            if (width <= 0 || height <= 0)
+            {
+                return;
+            }
+
+            controller.ChangeAspectRatio(width, height);
+            if (CurrentEditorState.SelectedElement.Value == CurrentEditorState.CurrentScreen.Value.GetRootElement())
+            {
+                CurrentEditorState.TriggerElementIsDirty(this, new ValuesUpdated(CurrentEditorState.SelectedElement));
+            }
         }
 
         protected override void OnSelectedElementChanged(BaseElement selectedElement)
@@ -67,10 +83,19 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
+            if (elementChanges.ChangeType == ElementChanges.ElementChangeType.ValueUpdated && elementChanges.TargetElement is RootElement)
+            {
+                UnityEngine.Vector2 size = elementChanges.TargetElement.Transform.Size.Value;
+                if (!Mathf.Approximately(size.x, controller.CurrentWidth) || !Mathf.Approximately(size.y, controller.CurrentHeight))
+                {
+                    OnChangeAspectRatio(Mathf.RoundToInt(size.x), Mathf.RoundToInt(size.y));
+                }
+            }
+
             rendererDisplay.OnElementIsDirty(elementChanges);
         }
 
-        protected override void OnCurrentScreenChanged(Screen currentScreen)
+        protected override void OnCurrentScreenChanged(JESUIS.Shared.ScreenData.Screen currentScreen)
         {
             rendererDisplay.OnCurrentScreenChanged(currentScreen);
         }

@@ -111,7 +111,7 @@ namespace JESUIS.Editor.Elements.Layout.TabBarWidgets
 
         public void OnChange(int optionSelected)
         {
-            if (optionSelected < 0 || optionSelected >= options.Count)
+            if (optionSelected < 0 || optionSelected > options.Count)
             {
                 return;
             }

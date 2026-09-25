@@ -91,7 +91,12 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             {
                 if (elementChanges is ValuesUpdated valuesUpdatedChange)
                 {
-                    VisualElement targetElement = elementToRendererElementMap[valuesUpdatedChange.TargetElement]; 
+                    if (valuesUpdatedChange.TargetElement is RootElement)
+                    {
+                        return;
+                    }
+
+                    VisualElement targetElement = elementToRendererElementMap[valuesUpdatedChange.TargetElement];
                     if (targetElement is IRendererElement rendererElement)
                     {
                         rendererElement.OnValuesChanged();
