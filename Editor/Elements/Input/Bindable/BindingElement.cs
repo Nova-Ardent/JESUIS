@@ -109,7 +109,7 @@ namespace JESUIS.Editor.Elements.Input.Bindable
 
         void ClearBinding()
         {
-            SetBindingWithoutNotify(0, 0);
+            SetBinding(0, 0);
         }
 
         void OnOptionClicked(Shared.ScreenData.DataBindings.DataBinding binding)
