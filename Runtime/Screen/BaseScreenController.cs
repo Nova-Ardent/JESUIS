@@ -1,3 +1,4 @@
+using JESUIS.Runtime.Screen.Data;
 using System.Collections;
 using UnityEngine;
 
@@ -5,6 +6,12 @@ namespace JESUIS.Runtime.Screen
 {
     public class BaseScreenController
     {
+#if UNITY_EDITOR
+        public Model RootModel = new Model("Root");
+#else
+        public Model RootModel = new Model();
+#endif
+
         public ScreenStackContainer ScreenStack;
 
         public virtual void OnLoad() { }

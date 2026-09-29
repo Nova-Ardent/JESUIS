@@ -30,10 +30,25 @@ namespace JESUIS.Shared.ScreenData.Data
             return parent;
         } 
 
+        public BaseElement GetChild(int index)
+        {
+            if (index < 0 || index >= children.Count)
+            {
+                return null;
+            }
+
+            return children[index];
+        }
+
         public IEnumerable<BaseElement> GetChildren()
         {
             return children;
-        } 
+        }
+        
+        public int ChildCount()
+        {
+            return children.Count;
+        }
 
         public override string ToString()
         {

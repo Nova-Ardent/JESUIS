@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace JESUIS.Shared.ScreenData.DataBindings
@@ -6,9 +7,12 @@ namespace JESUIS.Shared.ScreenData.DataBindings
     {
         public ulong UIDHigh { get; set; }
         public ulong UIDLow { get; set; }
+        public bool HasUID { get; }
+        public System.Guid Guid { get; }
 
         public void SetBindingValue(object value);
         public object GetBindingValue();
+
     }
 
     [System.Serializable]
@@ -22,6 +26,7 @@ namespace JESUIS.Shared.ScreenData.DataBindings
             get => uIDHigh;
             set 
             {
+                guid = null;
                 uIDHigh = value; 
             } 
         }
@@ -32,7 +37,29 @@ namespace JESUIS.Shared.ScreenData.DataBindings
             get => uIDLow;
             set
             {
+                guid = null;
                 uIDLow = value;
+            }
+        }
+
+        public bool HasUID => UIDHigh != 0 || UIDLow != 0;
+
+        [NonSerialized]
+        System.Guid? guid;
+        public System.Guid Guid
+        {
+            get
+            {
+                if (this.guid == null)
+                {
+                    Span<byte> bytes = stackalloc byte[16];
+                    BitConverter.TryWriteBytes(bytes[..8], UIDHigh);
+                    BitConverter.TryWriteBytes(bytes[8..], UIDLow);
+
+                    guid = new System.Guid(bytes);
+                }
+
+                return guid.Value;
             }
         }
 

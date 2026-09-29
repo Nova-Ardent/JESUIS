@@ -139,7 +139,11 @@ namespace JESUIS.Shared.ScreenData.DataBindings
 
     public static partial class Common
     {
+#if UNITY_EDITOR
         [InitializeOnLoadMethod]
+#else
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+#endif
         public static void Initialize()
         {
             DataBindingContainer.BuildDataContainer(typeof(Common)); 

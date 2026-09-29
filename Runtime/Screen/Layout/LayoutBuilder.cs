@@ -3,6 +3,7 @@ using UnityEngine;
 using JESUIS.Runtime.Utilities;
 using JESUIS.Shared.ScreenData.Data;
 using UnityEngine.PlayerLoop;
+using JESUIS.Runtime.Screen.Data;
 
 namespace JESUIS.Runtime.Screen.Layout
 {
@@ -23,7 +24,8 @@ namespace JESUIS.Runtime.Screen.Layout
 
         public void OnUpdate()
         {
-            rootLayout.UpdateChildren();
+            rootLayout.RecursivelySyncModels();
+            rootLayout.UpdateChildren(false, true);
         }
 
         public void Initialize(GameObject screenContainer)
@@ -47,13 +49,16 @@ namespace JESUIS.Runtime.Screen.Layout
 
         public void ClearLayout()
         {
+            rootLayout.ClearData();
+
             foreach (BaseLayout layout in activeElements)
             {
                 layout.ReleaseToPool();
             }
+            activeElements.Clear();
         }
 
-        public void BuildLayout(System.Guid uid)
+        public void BuildLayout(System.Guid uid, Model rootModel)
         {
             Shared.ScreenData.Screen screen = layoutLoader.LoadLayout(uid);
             if (screen == null)
@@ -61,14 +66,17 @@ namespace JESUIS.Runtime.Screen.Layout
                 throw new System.Exception($"Failed to load screen with uid {uid}, check that the metadata exists and is in the save path as the target screen, and that both are in a Resources folder");
             }
 
-            rootLayout.SetLayout(screen.GetRootElement());
-            RecursivelyBuildLayout(rootLayout, screen.GetRootElement());
+            rootLayout.SetLayoutAndModel(screen.GetRootElement(), rootModel);
+            RecursivelyBuildLayout(rootLayout, screen.GetRootElement(), rootModel);
         }
 
-        void RecursivelyBuildLayout(BaseLayout baseLayout, BaseElement baseElement)
+        void RecursivelyBuildLayout(BaseLayout baseLayout, BaseElement baseElement, Model model)
         {
-            foreach (var child in baseElement.GetChildren())
+            for (int i = 0; i < baseElement.ChildCount(); i++)
             {
+                var child = baseElement.GetChild(i);
+                var childModel = model.TryGetChildOrSelf(i);
+
                 BaseLayout childLayout = null;
                 switch (child.GetType())
                 {
@@ -90,8 +98,10 @@ namespace JESUIS.Runtime.Screen.Layout
                 {
                     activeElements.Add(childLayout);
                     childLayout.transform.SetParent(baseLayout.transform);
-                    childLayout.SetLayout(child);
-                    RecursivelyBuildLayout(childLayout, child);
+                    childLayout.SetLayoutAndModel(child, childModel);
+                    RecursivelyBuildLayout(childLayout, child, childModel);
+
+                    baseLayout.AddChildLayout(childLayout);
                 }
             }
         }

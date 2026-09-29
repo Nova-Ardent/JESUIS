@@ -1,14 +1,19 @@
 using JESUIS.Runtime.Screen.Layout;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using System.Reflection;
-using System.Collections;
+using Unity.Profiling;
+using UnityEngine;
 
 namespace JESUIS.Runtime.Screen
 {
     public class ScreenStackContainer
     {
+        static readonly ProfilerMarker screen = new ProfilerMarker("Screen");
+        static readonly ProfilerMarker layout = new ProfilerMarker("Layout");
+
+
         LayoutBuilder layoutBuilder = new LayoutBuilder();
 
         GameObject screenContainer;
@@ -26,12 +31,16 @@ namespace JESUIS.Runtime.Screen
 
         public void Update()
         {
+            screen.Begin();
             if (CurrentScreen != null)
             {
                 CurrentScreen.OnUpdate();
             }
+            screen.End();
 
+            layout.Begin();
             layoutBuilder.OnUpdate();
+            layout.End();
         }
 
         public IEnumerator AsyncUpdate()
@@ -131,7 +140,7 @@ namespace JESUIS.Runtime.Screen
             screen.OnLoad();
             QueuedAsyncEvent.Enqueue(screen.OnLoadAsync());
 
-            layoutBuilder.BuildLayout(screenLayoutAttribute.Guid);
+            layoutBuilder.BuildLayout(screenLayoutAttribute.Guid, screen.RootModel);
         }
 
         void UnloadScreen(BaseScreenController screen)

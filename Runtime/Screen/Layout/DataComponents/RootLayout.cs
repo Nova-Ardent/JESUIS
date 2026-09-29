@@ -10,8 +10,6 @@ namespace JESUIS.Runtime.Screen.Layout
             TryGetComponent<RectTransform>(out Transform);
         }
 
-        public override void SetLayout(BaseElement baseElement)
-        {
-        }
+        protected override void PostModelSync() {}
     }
 }

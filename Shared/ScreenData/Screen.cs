@@ -16,6 +16,7 @@ namespace JESUIS.Shared.ScreenData
             return rootElement;
         }
 
+#if UNITY_EDITOR
         public static void UnloadScreen(Screen screen)
         {
             if (EditorUtility.IsPersistent(screen.ScreenMetaData))
@@ -29,5 +30,6 @@ namespace JESUIS.Shared.ScreenData
             else
                 UnityEngine.Object.DestroyImmediate(screen, true);
         }
+#endif
     }
 }
