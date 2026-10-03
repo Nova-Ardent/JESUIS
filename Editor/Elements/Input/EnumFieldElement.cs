@@ -48,6 +48,12 @@ namespace JESUIS.Editor.Elements.Input
             }
         }
 
+        public override void Lock(bool isLocked)
+        {
+            base.Lock(isLocked);
+            enumField.SetEnabled(!isLocked);
+        }
+
         void OnValueChanged(ChangeEvent<Enum> changeEvent)
         {
             CurrentValue = (T)changeEvent.newValue;

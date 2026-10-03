@@ -78,6 +78,12 @@ namespace JESUIS.Editor.Elements.Input
             CurrentValue = Convert(changeEvent.newValue);
             onValueChanged?.Invoke(CurrentValue);
         }
+
+        public override void Lock(bool isLocked)
+        {
+            inputField.SetEnabled(!isLocked);
+            base.Lock(isLocked);
+        }
     }
 
     public abstract class InputFieldElement<I, J> : LabelledFieldElement
@@ -153,6 +159,13 @@ namespace JESUIS.Editor.Elements.Input
             {
                 onValueChanged += onChange;
             }
+        }
+
+        public override void Lock(bool isLocked)
+        {
+            input1.Lock(isLocked);
+            input2.Lock(isLocked);
+            base.Lock(isLocked);
         }
     }
 }

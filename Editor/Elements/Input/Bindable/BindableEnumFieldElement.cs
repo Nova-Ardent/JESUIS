@@ -76,6 +76,12 @@ namespace JESUIS.Editor.Elements.Input.Bindable
             }
         }
 
+        public void Lock(bool isLocked)
+        {
+            bindingElement.Lock(isLocked);
+            enumField.Lock(isLocked);
+        }
+
         void OnGeometryChanged(GeometryChangedEvent evt)
         {
             bindingContainer.style.width = 40;

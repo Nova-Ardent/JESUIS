@@ -42,11 +42,16 @@ namespace JESUIS.Editor.Settings
         public static readonly Color ALIGNMENT_SELECTOR_PIN_UNSELECTED = new Color(0.5f, 0.5f, 0.5f);
         public static readonly Color ALIGNMENT_SELECTOR_PIN_SELECTED = new Color(1f, 1f, 1f);
         public static readonly Color ALIGNMENT_SELECTOR_PIN_HOVER = new Color(.75f, .75f, .75f);
+        public static readonly Color ALIGNMENT_SELECTOR_PIN_LOCKED = new Color(0.4f, 0.4f, 0.4f);
 
+        public static readonly Color BINDING_LOCKED = new Color(0.4f, 0.4f, 0.4f);
         public static readonly Color BINDING_COLOR_UNHIGHLIGHTED = new Color(0.5f, 0.5f, 0.5f);
         public static readonly Color BINDING_COLOR_UNHIGHLIGHTED_HAS_BINDING = new Color(1.17254901960784313f, 1.36470588235294116f, 1.5294117647058824f) * BINDING_COLOR_UNHIGHLIGHTED;
 
         public static readonly Color BINDING_COLOR_HIGHLIGHTED = new Color(0.75f, 0.75f, 0.75f);
         public static readonly Color BINDING_COLOR_HIGHLIGHTED_HAS_BINDING = new Color(1.17254901960784313f, 1.36470588235294116f, 1.5294117647058824f) * BINDING_COLOR_HIGHLIGHTED;
+
+        public static readonly Color ENABLED_ELEMENT_COLOR = Color.white;
+        public static readonly Color DISABLED_ELEMENT_COLOR = Color.grey;
     }
 }

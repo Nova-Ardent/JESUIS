@@ -23,6 +23,10 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             Renderer,
         }
 
+        public EditorViews()
+        {
+        }
+
         public EditorViews(EditorState editorState)
         {
             CurrentEditorState = editorState;

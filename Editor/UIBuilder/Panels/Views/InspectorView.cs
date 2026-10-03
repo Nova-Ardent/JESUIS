@@ -7,7 +7,7 @@ using JESUIS.Editor.UIBuilder.Data.StateChanges;
 using JESUIS.Editor.UIBuilder.Data;
 using JESUIS.Shared.ScreenData.Data;
 using JESUIS.Shared.ScreenData.DataBindings;
-using static JESUIS.Shared.ScreenData.Data.TextureElement;
+using JESUIS.Shared.ScreenData.Types;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,12 +15,16 @@ using System;
 using UnityEngine.UIElements;
 using UnityEngine;
 
+using static JESUIS.Shared.ScreenData.Data.PrefabElement;
+using static JESUIS.Shared.ScreenData.Data.TextureElement;
+
 namespace JESUIS.Editor.UIBuilder.Panels.Views
 {
     public class InspectorView : EditorViews
     {
         const int ELEMENT_PADDING = 2;
 
+        Attribute[] attributes;
         Action onSelectedElementUpdated;
 
         public override Views Type => Views.Inspector;
@@ -56,6 +60,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 return;
             }
 
+            attributes = Attribute.GetCustomAttributes(baseElement.GetType());
             SetFieldsOfTarget(this, baseElement.GetType(), baseElement);
         }
 
@@ -102,6 +107,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type == typeof(Color): return ColorFieldElement(fieldInfo, target);
 
                 // Unity types
+                case var type when type == typeof(Shared.ScreenData.Screen): return ObjectFieldElement<Shared.ScreenData.Screen>(fieldInfo, target);
                 case var type when type == typeof(UnityEngine.Texture2D): return ObjectFieldElement<UnityEngine.Texture2D>(fieldInfo, target);
 
                 // Compound Types
@@ -112,7 +118,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                     }
                     else
                     {
-                        return TransformInputElement.RegisterField(fieldInfo, target, this, CurrentEditorState, ref onSelectedElementUpdated);
+                        return TransformInputElement.RegisterField(fieldInfo, target, this, CurrentEditorState, ref onSelectedElementUpdated, attributes.Where(x => x is TransformElementLock).Cast<TransformElementLock>().ToArray());
                     }
 
                 // Bindable Types
@@ -126,6 +132,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 case var type when type == typeof(Bindable<Color>): return ColorBindableFieldElement(fieldInfo, target);
 
                 // Unity Bindable Types
+                case var type when type == typeof(Bindable<Shared.ScreenData.Screen>): return ObjectBindableFieldElement<Shared.ScreenData.Screen>(fieldInfo, target);
                 case var type when type == typeof(Bindable<UnityEngine.Texture2D>): return ObjectBindableFieldElement<UnityEngine.Texture2D>(fieldInfo, target);
 
                 case var type when type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Bindable<>): 
@@ -149,6 +156,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
         {
             return type switch
             {
+                var t when t == typeof(PrefabData) => ResourceLoader.Instance.Icons.Hierarchy.Prefab.Value,
                 var t when t == typeof(ImageData) => ResourceLoader.Instance.Icons.Hierarchy.Image.Value,
                 _ => null
             };

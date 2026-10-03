@@ -52,11 +52,13 @@ namespace JESUIS.Editor.Resources
         {
             public Resource<Texture2D> Root;
             public Resource<Texture2D> Image;
+            public Resource<Texture2D> Prefab;
 
             public HierarchyResources(string path)
             {
                 Root = new Resource<Texture2D>(path, "Root.png");
                 Image = new Resource<Texture2D>(path, "Image.png");
+                Prefab = new Resource<Texture2D>(path, "Prefab.png");
             }
         }
 

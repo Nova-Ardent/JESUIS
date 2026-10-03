@@ -18,6 +18,14 @@ namespace JESUIS.Editor.UIBuilder.Data
         public void TriggerElementIsDirty(EditorViews triggeringView, ElementChanges elementChange)
         {
             elementIsDirty?.Invoke(triggeringView, elementChange);
+
+            if (elementChange is ValuesUpdated && triggeringView.Type != EditorViews.Views.None)
+            {
+                if (SelectedElement.Value.PostValueUpdated())
+                {
+                    elementIsDirty?.Invoke(new EditorViews(), new ValuesUpdated(SelectedElement));
+                }
+            }
         }
 
         public void ListenToElementIsDirty(Action<EditorViews, ElementChanges> action)

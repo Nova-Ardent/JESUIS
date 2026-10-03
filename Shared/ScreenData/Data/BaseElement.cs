@@ -25,6 +25,11 @@ namespace JESUIS.Shared.ScreenData.Data
             children.Remove(child);
         }
 
+        public virtual bool PostValueUpdated()
+        {
+            return false;
+        }
+
         public BaseElement GetParent()
         {
             return parent;

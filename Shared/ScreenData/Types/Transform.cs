@@ -1,4 +1,5 @@
 using JESUIS.Shared.ScreenData.DataBindings;
+using System;
 using UnityEngine;
 
 namespace JESUIS.Shared.ScreenData.Types
@@ -158,5 +159,30 @@ namespace JESUIS.Shared.ScreenData.Types
         {
             return unit == Unit.Pixels ? position : parent.Size.Value.y * position / 100;
         }
+    }
+
+    public enum TransformDatas
+    {
+        Size,
+        Position,
+        Scale,
+        Rotation,
+        Anchor,
+        Pivot,
+        VerticalPosition,
+        VerticalSize,
+        HorizontalPosition,
+        HorizontalSize
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class TransformElementLock : Attribute
+    {
+        public TransformElementLock(params TransformDatas[] lockedDatas)
+        {
+            LockedDatas = lockedDatas;
+        }
+
+        public TransformDatas[] LockedDatas { get; }
     }
 }

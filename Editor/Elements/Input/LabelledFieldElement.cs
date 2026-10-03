@@ -1,3 +1,4 @@
+using JESUIS.Editor.Settings;
 using JESUIS.Editor.Utilities.StyleSheets;
 using UnityEngine.UIElements;
 
@@ -27,6 +28,7 @@ namespace JESUIS.Editor.Elements.Input
 
             label = new Label(labelText);
             label.AddStyle(InputFieldsUSS.StyleSheetInstance, "labelled-field-label-common");
+            label.style.color = Colors.ENABLED_ELEMENT_COLOR;
 
             if (elementType == LabelType.Sub)
             {
@@ -60,6 +62,18 @@ namespace JESUIS.Editor.Elements.Input
         public void ChangeLabel(string newLabel)
         {
             label.text = newLabel;
+        }
+
+        public virtual void Lock(bool isLocked)
+        {
+            if (isLocked)
+            {
+                label.style.color = Colors.DISABLED_ELEMENT_COLOR;
+            }
+            else
+            {
+                label.style.color = Colors.ENABLED_ELEMENT_COLOR;
+            }
         }
     }
 }

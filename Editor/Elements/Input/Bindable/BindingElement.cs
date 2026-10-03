@@ -20,6 +20,7 @@ namespace JESUIS.Editor.Elements.Input.Bindable
     {
         Type type { get; set; }
         Action onValueChanged;
+        bool isLocked = false;
 
         public ulong UIDHigh { get; private set; }
         public ulong UIDLow { get; private set; }
@@ -53,6 +54,9 @@ namespace JESUIS.Editor.Elements.Input.Bindable
 
         public void SetBindingWithoutNotify(ulong high, ulong low)
         {
+            if (isLocked)
+                return;
+
             UIDHigh = high;
             UIDLow = low;
 
@@ -86,12 +90,33 @@ namespace JESUIS.Editor.Elements.Input.Bindable
 
         public void SetBinding(ulong high, ulong low)
         {
+            if (isLocked)
+                return;
+
             SetBindingWithoutNotify(high, low);
             onValueChanged?.Invoke();
         }
 
+        public void Lock(bool isLocked)
+        {
+            if (isLocked)
+            {
+                UIDHigh = 0;
+                UIDLow = 0;
+                this.isLocked = true;
+                ShowLocked();
+            }
+            else
+            {
+                this.isLocked = false;
+            }
+        }
+
         void OnClick(MouseUpEvent evt)
         {
+            if (isLocked)
+                return;
+
             Shared.ScreenData.DataBindings.DataBinding[] bindings = DataBindingContainer.GetDataBindingsOfType(type).ToArray();
             if (bindings.Length == 0)
             {
@@ -114,6 +139,9 @@ namespace JESUIS.Editor.Elements.Input.Bindable
 
         void OnOptionClicked(Shared.ScreenData.DataBindings.DataBinding binding)
         {
+            if (isLocked)
+                return;
+
             System.Guid uid = binding.UID;
 
             Span<byte> bytes = stackalloc byte[16];
@@ -127,6 +155,12 @@ namespace JESUIS.Editor.Elements.Input.Bindable
 
         void OnMouseEnter(MouseEnterEvent evt)
         {
+            if (isLocked)
+            {
+                ShowLocked();
+                return;
+            }
+
             Color color = (UIDHigh != 0 && UIDLow != 0) ? Colors.BINDING_COLOR_HIGHLIGHTED_HAS_BINDING : Colors.BINDING_COLOR_HIGHLIGHTED;
 
             style.unityBackgroundImageTintColor = color;
@@ -138,6 +172,12 @@ namespace JESUIS.Editor.Elements.Input.Bindable
 
         void OnMouseLeave(MouseLeaveEvent evt)
         {
+            if (isLocked)
+            {
+                ShowLocked();
+                return;
+            }
+
             Color color = (UIDHigh != 0 && UIDLow != 0) ? Colors.BINDING_COLOR_UNHIGHLIGHTED_HAS_BINDING : Colors.BINDING_COLOR_UNHIGHLIGHTED;
 
             style.unityBackgroundImageTintColor = color;
@@ -145,6 +185,17 @@ namespace JESUIS.Editor.Elements.Input.Bindable
             style.borderTopColor = color;
             style.borderRightColor = color;
             style.borderBottomColor = color;
-        }   
+        }
+
+        void ShowLocked()
+        {
+            Color color = Colors.BINDING_LOCKED;
+
+            style.unityBackgroundImageTintColor = color;
+            style.borderLeftColor = color;
+            style.borderTopColor = color;
+            style.borderRightColor = color;
+            style.borderBottomColor = color;
+        }
     }
 }

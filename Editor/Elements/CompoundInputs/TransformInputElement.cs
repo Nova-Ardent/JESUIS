@@ -11,6 +11,7 @@ using System.Reflection;
 using System;
 using UnityEngine.UIElements;
 using UnityEngine;
+using System.Linq;
 
 namespace JESUIS.Editor.Elements.CompoundInputs
 {
@@ -38,7 +39,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
 
         Shared.ScreenData.Types.Transform targetTransform;
 
-        public TransformInputElement(string name, Shared.ScreenData.Types.Transform target) : base("Transform", name, ResourceLoader.Instance.Icons.Inspector.Transform.Value)
+        public TransformInputElement(string name, Shared.ScreenData.Types.Transform target, TransformDatas[] transformDataLocks) : base("Transform", name, ResourceLoader.Instance.Icons.Inspector.Transform.Value)
         {
             targetTransform = target;
 
@@ -52,6 +53,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.Size = newValue;
                 onChange?.Invoke();
             });
+            sizeField.Lock(transformDataLocks.Contains(TransformDatas.Size));
             Add(sizeField);
 
             positionField = new BindableVector2fFieldElement("Position");
@@ -62,6 +64,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.Position = newValue;
                 onChange?.Invoke();
             });
+            positionField.Lock(transformDataLocks.Contains(TransformDatas.Position));
             Add(positionField);
 
             scaleField = new BindableVector2fFieldElement("Scale");
@@ -72,6 +75,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.Scale = newValue;
                 onChange?.Invoke();
             });
+            scaleField.Lock(transformDataLocks.Contains(TransformDatas.Scale));
             Add(scaleField);
 
             rotationField = new BindableFloatInputFieldElement("Rotation", 0);
@@ -82,6 +86,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.Rotation = newValue;
                 onChange?.Invoke();
             });
+            rotationField.Lock(transformDataLocks.Contains(TransformDatas.Rotation));
             Add(rotationField);
 
             anchorField = new BindableAlignmentSelector("Anchor");
@@ -92,6 +97,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.Anchor = newValue;
                 onChange?.Invoke();
             });
+            anchorField.Lock(transformDataLocks.Contains(TransformDatas.Anchor));
             Add(anchorField);
 
             pivotField = new BindableAlignmentSelector("Pivot");
@@ -102,6 +108,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.Pivot = newValue;
                 onChange?.Invoke();
             });
+            pivotField.Lock(transformDataLocks.Contains(TransformDatas.Pivot));
             Add(pivotField);
 
             verticalPositionField = new BindableEnumFieldElement<Unit>("Vert Pos", Unit.Pixels);
@@ -112,6 +119,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.VerticalPosition = newValue;
                 onChange?.Invoke();
             });
+            verticalPositionField.Lock(transformDataLocks.Contains(TransformDatas.VerticalPosition));
             Add(verticalPositionField);
 
             verticalSizeField = new BindableEnumFieldElement<Unit>("Vert Size", Unit.Pixels);
@@ -122,6 +130,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.VerticalSize = newValue;
                 onChange?.Invoke();
             });
+            verticalSizeField.Lock(transformDataLocks.Contains(TransformDatas.VerticalSize));
             Add(verticalSizeField);
 
             horizontalPositionField = new BindableEnumFieldElement<Unit>("Horz Pos", Unit.Pixels);
@@ -132,6 +141,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.HorizontalPosition = newValue;
                 onChange?.Invoke();
             });
+            horizontalPositionField.Lock(transformDataLocks.Contains(TransformDatas.HorizontalPosition));
             Add(horizontalPositionField);
 
             horizontalSizeField = new BindableEnumFieldElement<Unit>("Horz Size", Unit.Pixels);
@@ -142,6 +152,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 target.HorizontalSize = newValue;
                 onChange?.Invoke();
             });
+            horizontalSizeField.Lock(transformDataLocks.Contains(TransformDatas.HorizontalSize));
             Add(horizontalSizeField);
 
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -183,7 +194,7 @@ namespace JESUIS.Editor.Elements.CompoundInputs
             horizontalSizeField.style.width = contentRect.width - horizontalSizeField.resolvedStyle.left + 10;
         }
 
-        public static TransformInputElement RegisterField(FieldInfo info, object target, EditorViews triggeringView, EditorState editorState, ref Action onSelectedElementUpdated)
+        public static TransformInputElement RegisterField(FieldInfo info, object target, EditorViews triggeringView, EditorState editorState, ref Action onSelectedElementUpdated, TransformElementLock[] transformLocks)
         {
             Shared.ScreenData.Types.Transform transform = (Shared.ScreenData.Types.Transform)info.GetValue(target);
             if (transform == null)
@@ -192,7 +203,10 @@ namespace JESUIS.Editor.Elements.CompoundInputs
                 return null;
             }
 
-            TransformInputElement inputElement = new TransformInputElement(info.Name, transform);
+            TransformInputElement inputElement = new TransformInputElement(info.Name, transform, transformLocks
+                .SelectMany(x => x.LockedDatas)
+                .Distinct()
+                .ToArray());
             inputElement.RegisterOnValueChanged(() =>
             {
                 editorState.TriggerElementIsDirty(triggeringView, new ValuesUpdated(editorState.SelectedElement));

@@ -76,6 +76,7 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
             {
                 yield return new NamedAction("Add Empty", () => AddEmpty(item), true);
                 yield return new NamedAction("Add Texture", () => AddTexture(item), true);
+                yield return new NamedAction("Add Prefab", () => AddPrefab(item), true);
             }
 
             if (item.TargetObject is BaseElement && item.TargetObject is not RootElement)
@@ -113,6 +114,24 @@ namespace JESUIS.Editor.UIBuilder.Panels.Views
                 item.AddChild(new HierarchyItem(newTexture, GetActions, OnElementClicked));
                 editorHierarchy.RebuildListVisuals();
                 CurrentEditorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newTexture));
+            }
+            else
+            {
+                Debug.LogError("Target object is not a BaseElement.");
+            }
+        }
+
+        void AddPrefab(HierarchyItem item)
+        {
+            PrefabElement newPrefab = new PrefabElement();
+            newPrefab.SetName("New Prefab");
+
+            if (item.TargetObject is BaseElement baseElement)
+            {
+                baseElement.AddChild(newPrefab);
+                item.AddChild(new HierarchyItem(newPrefab, GetActions, OnElementClicked));
+                editorHierarchy.RebuildListVisuals();
+                CurrentEditorState.TriggerElementIsDirty(this, new ChildAdded(baseElement, newPrefab));
             }
             else
             {

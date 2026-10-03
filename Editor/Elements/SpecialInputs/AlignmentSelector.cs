@@ -82,6 +82,7 @@ namespace JESUIS.Editor.Elements.SpecialInputs
             label.style.left = 9;
             label.style.height = LABEL_HEIGHT;
             label.style.width = AlignmentTool.SIZE - 18;
+            label.style.color = Colors.ENABLED_ELEMENT_COLOR;
             Add(label);
         }
 
@@ -142,6 +143,21 @@ namespace JESUIS.Editor.Elements.SpecialInputs
                 onValueChanged += onChange;
             }
         }
+
+        public void Lock(bool isLocked)
+        {
+            if (isLocked)
+            {
+                label.style.color = Colors.DISABLED_ELEMENT_COLOR;
+            }
+            else
+            {
+                label.style.color = Colors.ENABLED_ELEMENT_COLOR;
+            }
+
+            bindingElement.Lock(isLocked);
+            alignmentTool.Lock(isLocked);
+        }
     }
 
     public class AlignmentTool : VisualElement
@@ -154,6 +170,7 @@ namespace JESUIS.Editor.Elements.SpecialInputs
 
             Alignment alignment;
             bool isSelected = false;
+            bool isLocked = false;
 
             public AlignmentPin(Alignment alignment)
             {
@@ -183,6 +200,13 @@ namespace JESUIS.Editor.Elements.SpecialInputs
             public void SetSelected(bool selected)
             {
                 isSelected = selected;
+
+                if (isLocked)
+                {
+                    style.backgroundColor = Colors.ALIGNMENT_SELECTOR_PIN_LOCKED;
+                    return;
+                }
+
                 if (isSelected)
                 {
                     style.backgroundColor = Colors.ALIGNMENT_SELECTOR_PIN_SELECTED;
@@ -193,8 +217,20 @@ namespace JESUIS.Editor.Elements.SpecialInputs
                 }
             }
 
+            public void Lock(bool isLocked)
+            {
+                this.isLocked = isLocked;
+                SetLockedTexture();
+            }
+
             void OnEnter(MouseEnterEvent evt)
             {
+                if (isLocked)
+                {
+                    style.backgroundColor = Colors.ALIGNMENT_SELECTOR_PIN_LOCKED;
+                    return;
+                }
+
                 if (isSelected)
                     return;
 
@@ -203,10 +239,28 @@ namespace JESUIS.Editor.Elements.SpecialInputs
 
             void OnExit(MouseLeaveEvent evt)
             {
+                if (isLocked)
+                {
+                    style.backgroundColor = Colors.ALIGNMENT_SELECTOR_PIN_LOCKED;
+                    return;
+                }
+
                 if (isSelected)
                     return;
 
                 style.backgroundColor = Colors.ALIGNMENT_SELECTOR_PIN_UNSELECTED;
+            }
+
+            void SetLockedTexture()
+            {
+                if (isLocked)
+                {
+                    style.backgroundColor = Colors.ALIGNMENT_SELECTOR_PIN_LOCKED;
+                }
+                else
+                {
+                    style.backgroundColor = Colors.ALIGNMENT_SELECTOR_PIN_UNSELECTED;
+                }
             }
         }
 
@@ -247,6 +301,14 @@ namespace JESUIS.Editor.Elements.SpecialInputs
             else
             {
                 this.onChange += onChange;
+            }
+        }
+
+        public void Lock(bool isLocked)
+        {
+            foreach (var pin in alignmentPins)
+            {
+                pin.Lock(isLocked);
             }
         }
 
