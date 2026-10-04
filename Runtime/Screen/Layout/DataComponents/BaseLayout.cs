@@ -179,7 +179,7 @@ namespace JESUIS.Runtime.Screen.Layout
             Transform.anchoredPosition = localPosition;
 
             Transform.localScale = modelTransform.Scale.Value;
-            Transform.localRotation = Quaternion.Euler(0, 0, modelTransform.Rotation.Value);
+            Transform.localRotation = Quaternion.Euler(0, 0, -modelTransform.Rotation.Value);
         }
 
         public void RecursivelySyncModels()
