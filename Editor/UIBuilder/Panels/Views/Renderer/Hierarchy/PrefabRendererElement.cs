@@ -9,6 +9,8 @@ namespace Assets.JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
     [RendererElement(typeof(PrefabElement))]
     public class PrefabRendererElement : EmptyRendererElement, IRendererElement<PrefabElement>
     {
+        VisualElement prefabContainer = new VisualElement();
+
         Screen lastPrefab;
         RendererElementLoader elementLoader = RendererElementLoader.Instance;
 
@@ -24,6 +26,14 @@ namespace Assets.JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             }
         }
 
+        public PrefabRendererElement() : base()
+        {
+            prefabContainer.style.left = 0;
+            prefabContainer.style.top = 0;
+            prefabContainer.style.position = Position.Absolute;
+            Add(prefabContainer);
+        }
+
         public override void OnValuesChanged()
         {
             PrefabElement prefabElement = (PrefabElement)base.Data;
@@ -32,13 +42,15 @@ namespace Assets.JESUIS.Editor.UIBuilder.Panels.Views.Renderer.Hierarchy
             {
                 lastPrefab = prefabElement.Prefab.Prefab;
 
-                Clear();
+                prefabContainer.Clear();
 
                 if (prefabElement.Prefab.Prefab != null)
-                    BuildHierarchy(prefabElement.Prefab.Prefab.GetRootElement(), this);
+                    BuildHierarchy(prefabElement.Prefab.Prefab.GetRootElement(), prefabContainer);
             }
 
             base.OnValuesChanged();
+            prefabContainer.style.width = this.style.width;
+            prefabContainer.style.height = this.style.height;
             UpdateChildValues(this);
         }
 

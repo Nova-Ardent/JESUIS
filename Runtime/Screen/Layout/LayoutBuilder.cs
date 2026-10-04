@@ -92,7 +92,13 @@ namespace JESUIS.Runtime.Screen.Layout
                     case var type when type == typeof(TextureElement):
                         childLayout = textureLayout.Instantiate();
                         break;
+                    case var type when type == typeof(PrefabElement):
+                        childLayout = DeconstructPrefab(baseLayout, child as PrefabElement, childModel);
+                        break;
                 }
+
+                if (child.GetType() == typeof(PrefabElement))
+                    continue;
 
                 if (childLayout != null)
                 {
@@ -104,6 +110,33 @@ namespace JESUIS.Runtime.Screen.Layout
                     baseLayout.AddChildLayout(childLayout);
                 }
             }
+        }
+
+        BaseLayout DeconstructPrefab(BaseLayout parent, PrefabElement prefabElement, Model model)
+        {
+            EmptyElement emptyElement = new EmptyElement();
+            emptyElement.Transform = prefabElement.Transform;
+            emptyElement.Name = prefabElement.Name;
+            
+            foreach (var element in prefabElement.Prefab.Prefab.GetRootElement().GetChildren())
+            {
+                emptyElement.AddChild(element);
+            }
+
+            foreach (var element in prefabElement.GetChildren())
+            {
+                emptyElement.AddChild(element);
+            }
+
+            BaseLayout childLayout = emptyLayouts.Instantiate();
+
+            activeElements.Add(childLayout);
+            childLayout.transform.SetParent(parent.transform);
+            childLayout.SetLayoutAndModel(emptyElement, model);
+            RecursivelyBuildLayout(childLayout, emptyElement, model);
+
+            parent.AddChildLayout(childLayout);
+            return childLayout;
         }
     }
 }
